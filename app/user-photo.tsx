@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Platform } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, Platform, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Camera, Upload } from "lucide-react-native";
@@ -86,7 +86,7 @@ export default function UserPhotoScreen() {
   
   return (
     <SafeAreaView style={styles.container} edges={["bottom"]}>
-      <View style={styles.content}>
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <Text style={styles.title}>Take Your Selfie</Text>
           <Text style={styles.subtitle}>
@@ -134,7 +134,7 @@ export default function UserPhotoScreen() {
           <Text style={styles.tipText}>• Remove glasses and hats</Text>
           <Text style={styles.tipText}>• Ensure your full face is visible</Text>
         </View>
-      </View>
+      </ScrollView>
       
       <View style={styles.footer}>
         <Animated.View style={animatedButtonStyle}>
@@ -166,8 +166,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  content: {
+  scrollView: {
     flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 20,
   },
   header: {
     padding: 16,

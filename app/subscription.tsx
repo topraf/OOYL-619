@@ -62,7 +62,7 @@ export default function SubscriptionScreen() {
                   <Text style={styles.planName}>{plan.name}</Text>
                   <Text style={styles.planPrice}>{plan.price}</Text>
                   <Text style={styles.planInterval}>
-                    {plan.interval === "one-time" ? "One-time" : `per ${plan.interval}`}
+                    {plan.interval === "one-time" ? "" : `per ${plan.interval}`}
                   </Text>
                 </View>
                 
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     width: (width - 64) / 3.2,
     backgroundColor: colors.card,
     borderRadius: 16,
-    padding: 12,
+    padding: 8,
     borderWidth: 2,
     borderColor: "transparent",
     shadowColor: colors.shadow,
@@ -199,42 +199,42 @@ const styles = StyleSheet.create({
   },
   planHeader: {
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: 8,
   },
   planName: {
     fontSize: 14,
     fontWeight: "600",
     color: colors.text,
-    marginBottom: 4,
+    marginBottom: 2,
   },
   planPrice: {
     fontSize: 18,
     fontWeight: "700",
     color: colors.primary,
-    marginBottom: 2,
+    marginBottom: 0,
   },
   planInterval: {
-    fontSize: 12,
+    fontSize: 10,
     color: colors.textLight,
   },
   radioButton: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
     borderWidth: 2,
     borderColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "center",
-    marginTop: 8,
+    marginTop: 4,
   },
   radioButtonSelected: {
     borderColor: colors.primary,
   },
   radioButtonInner: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
     backgroundColor: colors.primary,
   },
   popularBadge: {

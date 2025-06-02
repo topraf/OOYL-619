@@ -6,11 +6,11 @@ import { colors } from "@/constants/colors";
 interface FeatureScoreCardProps {
   name: string;
   score: number;
-  status: "Low" | "Mid" | "High";
+  status: "High" | "Mid" | "Low";
 }
 
 const { width } = Dimensions.get("window");
-const cardWidth = (width - 48) / 2;
+const cardWidth = width * 0.6;
 
 export default function FeatureScoreCard({ name, score, status }: FeatureScoreCardProps) {
   const getStatusColor = () => {
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderRadius: 12,
     padding: 16,
-    marginBottom: 16,
+    marginRight: 12,
     shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

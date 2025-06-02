@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Platform, Dimensions, Share, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { Share2, Camera, MessageCircle, Sparkles, ArrowLeft, Trash2, Star } from "lucide-react-native";
+import { Share2, Camera, MessageCircle, ArrowLeft, Trash2, Star } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors } from "@/constants/colors";
@@ -119,10 +119,10 @@ export default function ResultsScreen() {
   // Mock feature scores for demonstration
   const getFeatureScores = () => {
     return [
-      { name: "Facial Symmetry", score: Math.round(Math.random() * 40 + 60), status: "High" },
-      { name: "Jawline", score: Math.round(Math.random() * 40 + 40), status: "Mid" },
-      { name: "Eyes", score: Math.round(Math.random() * 40 + 50), status: "Mid" },
-      { name: "Skin", score: Math.round(Math.random() * 40 + 60), status: "High" },
+      { name: "Facial Symmetry", score: Math.round(Math.random() * 40 + 60), status: "High" as const },
+      { name: "Jawline", score: Math.round(Math.random() * 40 + 40), status: "Mid" as const },
+      { name: "Eyes", score: Math.round(Math.random() * 40 + 50), status: "Mid" as const },
+      { name: "Skin", score: Math.round(Math.random() * 40 + 60), status: "High" as const },
     ];
   };
 
@@ -281,7 +281,11 @@ export default function ResultsScreen() {
             {isPremium && (
               <View style={styles.featureScoresContainer}>
                 <Text style={styles.sectionTitle}>Your Beauty Analysis</Text>
-                <View style={styles.featureScoresGrid}>
+                <ScrollView 
+                  horizontal 
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.featureScoresRow}
+                >
                   {getFeatureScores().map((feature, index) => (
                     <FeatureScoreCard 
                       key={index}
@@ -290,7 +294,7 @@ export default function ResultsScreen() {
                       status={feature.status}
                     />
                   ))}
-                </View>
+                </ScrollView>
               </View>
             )}
             
@@ -511,10 +515,9 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: 16,
   },
-  featureScoresGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
+  featureScoresRow: {
+    paddingRight: 16,
+    paddingBottom: 8,
   },
   actionsContainer: {
     backgroundColor: colors.card,
