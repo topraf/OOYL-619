@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { Settings, History, Camera, Image as ImageIcon } from "lucide-react-native";
+import { Settings, Camera, Image as ImageIcon } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
 import { colors } from "@/constants/colors";
@@ -25,14 +25,14 @@ export default function HomeScreen() {
     };
   });
   
-  // Check if onboarding is completed
+  // Check if onboarding is completed - using a safer approach
   useEffect(() => {
     // Use a timeout to ensure the Root Layout is mounted first
     const timer = setTimeout(() => {
       if (!hasCompletedOnboarding) {
         router.push("/onboarding/index");
       }
-    }, 0);
+    }, 100);
     
     return () => clearTimeout(timer);
   }, [hasCompletedOnboarding, router]);
@@ -50,25 +50,10 @@ export default function HomeScreen() {
     buttonScale.value = withSpring(1);
   };
   
-  // For demo purposes, uncomment this to skip onboarding
-  // useEffect(() => {
-  //   completeOnboarding();
-  // }, []);
-  
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.iconButton}
-          onPress={() => router.push("/history")}
-        >
-          <History size={24} color={colors.text} />
-        </TouchableOpacity>
-        
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>League Checker</Text>
-          <Text style={styles.subtitle}>Are they in your league?</Text>
-        </View>
+        <View style={styles.spacer} />
         
         <TouchableOpacity
           style={styles.iconButton}
@@ -212,6 +197,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
+  spacer: {
+    width: 40,
+  },
   iconButton: {
     width: 40,
     height: 40,
@@ -220,24 +208,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  titleContainer: {
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: colors.text,
-  },
-  subtitle: {
-    fontSize: 12,
-    color: colors.textLight,
-    marginTop: 2,
-  },
   content: {
     flex: 1,
   },
   contentContainer: {
-    paddingBottom: 80, // Space for bottom navigation
+    paddingBottom: 100, // Increased bottom padding to prevent menu overlap
   },
   heroContainer: {
     height: 240,

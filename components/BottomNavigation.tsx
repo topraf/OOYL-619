@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 70,
+    height: 80, // Increased height for better touch targets
     backgroundColor: colors.background,
     flexDirection: "row",
     borderTopWidth: 1,
@@ -77,6 +77,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 10,
+    paddingBottom: 10, // Add padding at the bottom for better spacing
   },
   tab: {
     flex: 1,

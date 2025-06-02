@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Platform, Dimensions, Share } from "react-native";
+import React, { useState, useEffect } from "react";
+import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Platform, Dimensions, Share, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { Share2, Camera, MessageCircle, Sparkles, Home, ArrowLeft } from "lucide-react-native";
+import { Share2, Camera, MessageCircle, Sparkles, ArrowLeft, Trash2 } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors } from "@/constants/colors";
@@ -12,15 +12,18 @@ import ImagePreview from "@/components/ImagePreview";
 import PaywallModal from "@/components/PaywallModal";
 import FeatureScoreCard from "@/components/FeatureScoreCard";
 import BottomNavigation from "@/components/BottomNavigation";
+import ComparisonCard from "@/components/ComparisonCard";
+import EmptyState from "@/components/EmptyState";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 
 const { width } = Dimensions.get("window");
 
 export default function ResultsScreen() {
   const router = useRouter();
-  const { comparisons, isLoading, isPremium } = useUserStore();
+  const { comparisons, isLoading, isPremium, clearHistory } = useUserStore();
   const [showResult, setShowResult] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   
   const buttonScale = useSharedValue(1);
   const animatedButtonStyle = useAnimatedStyle(() => {
@@ -80,6 +83,13 @@ export default function ResultsScreen() {
     }
   };
 
+  const handleClearHistory = () => {
+    // Simple confirmation
+    if (comparisons.length > 0) {
+      clearHistory();
+    }
+  };
+
   const getLeagueText = () => {
     if (!latestResult) return "";
     
@@ -124,12 +134,56 @@ export default function ResultsScreen() {
     buttonScale.value = withSpring(1);
   };
 
+  const toggleHistoryView = () => {
+    setShowHistory(!showHistory);
+  };
+
   if (isLoading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
         <Text style={styles.loadingText}>Analyzing your photos...</Text>
         <ActivityIndicator size="large" color={colors.primary} style={styles.loader} />
         <Text style={styles.loadingSubtext}>Calculating league status</Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (showHistory) {
+    return (
+      <SafeAreaView style={styles.container} edges={["top"]}>
+        <View style={styles.header}>
+          <TouchableOpacity 
+            style={styles.backButton} 
+            onPress={toggleHistoryView}
+          >
+            <ArrowLeft size={20} color={colors.text} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Your History</Text>
+          <TouchableOpacity style={styles.clearButton} onPress={handleClearHistory}>
+            <Trash2 size={16} color={colors.error} />
+          </TouchableOpacity>
+        </View>
+        
+        {comparisons.length === 0 ? (
+          <EmptyState
+            title="No History Yet"
+            message="Your comparisons will appear here after you complete them."
+          />
+        ) : (
+          <FlatList
+            data={comparisons}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <View style={styles.cardContainer}>
+                <ComparisonCard result={item} compact={true} />
+              </View>
+            )}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
+        
+        <BottomNavigation currentRoute="results" />
       </SafeAreaView>
     );
   }
@@ -171,9 +225,14 @@ export default function ResultsScreen() {
                 <ArrowLeft size={20} color={colors.text} />
               </TouchableOpacity>
               <Text style={styles.headerTitle}>Your Results</Text>
-              <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
-                <Share2 size={20} color={colors.text} />
-              </TouchableOpacity>
+              <View style={styles.headerActions}>
+                <TouchableOpacity style={styles.historyButton} onPress={toggleHistoryView}>
+                  <Text style={styles.historyButtonText}>History</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
+                  <Share2 size={20} color={colors.text} />
+                </TouchableOpacity>
+              </View>
             </View>
             
             <LinearGradient
@@ -317,7 +376,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     padding: 16,
-    paddingBottom: 80, // Space for bottom navigation
+    paddingBottom: 100, // Increased space for bottom navigation
   },
   header: {
     flexDirection: "row",
@@ -338,7 +397,31 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: colors.text,
   },
+  headerActions: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  historyButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: colors.card,
+    marginRight: 8,
+  },
+  historyButtonText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: colors.text,
+  },
   shareButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.card,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  clearButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -499,5 +582,13 @@ const styles = StyleSheet.create({
     color: colors.background,
     fontSize: 16,
     fontWeight: "600",
+  },
+  cardContainer: {
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  listContent: {
+    padding: 16,
+    paddingBottom: 100, // Space for bottom navigation
   },
 });

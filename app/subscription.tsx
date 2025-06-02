@@ -39,7 +39,7 @@ export default function SubscriptionScreen() {
   
   return (
     <SafeAreaView style={styles.container} edges={["bottom"]}>
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
         <View style={styles.header}>
           <Text style={styles.title}>Upgrade to Premium</Text>
           <Text style={styles.subtitle}>
@@ -182,6 +182,9 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+  contentContainer: {
+    paddingBottom: 20,
   },
   header: {
     padding: 16,
