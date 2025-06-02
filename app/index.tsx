@@ -16,7 +16,7 @@ const { width } = Dimensions.get("window");
 export default function HomeScreen() {
   const router = useRouter();
   const { resetUserImages, freeComparisonUsed, isPremium } = useUserStore();
-  const { hasCompletedOnboarding, completeOnboarding } = useOnboardingStore();
+  const { hasCompletedOnboarding } = useOnboardingStore();
   
   const buttonScale = useSharedValue(1);
   const animatedButtonStyle = useAnimatedStyle(() => {
@@ -27,10 +27,15 @@ export default function HomeScreen() {
   
   // Check if onboarding is completed
   useEffect(() => {
-    if (!hasCompletedOnboarding) {
-      router.replace("/onboarding");
-    }
-  }, [hasCompletedOnboarding]);
+    // Use a timeout to ensure the Root Layout is mounted first
+    const timer = setTimeout(() => {
+      if (!hasCompletedOnboarding) {
+        router.push("/onboarding/index");
+      }
+    }, 0);
+    
+    return () => clearTimeout(timer);
+  }, [hasCompletedOnboarding, router]);
   
   const handleStartComparison = () => {
     resetUserImages();
