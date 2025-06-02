@@ -13,7 +13,7 @@ const { width } = Dimensions.get("window");
 
 export default function OnboardingNotificationsScreen() {
   const router = useRouter();
-  const { setCurrentStep } = useOnboardingStore();
+  const { setCurrentStep, skipNotifications } = useOnboardingStore();
   
   const enableButtonScale = useSharedValue(1);
   const skipButtonScale = useSharedValue(1);
@@ -43,6 +43,7 @@ export default function OnboardingNotificationsScreen() {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
+    skipNotifications();
     setCurrentStep(4);
     router.push("/onboarding/subscription");
   };

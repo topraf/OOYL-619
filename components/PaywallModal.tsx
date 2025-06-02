@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Modal } from "react-native";
-import { X } from "lucide-react-native";
+import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Modal, Dimensions } from "react-native";
+import { X, Star } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors } from "@/constants/colors";
 import { subscriptionPlans } from "@/mocks/subscriptions";
-import SubscriptionCard from "./SubscriptionCard";
 import { useUserStore } from "@/store/user-store";
+
+const { width } = Dimensions.get("window");
 
 interface PaywallModalProps {
   visible: boolean;
@@ -14,7 +15,7 @@ interface PaywallModalProps {
 }
 
 export default function PaywallModal({ visible, onClose, onSuccess }: PaywallModalProps) {
-  const [selectedPlanId, setSelectedPlanId] = useState("weekly");
+  const [selectedPlanId, setSelectedPlanId] = useState("monthly");
   const setPremiumStatus = useUserStore(state => state.setPremiumStatus);
   
   const handleSubscribe = () => {
@@ -42,7 +43,7 @@ export default function PaywallModal({ visible, onClose, onSuccess }: PaywallMod
           </View>
           
           <LinearGradient
-            colors={[colors.primary, colors.accent]}
+            colors={[colors.primary, colors.secondary]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.banner}
@@ -52,20 +53,48 @@ export default function PaywallModal({ visible, onClose, onSuccess }: PaywallMod
             </Text>
           </LinearGradient>
           
-          <ScrollView style={styles.plansContainer}>
-            {subscriptionPlans.map(plan => (
-              <SubscriptionCard
-                key={plan.id}
-                plan={plan}
-                isSelected={selectedPlanId === plan.id}
-                onSelect={() => setSelectedPlanId(plan.id)}
-              />
-            ))}
-          </ScrollView>
+          <View style={styles.plansContainer}>
+            <View style={styles.plansRow}>
+              {subscriptionPlans.map(plan => (
+                <TouchableOpacity
+                  key={plan.id}
+                  style={[
+                    styles.planCard,
+                    selectedPlanId === plan.id && styles.selectedPlanCard
+                  ]}
+                  onPress={() => setSelectedPlanId(plan.id)}
+                >
+                  <View style={styles.planHeader}>
+                    <Text style={styles.planName}>{plan.name}</Text>
+                    <Text style={styles.planPrice}>{plan.price}</Text>
+                    <Text style={styles.planInterval}>
+                      {plan.interval === "one-time" ? "One-time" : `per ${plan.interval}`}
+                    </Text>
+                  </View>
+                  
+                  {plan.popular && (
+                    <View style={styles.popularBadge}>
+                      <Star size={12} color={colors.background} />
+                      <Text style={styles.popularText}>POPULAR</Text>
+                    </View>
+                  )}
+                  
+                  <View style={[
+                    styles.radioButton,
+                    selectedPlanId === plan.id && styles.radioButtonSelected
+                  ]}>
+                    {selectedPlanId === plan.id && (
+                      <View style={styles.radioButtonInner} />
+                    )}
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
           
           <View style={styles.footer}>
             <TouchableOpacity style={styles.subscribeButton} onPress={handleSubscribe}>
-              <Text style={styles.subscribeText}>Subscribe Now</Text>
+              <Text style={styles.subscribeText}>Start 3-Day Free Trial</Text>
             </TouchableOpacity>
             
             <Text style={styles.disclaimer}>
@@ -125,11 +154,88 @@ const styles = StyleSheet.create({
   },
   plansContainer: {
     paddingHorizontal: 16,
-    maxHeight: 400,
+    marginBottom: 24,
+  },
+  plansRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  planCard: {
+    width: (width - 64) / 3.2,
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    padding: 12,
+    borderWidth: 2,
+    borderColor: "transparent",
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+    position: "relative",
+  },
+  selectedPlanCard: {
+    borderColor: colors.primary,
+  },
+  planHeader: {
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  planName: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: colors.text,
+    marginBottom: 4,
+  },
+  planPrice: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: colors.primary,
+    marginBottom: 2,
+  },
+  planInterval: {
+    fontSize: 12,
+    color: colors.textLight,
+  },
+  radioButton: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: colors.border,
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
+    marginTop: 8,
+  },
+  radioButtonSelected: {
+    borderColor: colors.primary,
+  },
+  radioButtonInner: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: colors.primary,
+  },
+  popularBadge: {
+    position: "absolute",
+    top: -8,
+    right: -8,
+    backgroundColor: colors.primary,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 10,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  popularText: {
+    color: colors.background,
+    fontSize: 8,
+    fontWeight: "700",
+    marginLeft: 2,
   },
   footer: {
     paddingHorizontal: 16,
-    marginTop: 16,
   },
   subscribeButton: {
     backgroundColor: colors.primary,

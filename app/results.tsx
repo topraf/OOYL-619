@@ -119,10 +119,10 @@ export default function ResultsScreen() {
   // Mock feature scores for demonstration
   const getFeatureScores = () => {
     return [
-      { name: "Facial Symmetry", score: Math.round(Math.random() * 40 + 60), status: "High" as const },
-      { name: "Jawline", score: Math.round(Math.random() * 40 + 40), status: "Mid" as const },
-      { name: "Eyes", score: Math.round(Math.random() * 40 + 50), status: "Mid" as const },
-      { name: "Skin", score: Math.round(Math.random() * 40 + 60), status: "High" as const },
+      { name: "Facial Symmetry", score: Math.round(Math.random() * 40 + 60), status: "High" },
+      { name: "Jawline", score: Math.round(Math.random() * 40 + 40), status: "Mid" },
+      { name: "Eyes", score: Math.round(Math.random() * 40 + 50), status: "Mid" },
+      { name: "Skin", score: Math.round(Math.random() * 40 + 60), status: "High" },
     ];
   };
 
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     padding: 16,
-    paddingBottom: 100, // Increased space for bottom navigation
+    paddingBottom: 120, // Increased space for bottom navigation
   },
   header: {
     flexDirection: "row",
@@ -589,6 +589,6 @@ const styles = StyleSheet.create({
   },
   listContent: {
     padding: 16,
-    paddingBottom: 100, // Space for bottom navigation
+    paddingBottom: 120, // Space for bottom navigation
   },
 });

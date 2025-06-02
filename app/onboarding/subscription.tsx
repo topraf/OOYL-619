@@ -16,9 +16,9 @@ const { width } = Dimensions.get("window");
 
 export default function OnboardingSubscriptionScreen() {
   const router = useRouter();
-  const { completeOnboarding } = useOnboardingStore();
+  const { completeOnboarding, skipPremium } = useOnboardingStore();
   const { setPremiumStatus } = useUserStore();
-  const [selectedPlan, setSelectedPlan] = useState(subscriptionPlans.find(p => p.id === "yearly"));
+  const [selectedPlan, setSelectedPlan] = useState(subscriptionPlans.find(p => p.id === "monthly"));
   
   const subscribeButtonScale = useSharedValue(1);
   const skipButtonScale = useSharedValue(1);
@@ -49,6 +49,7 @@ export default function OnboardingSubscriptionScreen() {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
+    skipPremium();
     completeOnboarding();
     router.push("/");
   };
@@ -96,23 +97,30 @@ export default function OnboardingSubscriptionScreen() {
         </View>
         
         <View style={styles.plansContainer}>
-          {subscriptionPlans.map(plan => (
-            <TouchableOpacity
-              key={plan.id}
-              style={[
-                styles.planCard,
-                selectedPlan?.id === plan.id && styles.selectedPlanCard
-              ]}
-              onPress={() => setSelectedPlan(plan)}
-            >
-              <View style={styles.planHeader}>
-                <View>
+          <View style={styles.plansRow}>
+            {subscriptionPlans.map(plan => (
+              <TouchableOpacity
+                key={plan.id}
+                style={[
+                  styles.planCard,
+                  selectedPlan?.id === plan.id && styles.selectedPlanCard
+                ]}
+                onPress={() => setSelectedPlan(plan)}
+              >
+                <View style={styles.planHeader}>
                   <Text style={styles.planName}>{plan.name}</Text>
                   <Text style={styles.planPrice}>{plan.price}</Text>
                   <Text style={styles.planInterval}>
-                    {plan.interval === "one-time" ? "One-time payment" : `per ${plan.interval}`}
+                    {plan.interval === "one-time" ? "One-time" : `per ${plan.interval}`}
                   </Text>
                 </View>
+                
+                {plan.popular && (
+                  <View style={styles.popularBadge}>
+                    <Star size={12} color={colors.background} />
+                    <Text style={styles.popularText}>POPULAR</Text>
+                  </View>
+                )}
                 
                 <View style={[
                   styles.radioButton,
@@ -122,25 +130,9 @@ export default function OnboardingSubscriptionScreen() {
                     <View style={styles.radioButtonInner} />
                   )}
                 </View>
-              </View>
-              
-              {plan.popular && (
-                <View style={styles.popularBadge}>
-                  <Star size={12} color={colors.background} />
-                  <Text style={styles.popularText}>MOST POPULAR</Text>
-                </View>
-              )}
-              
-              <View style={styles.planFeatures}>
-                {plan.features.slice(0, 3).map((feature, index) => (
-                  <View key={index} style={styles.planFeatureItem}>
-                    <Check size={14} color={colors.primary} />
-                    <Text style={styles.planFeatureText}>{feature}</Text>
-                  </View>
-                ))}
-              </View>
-            </TouchableOpacity>
-          ))}
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
         
         <View style={styles.trialContainer}>
@@ -256,11 +248,15 @@ const styles = StyleSheet.create({
   plansContainer: {
     marginBottom: 24,
   },
+  plansRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
   planCard: {
+    width: (width - 72) / 3,
     backgroundColor: colors.card,
     borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
+    padding: 12,
     borderWidth: 2,
     borderColor: "transparent",
     shadowColor: colors.shadow,
@@ -274,74 +270,61 @@ const styles = StyleSheet.create({
     borderColor: colors.primary,
   },
   planHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 16,
+    alignItems: "center",
+    marginBottom: 12,
   },
   planName: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: "600",
     color: colors.text,
     marginBottom: 4,
   },
   planPrice: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: "700",
     color: colors.primary,
     marginBottom: 2,
   },
   planInterval: {
-    fontSize: 14,
+    fontSize: 12,
     color: colors.textLight,
   },
   radioButton: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
     borderWidth: 2,
     borderColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
+    alignSelf: "center",
+    marginTop: 8,
   },
   radioButtonSelected: {
     borderColor: colors.primary,
   },
   radioButtonInner: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
     backgroundColor: colors.primary,
   },
   popularBadge: {
     position: "absolute",
-    top: 16,
-    right: 16,
+    top: -8,
+    right: -8,
     backgroundColor: colors.primary,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 10,
     flexDirection: "row",
     alignItems: "center",
   },
   popularText: {
     color: colors.background,
-    fontSize: 10,
+    fontSize: 8,
     fontWeight: "700",
-    marginLeft: 4,
-  },
-  planFeatures: {
-    marginTop: 8,
-  },
-  planFeatureItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  planFeatureText: {
-    fontSize: 14,
-    color: colors.text,
-    marginLeft: 8,
+    marginLeft: 2,
   },
   trialContainer: {
     marginBottom: 24,

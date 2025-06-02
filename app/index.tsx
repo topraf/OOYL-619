@@ -16,7 +16,7 @@ const { width } = Dimensions.get("window");
 export default function HomeScreen() {
   const router = useRouter();
   const { resetUserImages, freeComparisonUsed, isPremium } = useUserStore();
-  const { hasCompletedOnboarding } = useOnboardingStore();
+  const { hasCompletedOnboarding, shouldShowNotifications, shouldShowPremium } = useOnboardingStore();
   
   const buttonScale = useSharedValue(1);
   const animatedButtonStyle = useAnimatedStyle(() => {
@@ -31,11 +31,15 @@ export default function HomeScreen() {
     const timer = setTimeout(() => {
       if (!hasCompletedOnboarding) {
         router.push("/onboarding/index");
+      } else if (shouldShowNotifications) {
+        router.push("/onboarding/notifications");
+      } else if (shouldShowPremium) {
+        router.push("/onboarding/subscription");
       }
     }, 100);
     
     return () => clearTimeout(timer);
-  }, [hasCompletedOnboarding, router]);
+  }, [hasCompletedOnboarding, shouldShowNotifications, shouldShowPremium, router]);
   
   const handleStartComparison = () => {
     resetUserImages();
@@ -52,32 +56,22 @@ export default function HomeScreen() {
   
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      <View style={styles.header}>
-        <View style={styles.spacer} />
-        
-        <TouchableOpacity
-          style={styles.iconButton}
-          onPress={() => router.push("/settings")}
-        >
-          <Settings size={24} color={colors.text} />
-        </TouchableOpacity>
-      </View>
-      
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
         <View style={styles.heroContainer}>
           <Image
-            source={{ uri: "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" }}
+            source={{ uri: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" }}
             style={styles.heroImage}
           />
           <LinearGradient
             colors={["transparent", "rgba(0,0,0,0.7)"]}
             style={styles.heroGradient}
+          />
+          <TouchableOpacity
+            style={styles.settingsButton}
+            onPress={() => router.push("/settings")}
           >
-            <Text style={styles.heroTitle}>Find Out If They're In Your League</Text>
-            <Text style={styles.heroSubtitle}>
-              Compare your beauty score with others and get honest results
-            </Text>
-          </LinearGradient>
+            <Settings size={24} color={colors.background} />
+          </TouchableOpacity>
         </View>
         
         <View style={styles.actionsContainer}>
@@ -95,7 +89,7 @@ export default function HomeScreen() {
                 style={styles.buttonGradient}
               >
                 <Camera size={20} color={colors.background} />
-                <Text style={styles.buttonText}>Start New Comparison</Text>
+                <Text style={styles.buttonText}>Find out if (s)he is out of your league!</Text>
               </LinearGradient>
             </TouchableOpacity>
           </Animated.View>
@@ -188,31 +182,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  spacer: {
-    width: 40,
-  },
-  iconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.card,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   content: {
     flex: 1,
   },
   contentContainer: {
-    paddingBottom: 100, // Increased bottom padding to prevent menu overlap
+    paddingBottom: 120, // Increased bottom padding to prevent menu overlap
   },
   heroContainer: {
     height: 240,
@@ -238,16 +212,17 @@ const styles = StyleSheet.create({
     right: 0,
     padding: 16,
   },
-  heroTitle: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: colors.background,
-    marginBottom: 8,
-  },
-  heroSubtitle: {
-    fontSize: 14,
-    color: colors.background,
-    opacity: 0.9,
+  settingsButton: {
+    position: "absolute",
+    top: 12,
+    right: 12,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
   },
   actionsContainer: {
     marginTop: 24,

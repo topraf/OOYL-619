@@ -2,10 +2,10 @@ import { SubscriptionPlan } from "@/types";
 
 export const subscriptionPlans: SubscriptionPlan[] = [
   {
-    id: "monthly",
-    name: "Monthly",
-    price: "$9.99",
-    interval: "month",
+    id: "weekly",
+    name: "Weekly",
+    price: "3.99€",
+    interval: "week",
     features: [
       "Unlimited comparisons",
       "Celebrity comparisons",
@@ -15,24 +15,24 @@ export const subscriptionPlans: SubscriptionPlan[] = [
     ]
   },
   {
-    id: "yearly",
-    name: "Yearly",
-    price: "$59.99",
-    interval: "year",
+    id: "monthly",
+    name: "Monthly",
+    price: "9€",
+    interval: "month",
     features: [
       "Unlimited comparisons",
       "Celebrity comparisons",
       "AI beauty analysis",
       "AI roast feature",
       "Save history",
-      "50% savings vs monthly"
+      "Save 10% vs weekly"
     ],
     popular: true
   },
   {
     id: "lifetime",
     name: "Lifetime",
-    price: "$149.99",
+    price: "29€",
     interval: "one-time",
     features: [
       "Unlimited comparisons",
