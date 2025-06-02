@@ -38,7 +38,7 @@ export default function CelebritiesScreen() {
     }
     
     setTargetImage(image, name, true);
-    router.push("/target-photo");
+    router.push("/user-photo");
   };
 
   const onPressIn = () => {

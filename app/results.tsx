@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Platform, Dimensions, Share, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { Share2, Camera, MessageCircle, Sparkles, ArrowLeft, Trash2 } from "lucide-react-native";
+import { Share2, Camera, MessageCircle, Sparkles, ArrowLeft, Trash2, Star } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors } from "@/constants/colors";
@@ -297,32 +297,48 @@ export default function ResultsScreen() {
             <View style={styles.actionsContainer}>
               <Text style={styles.actionsTitle}>What's Next?</Text>
               
-              <TouchableOpacity 
-                style={styles.actionButton}
-                onPress={handleNewComparison}
-              >
-                <Camera size={20} color={colors.text} />
-                <Text style={styles.actionButtonText}>Try with another photo</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.actionButton}
-                onPress={() => handlePremiumFeature("Beauty Analysis")}
-              >
-                <Sparkles size={20} color={colors.text} />
-                <Text style={styles.actionButtonText}>Get beauty analysis & tips</Text>
-                {!isPremium && <Text style={styles.premiumLabel}>Premium</Text>}
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.actionButton}
-                onPress={() => router.push("/roastmaster")}
-              >
-                <MessageCircle size={20} color={colors.text} />
-                <Text style={styles.actionButtonText}>Get roasted by our AI</Text>
-                {!isPremium && <Text style={styles.premiumLabel}>Premium</Text>}
-              </TouchableOpacity>
+              <View style={styles.actionButtonsRow}>
+                <TouchableOpacity 
+                  style={styles.actionButtonCard}
+                  onPress={handleNewComparison}
+                >
+                  <View style={styles.actionIconCircle}>
+                    <Camera size={24} color={colors.primary} />
+                  </View>
+                  <Text style={styles.actionButtonCardText}>Try with another photo again</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.actionButtonCard}
+                  onPress={() => router.push("/celebrities")}
+                >
+                  <View style={styles.actionIconCircle}>
+                    <Star size={24} color={colors.primary} />
+                  </View>
+                  <Text style={styles.actionButtonCardText}>Compare with celebrities</Text>
+                  {!isPremium && <Text style={styles.premiumLabel}>Premium</Text>}
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.actionButtonCard}
+                  onPress={() => router.push("/roastmaster")}
+                >
+                  <View style={styles.actionIconCircle}>
+                    <MessageCircle size={24} color={colors.primary} />
+                  </View>
+                  <Text style={styles.actionButtonCardText}>Get roasted by our AI if you dare</Text>
+                  {!isPremium && <Text style={styles.premiumLabel}>Premium</Text>}
+                </TouchableOpacity>
+              </View>
             </View>
+            
+            <TouchableOpacity 
+              style={styles.shareFullButton}
+              onPress={handleShare}
+            >
+              <Share2 size={20} color={colors.background} />
+              <Text style={styles.shareFullButtonText}>Share Your Results</Text>
+            </TouchableOpacity>
             
             <View style={styles.disclaimerContainer}>
               <Text style={styles.disclaimer}>
@@ -517,23 +533,57 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: 16,
   },
-  actionButton: {
+  actionButtonsRow: {
     flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    justifyContent: "space-between",
+    marginHorizontal: -8,
   },
-  actionButtonText: {
-    marginLeft: 12,
-    fontSize: 14,
-    color: colors.text,
+  actionButtonCard: {
     flex: 1,
+    backgroundColor: colors.primary + "10",
+    borderRadius: 12,
+    padding: 12,
+    alignItems: "center",
+    marginHorizontal: 4,
+    position: "relative",
+  },
+  actionIconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.background,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  actionButtonCardText: {
+    fontSize: 12,
+    color: colors.text,
+    textAlign: "center",
+    lineHeight: 16,
   },
   premiumLabel: {
-    fontSize: 12,
+    position: "absolute",
+    top: 4,
+    right: 4,
+    fontSize: 10,
     color: colors.primary,
     fontWeight: "600",
+  },
+  shareFullButton: {
+    backgroundColor: colors.primary,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 16,
+    borderRadius: 12,
+    marginBottom: 24,
+  },
+  shareFullButtonText: {
+    color: colors.background,
+    fontSize: 16,
+    fontWeight: "600",
+    marginLeft: 8,
   },
   disclaimerContainer: {
     marginBottom: 24,

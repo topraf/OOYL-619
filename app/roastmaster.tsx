@@ -229,6 +229,14 @@ export default function RoastmasterScreen() {
           </Animated.View>
         )}
         
+        <TouchableOpacity 
+          style={styles.shareFullButton}
+          onPress={handleShare}
+        >
+          <Share2 size={20} color={colors.background} />
+          <Text style={styles.shareFullButtonText}>Share Your Roast</Text>
+        </TouchableOpacity>
+        
         <View style={styles.disclaimerContainer}>
           <Text style={styles.disclaimer}>
             Our AI roasts are meant to be humorous and not to be taken seriously.
@@ -378,15 +386,32 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+    marginBottom: 16,
   },
   generateButtonText: {
     color: colors.primary,
     fontSize: 16,
     fontWeight: "600",
   },
+  shareFullButton: {
+    backgroundColor: colors.primary,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 16,
+    borderRadius: 12,
+    marginHorizontal: 16,
+    marginBottom: 16,
+  },
+  shareFullButtonText: {
+    color: colors.background,
+    fontSize: 16,
+    fontWeight: "600",
+    marginLeft: 8,
+  },
   disclaimerContainer: {
     margin: 16,
-    marginTop: 24,
+    marginTop: 8,
   },
   disclaimer: {
     fontSize: 12,

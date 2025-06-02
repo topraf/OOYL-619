@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Dimensions, ScrollView, Image } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, Dimensions, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Check, ArrowRight, Star } from "lucide-react-native";
@@ -83,19 +83,6 @@ export default function OnboardingSubscriptionScreen() {
           Unlock all premium features and enjoy unlimited comparisons
         </Text>
         
-        <View style={styles.imageContainer}>
-          <Image
-            source={{ uri: "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" }}
-            style={styles.image}
-          />
-          <LinearGradient
-            colors={["transparent", "rgba(0,0,0,0.7)"]}
-            style={styles.imageGradient}
-          >
-            <Text style={styles.imageText}>Premium Experience</Text>
-          </LinearGradient>
-        </View>
-        
         <View style={styles.plansContainer}>
           <View style={styles.plansRow}>
             {subscriptionPlans.map(plan => (
@@ -132,6 +119,30 @@ export default function OnboardingSubscriptionScreen() {
                 </View>
               </TouchableOpacity>
             ))}
+          </View>
+        </View>
+        
+        <View style={styles.featuresContainer}>
+          <Text style={styles.featuresTitle}>Premium Features</Text>
+          
+          <View style={styles.featureItem}>
+            <Check size={20} color={colors.primary} />
+            <Text style={styles.featureText}>Unlimited comparisons</Text>
+          </View>
+          
+          <View style={styles.featureItem}>
+            <Check size={20} color={colors.primary} />
+            <Text style={styles.featureText}>Celebrity comparisons</Text>
+          </View>
+          
+          <View style={styles.featureItem}>
+            <Check size={20} color={colors.primary} />
+            <Text style={styles.featureText}>AI beauty analysis and tips</Text>
+          </View>
+          
+          <View style={styles.featureItem}>
+            <Check size={20} color={colors.primary} />
+            <Text style={styles.featureText}>AI roast feature</Text>
           </View>
         </View>
         
@@ -218,33 +229,6 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     lineHeight: 24,
   },
-  imageContainer: {
-    height: 180,
-    borderRadius: 16,
-    overflow: "hidden",
-    marginBottom: 24,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-  },
-  imageGradient: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 16,
-  },
-  imageText: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: colors.background,
-  },
   plansContainer: {
     marginBottom: 24,
   },
@@ -325,6 +309,28 @@ const styles = StyleSheet.create({
     fontSize: 8,
     fontWeight: "700",
     marginLeft: 2,
+  },
+  featuresContainer: {
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 24,
+  },
+  featuresTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: colors.text,
+    marginBottom: 16,
+  },
+  featureItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  featureText: {
+    marginLeft: 12,
+    fontSize: 16,
+    color: colors.text,
   },
   trialContainer: {
     marginBottom: 24,
