@@ -6,6 +6,7 @@ import { colors } from "@/constants/colors";
 import { useUserStore } from "@/store/user-store";
 import { useOnboardingStore } from "@/store/onboarding-store";
 import { useRouter } from "expo-router";
+import BottomNavigation from "@/components/BottomNavigation";
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -187,6 +188,8 @@ export default function SettingsScreen() {
           </Text>
         </View>
       </ScrollView>
+      
+      <BottomNavigation currentRoute="settings" />
     </SafeAreaView>
   );
 }
@@ -198,6 +201,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
+    paddingBottom: 120, // Space for bottom navigation
   },
   premiumBanner: {
     backgroundColor: colors.primary,
@@ -208,7 +212,7 @@ const styles = StyleSheet.create({
   },
   premiumTitle: {
     fontSize: 20,
-    fontWeight: "800",
+    fontWeight: "900",
     color: colors.background,
     marginBottom: 4,
   },
@@ -247,7 +251,7 @@ const styles = StyleSheet.create({
   getPremiumText: {
     color: colors.background,
     fontSize: 18,
-    fontWeight: "800",
+    fontWeight: "900",
     marginLeft: 8,
   },
   getPremiumTextAccent: {
@@ -264,7 +268,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: "800",
+    fontWeight: "900",
     color: colors.text,
     marginBottom: 16,
   },
@@ -330,7 +334,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 16,
-    fontWeight: "800",
+    fontWeight: "900",
     color: colors.text,
     marginBottom: 8,
   },

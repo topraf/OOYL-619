@@ -56,7 +56,13 @@ export default function OnboardingMoreFeaturesScreen() {
   
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+      <ScrollView 
+        style={styles.scrollView} 
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        bounces={true}
+        alwaysBounceVertical={true}
+      >
         <Animated.View style={animatedTitleStyle}>
           <Text style={styles.title}>
             Try our{" "}
@@ -145,10 +151,11 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 24,
+    paddingBottom: 20,
   },
   title: {
     fontSize: 28,
-    fontWeight: "800",
+    fontWeight: "900",
     color: colors.text,
     marginBottom: 32,
     textAlign: "center",

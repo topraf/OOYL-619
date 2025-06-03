@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Platform, Dimensions, Share, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { Home, Camera, MessageCircle, ArrowLeft, Trash2, Star } from "lucide-react-native";
+import { Home, Camera, MessageCircle, Star } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
+import { Platform as RNPlatform } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors } from "@/constants/colors";
 import { useUserStore } from "@/store/user-store";
@@ -17,6 +18,8 @@ import EmptyState from "@/components/EmptyState";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 
 const { width } = Dimensions.get("window");
+
+type FeatureStatus = "High" | "Mid" | "Low";
 
 export default function ResultsScreen() {
   const router = useRouter();
@@ -39,7 +42,7 @@ export default function ResultsScreen() {
       // Add a small delay for dramatic effect
       const timer = setTimeout(() => {
         setShowResult(true);
-        if (Platform.OS !== "web") {
+        if (RNPlatform.OS !== "web") {
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         }
       }, 1000);
@@ -49,12 +52,12 @@ export default function ResultsScreen() {
   }, [isLoading, latestResult]);
 
   const handleShare = async () => {
-    if (Platform.OS !== "web") {
+    if (RNPlatform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       
       try {
         const result = await Share.share({
-          message: `I just found out if someone is in my league using League Checker! My score: ${getOverallScore()}/100`,
+          message: `I just found out if someone is in my league using League Checker! My score: ${getOverallScore()}/10`,
           title: "League Checker Results"
         });
       } catch (error) {
@@ -66,7 +69,7 @@ export default function ResultsScreen() {
   };
 
   const handleNewComparison = () => {
-    if (Platform.OS !== "web") {
+    if (RNPlatform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     router.replace("/");
@@ -74,7 +77,7 @@ export default function ResultsScreen() {
   
   const handlePremiumFeature = (feature: string) => {
     if (isPremium) {
-      if (Platform.OS !== "web") {
+      if (RNPlatform.OS !== "web") {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
       alert(`${feature} feature coming soon!`);
@@ -132,23 +135,44 @@ export default function ResultsScreen() {
     }
   };
 
+  const getLeaguePhrase = () => {
+    if (!latestResult) return "";
+    
+    switch (latestResult.leagueStatus) {
+      case "way_beyond":
+        return "Dream on! 🌟";
+      case "out_of_league":
+        return "Aim high! 🎯";
+      case "slightly_above":
+        return "Close call! 📈";
+      case "in_your_league":
+        return "Perfect match! 💫";
+      case "slightly_below":
+        return "You're winning! 🏆";
+      case "you_can_do_better":
+        return "Reach higher! 🚀";
+      default:
+        return "Perfect match! 💫";
+    }
+  };
+
   const getOverallScore = () => {
     if (!latestResult?.user.beautyScore) return 0;
-    return Math.round(latestResult.user.beautyScore * 100);
+    return Math.round(latestResult.user.beautyScore * 10);
   };
 
   // Mock feature scores for demonstration
   const getFeatureScores = () => {
     const scores = [
-      { name: "Facial Symmetry", score: Math.round(Math.random() * 40 + 60) },
-      { name: "Jawline", score: Math.round(Math.random() * 40 + 40) },
-      { name: "Eyes", score: Math.round(Math.random() * 40 + 50) },
-      { name: "Skin", score: Math.round(Math.random() * 40 + 60) },
+      { name: "Facial Symmetry", score: Math.round(Math.random() * 4 + 6) },
+      { name: "Jawline", score: Math.round(Math.random() * 4 + 4) },
+      { name: "Eyes", score: Math.round(Math.random() * 4 + 5) },
+      { name: "Skin", score: Math.round(Math.random() * 4 + 6) },
     ];
 
     return scores.map(item => ({
       ...item,
-      status: item.score >= 70 ? "High" as const : item.score >= 50 ? "Mid" as const : "Low" as const
+      status: (item.score >= 7 ? "High" : item.score >= 5 ? "Mid" : "Low") as FeatureStatus
     }));
   };
 
@@ -185,15 +209,13 @@ export default function ResultsScreen() {
             style={styles.backButton} 
             onPress={toggleHistoryView}
           >
-            <ArrowLeft size={20} color={colors.text} />
+            <Home size={20} color={colors.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>
             Your{" "}
             <Text style={styles.headerTitleAccent}>History</Text>
           </Text>
-          <TouchableOpacity style={styles.clearButton} onPress={handleClearHistory}>
-            <Trash2 size={16} color={colors.error} />
-          </TouchableOpacity>
+          <View style={styles.placeholder} />
         </View>
         
         {comparisons.length === 0 ? (
@@ -206,9 +228,15 @@ export default function ResultsScreen() {
             data={comparisons}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <View style={styles.cardContainer}>
+              <TouchableOpacity 
+                style={styles.cardContainer}
+                onPress={() => {
+                  // Navigate to results with this specific comparison
+                  setShowHistory(false);
+                }}
+              >
                 <ComparisonCard result={item} compact={true} />
-              </View>
+              </TouchableOpacity>
             )}
             contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}
@@ -250,7 +278,12 @@ export default function ResultsScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent} 
+        showsVerticalScrollIndicator={false}
+        bounces={true}
+        alwaysBounceVertical={true}
+      >
         {showResult ? (
           <>
             <View style={styles.header}>
@@ -264,9 +297,7 @@ export default function ResultsScreen() {
                 Your{" "}
                 <Text style={styles.headerTitleAccent}>Results</Text>
               </Text>
-              <TouchableOpacity style={styles.historyButton} onPress={toggleHistoryView}>
-                <Text style={styles.historyButtonText}>History</Text>
-              </TouchableOpacity>
+              <View style={styles.placeholder} />
             </View>
             
             <LinearGradient
@@ -286,7 +317,7 @@ export default function ResultsScreen() {
                     style={styles.circleImage}
                   />
                   <Text style={styles.imageLabel}>You</Text>
-                  <Text style={styles.scoreText}>{getOverallScore()}/100</Text>
+                  <Text style={styles.scoreText}>{getOverallScore()}/10</Text>
                 </View>
                 
                 <View style={styles.vsContainer}>
@@ -302,7 +333,7 @@ export default function ResultsScreen() {
                     {latestResult.target.name || "Them"}
                   </Text>
                   <Text style={styles.scoreText}>
-                    {Math.round((latestResult.target.beautyScore || 0) * 100)}/100
+                    {Math.round((latestResult.target.beautyScore || 0) * 10)}/10
                   </Text>
                 </View>
               </View>
@@ -310,6 +341,9 @@ export default function ResultsScreen() {
             
             <View style={styles.gaugeContainer}>
               <LeagueGauge leagueStatus={latestResult.leagueStatus} />
+              <Text style={styles.leaguePhrase}>
+                {getLeaguePhrase()}
+              </Text>
               <Text style={styles.leagueDescription}>
                 {getLeagueDescription()}
               </Text>
@@ -474,30 +508,14 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 24,
-    fontWeight: "800",
+    fontWeight: "900",
     color: colors.text,
   },
   headerTitleAccent: {
     color: colors.primary,
   },
-  historyButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: colors.card,
-  },
-  historyButtonText: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: colors.text,
-  },
-  clearButton: {
+  placeholder: {
     width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.card,
-    justifyContent: "center",
-    alignItems: "center",
   },
   resultCard: {
     borderRadius: 16,
@@ -511,7 +529,7 @@ const styles = StyleSheet.create({
   },
   resultTitle: {
     fontSize: 22,
-    fontWeight: "800",
+    fontWeight: "900",
     color: colors.background,
     textAlign: "center",
     marginBottom: 20,
@@ -556,11 +574,18 @@ const styles = StyleSheet.create({
   gaugeContainer: {
     marginBottom: 24,
   },
+  leaguePhrase: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: colors.primary,
+    textAlign: "center",
+    marginTop: 12,
+  },
   leagueDescription: {
     fontSize: 16,
     color: colors.textLight,
     textAlign: "center",
-    marginTop: 16,
+    marginTop: 8,
     lineHeight: 22,
   },
   featureScoresContainer: {
@@ -568,7 +593,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 24,
-    fontWeight: "800",
+    fontWeight: "900",
     color: colors.text,
     marginBottom: 16,
   },
@@ -623,7 +648,7 @@ const styles = StyleSheet.create({
   },
   actionsTitle: {
     fontSize: 20,
-    fontWeight: "800",
+    fontWeight: "900",
     color: colors.text,
     marginBottom: 16,
   },
@@ -688,7 +713,7 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 28,
-    fontWeight: "800",
+    fontWeight: "900",
     color: colors.text,
     marginBottom: 8,
   },

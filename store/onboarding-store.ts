@@ -5,18 +5,17 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 interface OnboardingState {
   hasCompletedOnboarding: boolean;
   currentStep: number;
-  shouldShowNotifications: boolean;
-  shouldShowPremium: boolean;
-  lastNotificationPrompt: string | null;
-  lastPremiumPrompt: string | null;
+  hasShownNotifications: boolean;
+  hasShownPremium: boolean;
   
+  // Actions
   setCurrentStep: (step: number) => void;
   completeOnboarding: () => void;
   resetOnboarding: () => void;
-  
   skipNotifications: () => void;
   skipPremium: () => void;
   
+  // Conditional checks (disabled to prevent loops)
   checkShouldShowNotifications: () => boolean;
   checkShouldShowPremium: () => boolean;
 }
@@ -26,88 +25,34 @@ export const useOnboardingStore = create<OnboardingState>()(
     (set, get) => ({
       hasCompletedOnboarding: false,
       currentStep: 0,
-      shouldShowNotifications: false,
-      shouldShowPremium: false,
-      lastNotificationPrompt: null,
-      lastPremiumPrompt: null,
+      hasShownNotifications: false,
+      hasShownPremium: false,
       
-      setCurrentStep: (step: number) => {
-        set({ currentStep: step });
-      },
+      setCurrentStep: (step: number) => set({ currentStep: step }),
       
-      completeOnboarding: () => {
-        set({ 
-          hasCompletedOnboarding: true,
-          shouldShowNotifications: false,
-          shouldShowPremium: false
-        });
-      },
+      completeOnboarding: () => set({ 
+        hasCompletedOnboarding: true,
+        hasShownNotifications: true,
+        hasShownPremium: true
+      }),
       
-      resetOnboarding: () => {
-        set({ 
-          hasCompletedOnboarding: false, 
-          currentStep: 0,
-          shouldShowNotifications: false,
-          shouldShowPremium: false
-        });
-      },
+      resetOnboarding: () => set({ 
+        hasCompletedOnboarding: false,
+        currentStep: 0,
+        hasShownNotifications: false,
+        hasShownPremium: false
+      }),
       
-      skipNotifications: () => {
-        const now = new Date().toISOString();
-        set({ 
-          shouldShowNotifications: false,
-          lastNotificationPrompt: now
-        });
-      },
+      skipNotifications: () => set({ hasShownNotifications: true }),
       
-      skipPremium: () => {
-        const now = new Date().toISOString();
-        set({ 
-          shouldShowPremium: false,
-          lastPremiumPrompt: now
-        });
-      },
+      skipPremium: () => set({ hasShownPremium: true }),
       
-      checkShouldShowNotifications: () => {
-        const { lastNotificationPrompt, hasCompletedOnboarding } = get();
-        
-        // Only show if onboarding is completed
-        if (!hasCompletedOnboarding) return false;
-        
-        if (!lastNotificationPrompt) return true;
-        
-        // Check if it's been at least 1 day since the last prompt (for testing)
-        const lastPrompt = new Date(lastNotificationPrompt);
-        const now = new Date();
-        const diffTime = Math.abs(now.getTime() - lastPrompt.getTime());
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
-        const shouldShow = diffDays >= 1;
-        set({ shouldShowNotifications: shouldShow });
-        return shouldShow;
-      },
-      
-      checkShouldShowPremium: () => {
-        const { lastPremiumPrompt, hasCompletedOnboarding } = get();
-        
-        // Only show if onboarding is completed
-        if (!hasCompletedOnboarding) return false;
-        
-        if (!lastPremiumPrompt) return true;
-        
-        // Check if it's been at least 1 day since the last prompt (for testing)
-        const lastPrompt = new Date(lastPremiumPrompt);
-        const now = new Date();
-        const diffTime = Math.abs(now.getTime() - lastPrompt.getTime());
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
-        const shouldShow = diffDays >= 1;
-        set({ shouldShowPremium: shouldShow });
-        return shouldShow;
-      },
+      // Always return false to prevent loops
+      checkShouldShowNotifications: () => false,
+      checkShouldShowPremium: () => false,
     }),
     {
-      name: "league-checker-onboarding",
+      name: "onboarding-storage",
       storage: createJSONStorage(() => AsyncStorage),
     }
   )

@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { Settings, Camera, Image as ImageIcon } from "lucide-react-native";
+import { Settings, Camera, Image as ImageIcon, Star, MessageCircle } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
 import { colors } from "@/constants/colors";
@@ -16,13 +16,7 @@ const { width } = Dimensions.get("window");
 export default function HomeScreen() {
   const router = useRouter();
   const { resetUserImages, freeComparisonUsed, isPremium } = useUserStore();
-  const { 
-    hasCompletedOnboarding, 
-    shouldShowNotifications, 
-    shouldShowPremium,
-    checkShouldShowNotifications,
-    checkShouldShowPremium 
-  } = useOnboardingStore();
+  const { hasCompletedOnboarding } = useOnboardingStore();
   
   const buttonScale = useSharedValue(1);
   const animatedButtonStyle = useAnimatedStyle(() => {
@@ -31,37 +25,36 @@ export default function HomeScreen() {
     };
   });
   
-  // Check if onboarding is completed and handle conditional prompts
+  // Check if onboarding is completed
   useEffect(() => {
-    // Use a timeout to ensure the Root Layout is mounted first
     const timer = setTimeout(() => {
       if (!hasCompletedOnboarding) {
         router.push("/onboarding");
-      } else {
-        // Check if we should show notifications prompt
-        const shouldShowNotifs = checkShouldShowNotifications();
-        if (shouldShowNotifs) {
-          router.push("/onboarding-notifications");
-          return;
-        }
-        
-        // Check if we should show premium prompt (only if not premium)
-        if (!isPremium) {
-          const shouldShowPrem = checkShouldShowPremium();
-          if (shouldShowPrem) {
-            router.push("/onboarding-subscription");
-            return;
-          }
-        }
       }
     }, 100);
     
     return () => clearTimeout(timer);
-  }, [hasCompletedOnboarding, isPremium, router, checkShouldShowNotifications, checkShouldShowPremium]);
+  }, [hasCompletedOnboarding, router]);
   
   const handleStartComparison = () => {
     resetUserImages();
     router.push("/gender-selection");
+  };
+
+  const handleCelebrities = () => {
+    if (isPremium || !freeComparisonUsed) {
+      router.push("/celebrities");
+    } else {
+      router.push("/subscription");
+    }
+  };
+
+  const handleAIRoast = () => {
+    if (isPremium || !freeComparisonUsed) {
+      router.push("/roastmaster");
+    } else {
+      router.push("/subscription");
+    }
   };
 
   const onPressIn = () => {
@@ -117,6 +110,38 @@ export default function HomeScreen() {
               <Text style={styles.freeTag}>First comparison is FREE!</Text>
             </View>
           )}
+        </View>
+
+        <View style={styles.quickActionsContainer}>
+          <TouchableOpacity 
+            style={styles.quickActionButton}
+            onPress={handleCelebrities}
+          >
+            <View style={styles.quickActionContent}>
+              <Star size={20} color={colors.primary} />
+              <Text style={styles.quickActionText}>Celebrities</Text>
+            </View>
+            {(!isPremium && freeComparisonUsed) && (
+              <View style={styles.premiumBadge}>
+                <Star size={10} color={colors.background} />
+              </View>
+            )}
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.quickActionButton}
+            onPress={handleAIRoast}
+          >
+            <View style={styles.quickActionContent}>
+              <MessageCircle size={20} color={colors.primary} />
+              <Text style={styles.quickActionText}>AI Roast</Text>
+            </View>
+            {(!isPremium && freeComparisonUsed) && (
+              <View style={styles.premiumBadge}>
+                <Star size={10} color={colors.background} />
+              </View>
+            )}
+          </TouchableOpacity>
         </View>
         
         <View style={styles.featuresContainer}>
@@ -271,7 +296,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: colors.background,
     fontSize: 16,
-    fontWeight: "800",
+    fontWeight: "900",
     marginLeft: 8,
   },
   freeTagContainer: {
@@ -288,13 +313,53 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "700",
   },
+  quickActionsContainer: {
+    flexDirection: "row",
+    marginTop: 24,
+    paddingHorizontal: 16,
+    gap: 12,
+  },
+  quickActionButton: {
+    flex: 1,
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    padding: 16,
+    position: "relative",
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  quickActionContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  quickActionText: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: colors.text,
+    marginLeft: 8,
+  },
+  premiumBadge: {
+    position: "absolute",
+    top: -6,
+    right: -6,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: colors.primary,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   featuresContainer: {
     marginTop: 32,
     paddingHorizontal: 16,
   },
   featuresTitle: {
     fontSize: 24,
-    fontWeight: "800",
+    fontWeight: "900",
     color: colors.text,
     marginBottom: 16,
   },
@@ -356,7 +421,7 @@ const styles = StyleSheet.create({
   },
   premiumTitle: {
     fontSize: 24,
-    fontWeight: "800",
+    fontWeight: "900",
     color: colors.background,
     marginBottom: 8,
   },

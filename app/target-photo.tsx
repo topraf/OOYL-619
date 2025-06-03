@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { Camera, Upload, Star } from "lucide-react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as Haptics from "expo-haptics";
+import { LinearGradient } from "expo-linear-gradient";
 import { colors } from "@/constants/colors";
 import { useUserStore } from "@/store/user-store";
 import CameraView from "@/components/CameraView";
@@ -112,9 +113,15 @@ export default function TargetPhotoScreen() {
         style={styles.scrollView} 
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        bounces={true}
+        alwaysBounceVertical={true}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>Who Are You Comparing With?</Text>
+          <Text style={styles.title}>
+            Who Are You{" "}
+            <Text style={styles.titleAccent}>Comparing</Text>
+            {" "}With?
+          </Text>
           <Text style={styles.subtitle}>
             Take or upload a photo of the person you want to compare with
           </Text>
@@ -152,35 +159,51 @@ export default function TargetPhotoScreen() {
             </View>
           )}
         </View>
+
+        <View style={styles.orContainer}>
+          <View style={styles.orLine} />
+          <Text style={styles.orText}>Or</Text>
+          <View style={styles.orLine} />
+        </View>
         
         <TouchableOpacity 
           style={styles.celebrityOption}
           onPress={handleCelebrityComparison}
         >
-          <View style={styles.celebrityContent}>
-            <View style={styles.starIconContainer}>
-              <Star size={24} color={colors.primary} />
+          <LinearGradient
+            colors={[colors.secondary, colors.primary]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.celebrityGradient}
+          >
+            <View style={styles.celebrityContent}>
+              <View style={styles.starIconContainer}>
+                <Star size={24} color={colors.background} />
+              </View>
+              <View>
+                <Text style={styles.celebrityTitle}>Compare with Celebrities</Text>
+                <Text style={styles.celebritySubtitle}>
+                  Choose from our database of famous people
+                </Text>
+              </View>
             </View>
-            <View>
-              <Text style={styles.celebrityTitle}>Compare with Celebrities</Text>
-              <Text style={styles.celebritySubtitle}>
-                Choose from our database of famous people
-              </Text>
-            </View>
-          </View>
-          
-          {!isPremium && freeComparisonUsed && (
-            <View style={styles.premiumBadge}>
-              <Text style={styles.premiumText}>Premium</Text>
-            </View>
-          )}
+            
+            {(!isPremium && freeComparisonUsed) && (
+              <View style={styles.premiumBadge}>
+                <Star size={12} color={colors.background} />
+              </View>
+            )}
+          </LinearGradient>
         </TouchableOpacity>
         
         <View style={styles.tipContainer}>
-          <Text style={styles.tipTitle}>For Best Results:</Text>
-          <Text style={styles.tipText}>• Use a clear, front-facing photo</Text>
-          <Text style={styles.tipText}>• Ensure good lighting</Text>
-          <Text style={styles.tipText}>• Choose a photo with neutral expression</Text>
+          <Text style={styles.tipTitle}>
+            For{" "}
+            <Text style={styles.tipTitleAccent}>Best Results:</Text>
+          </Text>
+          <Text style={styles.tipText}>📸 Use a clear, front-facing photo</Text>
+          <Text style={styles.tipText}>💡 Ensure good lighting</Text>
+          <Text style={styles.tipText}>😐 Choose a photo with neutral expression</Text>
         </View>
       </ScrollView>
       
@@ -239,9 +262,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
-    fontWeight: "700",
+    fontWeight: "900",
     color: colors.text,
     marginBottom: 8,
+  },
+  titleAccent: {
+    color: colors.primary,
   },
   subtitle: {
     fontSize: 16,
@@ -282,11 +308,35 @@ const styles = StyleSheet.create({
     height: 300,
     borderRadius: 12,
   },
+  orContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 16,
+    marginBottom: 16,
+  },
+  orLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: colors.border,
+  },
+  orText: {
+    marginHorizontal: 16,
+    fontSize: 14,
+    color: colors.textLight,
+    fontWeight: "500",
+  },
   celebrityOption: {
-    backgroundColor: colors.card,
     marginHorizontal: 16,
     marginBottom: 16,
     borderRadius: 12,
+    overflow: "hidden",
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  celebrityGradient: {
     padding: 16,
     flexDirection: "row",
     alignItems: "center",
@@ -301,31 +351,29 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: colors.primary + "20",
+    backgroundColor: "rgba(255,255,255,0.2)",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 16,
   },
   celebrityTitle: {
     fontSize: 16,
-    fontWeight: "600",
-    color: colors.text,
+    fontWeight: "700",
+    color: colors.background,
     marginBottom: 4,
   },
   celebritySubtitle: {
     fontSize: 14,
-    color: colors.textLight,
+    color: colors.background,
+    opacity: 0.9,
   },
   premiumBadge: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  premiumText: {
-    color: colors.background,
-    fontSize: 12,
-    fontWeight: "600",
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   tipContainer: {
     backgroundColor: colors.card,
@@ -335,9 +383,12 @@ const styles = StyleSheet.create({
   },
   tipTitle: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "900",
     color: colors.text,
     marginBottom: 8,
+  },
+  tipTitleAccent: {
+    color: colors.primary,
   },
   tipText: {
     fontSize: 14,

@@ -90,6 +90,8 @@ export default function UserPhotoScreen() {
         style={styles.scrollView} 
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        bounces={true}
+        alwaysBounceVertical={true}
       >
         <View style={styles.header}>
           <Text style={styles.title}>
@@ -139,10 +141,10 @@ export default function UserPhotoScreen() {
             Tips for{" "}
             <Text style={styles.tipTitleAccent}>Best Results:</Text>
           </Text>
-          <Text style={styles.tipText}>• Use good lighting</Text>
-          <Text style={styles.tipText}>• Keep a neutral expression</Text>
-          <Text style={styles.tipText}>• Remove glasses and hats</Text>
-          <Text style={styles.tipText}>• Ensure your full face is visible</Text>
+          <Text style={styles.tipText}>💡 Use good lighting</Text>
+          <Text style={styles.tipText}>😐 Keep a neutral expression</Text>
+          <Text style={styles.tipText}>👓 Remove glasses and hats</Text>
+          <Text style={styles.tipText}>👤 Ensure your full face is visible</Text>
         </View>
       </ScrollView>
       
@@ -189,7 +191,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: "800",
+    fontWeight: "900",
     color: colors.text,
     marginBottom: 8,
   },
@@ -243,7 +245,7 @@ const styles = StyleSheet.create({
   },
   tipTitle: {
     fontSize: 18,
-    fontWeight: "800",
+    fontWeight: "900",
     color: colors.text,
     marginBottom: 8,
   },

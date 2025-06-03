@@ -1,57 +1,39 @@
 import React from "react";
-import { StyleSheet, View, Text, Dimensions } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { LeagueStatus } from "@/types";
 import { colors } from "@/constants/colors";
+import { LeagueStatus } from "@/types";
 
 interface LeagueGaugeProps {
   leagueStatus: LeagueStatus;
 }
 
-const { width } = Dimensions.get("window");
-const gaugeWidth = width - 48;
-
 export default function LeagueGauge({ leagueStatus }: LeagueGaugeProps) {
-  const getGaugePosition = () => {
+  const getIndicatorPosition = () => {
     switch (leagueStatus) {
-      case "way_beyond":
-        return { position: "90%", color: colors.gauge.red };
-      case "out_of_league":
-        return { position: "75%", color: colors.gauge.orange };
-      case "slightly_above":
-        return { position: "60%", color: colors.gauge.yellow };
-      case "in_your_league":
-        return { position: "50%", color: colors.gauge.green };
-      case "slightly_below":
-        return { position: "35%", color: colors.gauge.blue };
       case "you_can_do_better":
-        return { position: "15%", color: colors.gauge.purple };
+        return "8%";
+      case "slightly_below":
+        return "25%";
+      case "in_your_league":
+        return "50%";
+      case "slightly_above":
+        return "75%";
+      case "out_of_league":
+        return "88%";
+      case "way_beyond":
+        return "95%";
       default:
-        return { position: "50%", color: colors.gauge.green };
+        return "50%";
     }
   };
 
-  const getLeagueText = () => {
-    switch (leagueStatus) {
-      case "way_beyond":
-        return "Way Beyond Your League";
-      case "out_of_league":
-        return "Out of Your League";
-      case "slightly_above":
-        return "Slightly Above Your League";
-      case "in_your_league":
-        return "In Your League";
-      case "slightly_below":
-        return "Slightly Below Your League";
-      case "you_can_do_better":
-        return "You Can Do Better";
-      default:
-        return "In Your League";
+  const getLabelStyle = (status: LeagueStatus) => {
+    if (status === leagueStatus) {
+      return [styles.gaugeLabel, styles.activeLabelText];
     }
+    return styles.gaugeLabel;
   };
-
-  const { position, color } = getGaugePosition();
-  const leagueText = getLeagueText();
 
   return (
     <View style={styles.container}>
@@ -69,21 +51,16 @@ export default function LeagueGauge({ leagueStatus }: LeagueGaugeProps) {
           ]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
-          style={styles.gaugeBackground}
+          style={styles.gauge}
         />
         
-        <View 
-          style={[
-            styles.indicator, 
-            { left: position, backgroundColor: color }
-          ]}
-        />
+        <View style={[styles.indicator, { left: getIndicatorPosition() }]} />
       </View>
       
       <View style={styles.labelsContainer}>
-        <Text style={styles.label}>You Can Do Better</Text>
-        <Text style={styles.label}>In Your League</Text>
-        <Text style={styles.label}>Way Beyond</Text>
+        <Text style={getLabelStyle("you_can_do_better")}>You can do better</Text>
+        <Text style={getLabelStyle("in_your_league")}>In your league</Text>
+        <Text style={getLabelStyle("out_of_league")}>Out of your league</Text>
       </View>
     </View>
   );
@@ -91,51 +68,52 @@ export default function LeagueGauge({ leagueStatus }: LeagueGaugeProps) {
 
 const styles = StyleSheet.create({
   container: {
-    width: gaugeWidth,
-    alignSelf: "center",
-    backgroundColor: colors.card,
-    padding: 16,
-    borderRadius: 12,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    alignItems: "center",
   },
   title: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 20,
+    fontWeight: "900",
     color: colors.text,
-    textAlign: "center",
     marginBottom: 16,
   },
   gaugeContainer: {
-    height: 12,
-    borderRadius: 6,
-    overflow: "hidden",
     position: "relative",
-  },
-  gaugeBackground: {
-    height: "100%",
     width: "100%",
+    marginBottom: 12,
+  },
+  gauge: {
+    height: 16,
+    borderRadius: 8,
   },
   indicator: {
     position: "absolute",
-    width: 20,
-    height: 20,
-    borderRadius: 10,
     top: -4,
-    marginLeft: -10,
-    borderWidth: 2,
-    borderColor: colors.background,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: colors.background,
+    borderWidth: 3,
+    borderColor: colors.text,
+    marginLeft: -12,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   labelsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 8,
+    width: "100%",
   },
-  label: {
-    fontSize: 10,
+  gaugeLabel: {
+    fontSize: 12,
     color: colors.textLight,
+    textAlign: "center",
+    flex: 1,
+  },
+  activeLabelText: {
+    color: colors.success,
+    fontWeight: "800",
   },
 });
