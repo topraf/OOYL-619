@@ -118,6 +118,7 @@ function RootLayoutNav() {
             title: "Celebrity Comparison",
             headerTitleAlign: "center",
             animation: "slide_from_right",
+            headerShown: false,
           }}
         />
         <Stack.Screen
@@ -161,6 +162,42 @@ function RootLayoutNav() {
             headerTitleAlign: "center",
             headerShown: false,
             animation: "fade",
+          }}
+        />
+        <Stack.Screen
+          name="onboarding-features"
+          options={{
+            title: "Features",
+            headerTitleAlign: "center",
+            headerShown: false,
+            animation: "slide_from_right",
+          }}
+        />
+        <Stack.Screen
+          name="onboarding-more-features"
+          options={{
+            title: "More Features",
+            headerTitleAlign: "center",
+            headerShown: false,
+            animation: "slide_from_right",
+          }}
+        />
+        <Stack.Screen
+          name="onboarding-notifications"
+          options={{
+            title: "Notifications",
+            headerTitleAlign: "center",
+            headerShown: false,
+            animation: "slide_from_right",
+          }}
+        />
+        <Stack.Screen
+          name="onboarding-subscription"
+          options={{
+            title: "Premium",
+            headerTitleAlign: "center",
+            headerShown: false,
+            animation: "slide_from_right",
           }}
         />
       </Stack>

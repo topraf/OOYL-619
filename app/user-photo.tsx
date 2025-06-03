@@ -86,76 +86,84 @@ export default function UserPhotoScreen() {
   
   return (
     <SafeAreaView style={styles.container} edges={["bottom"]}>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Take Your Selfie</Text>
-          <Text style={styles.subtitle}>
-            We need a clear photo of your face for accurate comparison
-          </Text>
-        </View>
+      <View style={styles.content}>
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+          <View style={styles.header}>
+            <Text style={styles.title}>
+              Take Your{" "}
+              <Text style={styles.titleAccent}>Selfie</Text>
+            </Text>
+            <Text style={styles.subtitle}>
+              We need a clear photo of your face for accurate comparison
+            </Text>
+          </View>
+          
+          <View style={styles.photoSection}>
+            {user.frontImage ? (
+              <ImagePreview
+                uri={user.frontImage}
+                label="Your Selfie"
+                onRemove={handleRemovePhoto}
+                style={styles.previewImage}
+              />
+            ) : (
+              <View style={styles.photoOptions}>
+                <TouchableOpacity 
+                  style={styles.photoOption}
+                  onPress={handleTakePhoto}
+                >
+                  <View style={styles.iconContainer}>
+                    <Camera size={24} color={colors.primary} />
+                  </View>
+                  <Text style={styles.optionText}>Take Photo</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.photoOption}
+                  onPress={handlePickImage}
+                >
+                  <View style={styles.iconContainer}>
+                    <Upload size={24} color={colors.primary} />
+                  </View>
+                  <Text style={styles.optionText}>Upload Photo</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+          
+          <View style={styles.tipContainer}>
+            <Text style={styles.tipTitle}>
+              Tips for{" "}
+              <Text style={styles.tipTitleAccent}>Best Results:</Text>
+            </Text>
+            <Text style={styles.tipText}>• Use good lighting</Text>
+            <Text style={styles.tipText}>• Keep a neutral expression</Text>
+            <Text style={styles.tipText}>• Remove glasses and hats</Text>
+            <Text style={styles.tipText}>• Ensure your full face is visible</Text>
+          </View>
+        </ScrollView>
         
-        <View style={styles.photoSection}>
-          {user.frontImage ? (
-            <ImagePreview
-              uri={user.frontImage}
-              label="Your Selfie"
-              onRemove={handleRemovePhoto}
-              style={styles.previewImage}
-            />
-          ) : (
-            <View style={styles.photoOptions}>
-              <TouchableOpacity 
-                style={styles.photoOption}
-                onPress={handleTakePhoto}
-              >
-                <View style={styles.iconContainer}>
-                  <Camera size={24} color={colors.primary} />
-                </View>
-                <Text style={styles.optionText}>Take Photo</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.photoOption}
-                onPress={handlePickImage}
-              >
-                <View style={styles.iconContainer}>
-                  <Upload size={24} color={colors.primary} />
-                </View>
-                <Text style={styles.optionText}>Upload Photo</Text>
-              </TouchableOpacity>
-            </View>
+        <View style={styles.footer}>
+          <Animated.View style={animatedButtonStyle}>
+            <TouchableOpacity 
+              style={[styles.nextButton, !user.frontImage && styles.disabledButton]}
+              onPress={handleNext}
+              disabled={!user.frontImage}
+              onPressIn={user.frontImage ? onPressIn : undefined}
+              onPressOut={user.frontImage ? onPressOut : undefined}
+            >
+              <Text style={[styles.nextButtonText, !user.frontImage && styles.disabledButtonText]}>
+                Continue
+              </Text>
+            </TouchableOpacity>
+          </Animated.View>
+          
+          {!user.frontImage && (
+            <Text style={styles.footerText}>
+              Please add a selfie to continue
+            </Text>
           )}
         </View>
-        
-        <View style={styles.tipContainer}>
-          <Text style={styles.tipTitle}>Tips for Best Results:</Text>
-          <Text style={styles.tipText}>• Use good lighting</Text>
-          <Text style={styles.tipText}>• Keep a neutral expression</Text>
-          <Text style={styles.tipText}>• Remove glasses and hats</Text>
-          <Text style={styles.tipText}>• Ensure your full face is visible</Text>
-        </View>
-      </ScrollView>
-      
-      <View style={styles.footer}>
-        <Animated.View style={animatedButtonStyle}>
-          <TouchableOpacity 
-            style={[styles.nextButton, !user.frontImage && styles.disabledButton]}
-            onPress={handleNext}
-            disabled={!user.frontImage}
-            onPressIn={user.frontImage ? onPressIn : undefined}
-            onPressOut={user.frontImage ? onPressOut : undefined}
-          >
-            <Text style={[styles.nextButtonText, !user.frontImage && styles.disabledButtonText]}>
-              Continue
-            </Text>
-          </TouchableOpacity>
-        </Animated.View>
-        
-        {!user.frontImage && (
-          <Text style={styles.footerText}>
-            Please add a selfie to continue
-          </Text>
-        )}
       </View>
     </SafeAreaView>
   );
@@ -165,6 +173,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  content: {
+    flex: 1,
   },
   scrollView: {
     flex: 1,
@@ -178,10 +189,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   title: {
-    fontSize: 22,
-    fontWeight: "700",
+    fontSize: 28,
+    fontWeight: "800",
     color: colors.text,
     marginBottom: 8,
+  },
+  titleAccent: {
+    color: colors.primary,
   },
   subtitle: {
     fontSize: 16,
@@ -229,10 +243,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   tipTitle: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 18,
+    fontWeight: "800",
     color: colors.text,
     marginBottom: 8,
+  },
+  tipTitleAccent: {
+    color: colors.primary,
   },
   tipText: {
     fontSize: 14,

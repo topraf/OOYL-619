@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Platform, Dimensions, Share, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { Share2, Camera, MessageCircle, ArrowLeft, Trash2, Star } from "lucide-react-native";
+import { Home, Camera, MessageCircle, ArrowLeft, Trash2, Star } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors } from "@/constants/colors";
@@ -108,6 +108,27 @@ export default function ResultsScreen() {
         return "You can do better";
       default:
         return "They are in your league";
+    }
+  };
+
+  const getLeagueDescription = () => {
+    if (!latestResult) return "";
+    
+    switch (latestResult.leagueStatus) {
+      case "way_beyond":
+        return "This person is significantly more attractive than you based on our analysis.";
+      case "out_of_league":
+        return "This person is more attractive than you, but not impossibly so.";
+      case "slightly_above":
+        return "This person is slightly more attractive than you.";
+      case "in_your_league":
+        return "You and this person are well-matched in terms of attractiveness!";
+      case "slightly_below":
+        return "You are slightly more attractive than this person.";
+      case "you_can_do_better":
+        return "You are significantly more attractive than this person.";
+      default:
+        return "You and this person are well-matched in terms of attractiveness!";
     }
   };
 
@@ -232,20 +253,15 @@ export default function ResultsScreen() {
                 style={styles.backButton} 
                 onPress={() => router.push("/")}
               >
-                <ArrowLeft size={20} color={colors.text} />
+                <Home size={20} color={colors.text} />
               </TouchableOpacity>
               <Text style={styles.headerTitle}>
                 Your{" "}
                 <Text style={styles.headerTitleAccent}>Results</Text>
               </Text>
-              <View style={styles.headerActions}>
-                <TouchableOpacity style={styles.historyButton} onPress={toggleHistoryView}>
-                  <Text style={styles.historyButtonText}>History</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
-                  <Share2 size={20} color={colors.text} />
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity style={styles.historyButton} onPress={toggleHistoryView}>
+                <Text style={styles.historyButtonText}>History</Text>
+              </TouchableOpacity>
             </View>
             
             <LinearGradient
@@ -289,6 +305,9 @@ export default function ResultsScreen() {
             
             <View style={styles.gaugeContainer}>
               <LeagueGauge leagueStatus={latestResult.leagueStatus} />
+              <Text style={styles.leagueDescription}>
+                {getLeagueDescription()}
+              </Text>
             </View>
             
             {isPremium && (
@@ -314,13 +333,35 @@ export default function ResultsScreen() {
               </View>
             )}
             
+            <TouchableOpacity 
+              style={styles.shareFullButton}
+              onPress={handleShare}
+            >
+              <Text style={styles.shareFullButtonText}>Share Your Results</Text>
+              <View style={styles.socialIcons}>
+                <View style={[styles.socialIcon, { backgroundColor: "#E4405F" }]}>
+                  <Text style={styles.socialIconText}>IG</Text>
+                </View>
+                <View style={[styles.socialIcon, { backgroundColor: "#FFFC00" }]}>
+                  <Text style={[styles.socialIconText, { color: "#000" }]}>SC</Text>
+                </View>
+                <View style={[styles.socialIcon, { backgroundColor: "#000" }]}>
+                  <Text style={styles.socialIconText}>TT</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+            
             <View style={styles.actionsContainer}>
               <Text style={styles.actionsTitle}>
                 What's{" "}
                 <Text style={styles.actionsTitleAccent}>Next?</Text>
               </Text>
               
-              <View style={styles.actionButtonsRow}>
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.actionButtonsRow}
+              >
                 <TouchableOpacity 
                   style={styles.actionButtonCard}
                   onPress={handleNewComparison}
@@ -352,16 +393,8 @@ export default function ResultsScreen() {
                   <Text style={styles.actionButtonCardText}>Get roasted by our AI if you dare</Text>
                   {!isPremium && <Text style={styles.premiumLabel}>Premium</Text>}
                 </TouchableOpacity>
-              </View>
+              </ScrollView>
             </View>
-            
-            <TouchableOpacity 
-              style={styles.shareFullButton}
-              onPress={handleShare}
-            >
-              <Share2 size={20} color={colors.background} />
-              <Text style={styles.shareFullButtonText}>Share Your Results</Text>
-            </TouchableOpacity>
             
             <View style={styles.disclaimerContainer}>
               <Text style={styles.disclaimer}>
@@ -435,36 +468,23 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "800",
     color: colors.text,
   },
   headerTitleAccent: {
     color: colors.primary,
   },
-  headerActions: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
   historyButton: {
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
     backgroundColor: colors.card,
-    marginRight: 8,
   },
   historyButtonText: {
     fontSize: 12,
     fontWeight: "700",
     color: colors.text,
-  },
-  shareButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.card,
-    justifyContent: "center",
-    alignItems: "center",
   },
   clearButton: {
     width: 40,
@@ -531,11 +551,18 @@ const styles = StyleSheet.create({
   gaugeContainer: {
     marginBottom: 24,
   },
+  leagueDescription: {
+    fontSize: 16,
+    color: colors.textLight,
+    textAlign: "center",
+    marginTop: 16,
+    lineHeight: 22,
+  },
   featureScoresContainer: {
     marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "800",
     color: colors.text,
     marginBottom: 16,
@@ -546,6 +573,37 @@ const styles = StyleSheet.create({
   featureScoresRow: {
     paddingRight: 16,
     paddingBottom: 8,
+  },
+  shareFullButton: {
+    backgroundColor: colors.primary,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    marginBottom: 24,
+  },
+  shareFullButtonText: {
+    color: colors.background,
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  socialIcons: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  socialIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  socialIconText: {
+    color: colors.background,
+    fontSize: 12,
+    fontWeight: "700",
   },
   actionsContainer: {
     backgroundColor: colors.card,
@@ -559,7 +617,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   actionsTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "800",
     color: colors.text,
     marginBottom: 16,
@@ -569,16 +627,15 @@ const styles = StyleSheet.create({
   },
   actionButtonsRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginHorizontal: -8,
+    paddingRight: 16,
   },
   actionButtonCard: {
-    flex: 1,
+    width: width * 0.3,
     backgroundColor: colors.primary + "10",
     borderRadius: 12,
     padding: 12,
     alignItems: "center",
-    marginHorizontal: 4,
+    marginRight: 12,
     position: "relative",
   },
   actionIconCircle: {
@@ -604,21 +661,6 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontWeight: "700",
   },
-  shareFullButton: {
-    backgroundColor: colors.primary,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 16,
-    borderRadius: 12,
-    marginBottom: 24,
-  },
-  shareFullButtonText: {
-    color: colors.background,
-    fontSize: 16,
-    fontWeight: "700",
-    marginLeft: 8,
-  },
   disclaimerContainer: {
     marginBottom: 24,
   },
@@ -640,7 +682,7 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   emptyTitle: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "800",
     color: colors.text,
     marginBottom: 8,

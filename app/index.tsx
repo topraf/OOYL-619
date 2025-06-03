@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: colors.background,
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: "800",
     marginLeft: 8,
   },
   freeTagContainer: {
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   featuresTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "800",
     color: colors.text,
     marginBottom: 16,
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   premiumTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "800",
     color: colors.background,
     marginBottom: 8,

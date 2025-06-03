@@ -29,7 +29,10 @@ export default function SettingsScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {isPremium && (
           <View style={styles.premiumBanner}>
-            <Text style={styles.premiumTitle}>Premium Subscription</Text>
+            <Text style={styles.premiumTitle}>
+              Premium{" "}
+              <Text style={styles.premiumTitleAccent}>Subscription</Text>
+            </Text>
             <Text style={styles.premiumStatus}>Active</Text>
             <TouchableOpacity 
               style={styles.managePremiumButton}
@@ -46,12 +49,18 @@ export default function SettingsScreen() {
             onPress={() => router.push("/subscription")}
           >
             <CreditCard size={20} color={colors.background} />
-            <Text style={styles.getPremiumText}>Get Premium</Text>
+            <Text style={styles.getPremiumText}>
+              Get{" "}
+              <Text style={styles.getPremiumTextAccent}>Premium</Text>
+            </Text>
           </TouchableOpacity>
         )}
         
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>App Settings</Text>
+          <Text style={styles.sectionTitle}>
+            App{" "}
+            <Text style={styles.sectionTitleAccent}>Settings</Text>
+          </Text>
           
           <View style={styles.settingItem}>
             <View style={styles.settingInfo}>
@@ -81,7 +90,10 @@ export default function SettingsScreen() {
         </View>
         
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>About</Text>
+          <Text style={styles.sectionTitle}>
+            About{" "}
+            <Text style={styles.sectionTitleAccent}>& Support</Text>
+          </Text>
           
           <TouchableOpacity style={styles.aboutItem}>
             <Info size={20} color={colors.text} />
@@ -164,7 +176,11 @@ export default function SettingsScreen() {
         </View>
         
         <View style={styles.footer}>
-          <Text style={styles.footerText}>League Checker v1.0.0</Text>
+          <Text style={styles.footerText}>
+            League{" "}
+            <Text style={styles.footerTextAccent}>Checker</Text>
+            {" "}v1.0.0
+          </Text>
           <Text style={styles.disclaimer}>
             This app is for entertainment purposes only. Beauty is subjective and our algorithm
             provides an approximation based on photographic evidence.
@@ -191,10 +207,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   premiumTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "800",
     color: colors.background,
     marginBottom: 4,
+  },
+  premiumTitleAccent: {
+    color: colors.background,
+    textShadowColor: "rgba(255,255,255,0.3)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   premiumStatus: {
     fontSize: 14,
@@ -224,9 +246,15 @@ const styles = StyleSheet.create({
   },
   getPremiumText: {
     color: colors.background,
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: 18,
+    fontWeight: "800",
     marginLeft: 8,
+  },
+  getPremiumTextAccent: {
+    color: colors.background,
+    textShadowColor: "rgba(255,255,255,0.3)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   section: {
     marginBottom: 24,
@@ -235,7 +263,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "800",
     color: colors.text,
     marginBottom: 16,
@@ -301,9 +329,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   footerText: {
-    fontSize: 14,
-    color: colors.textLight,
+    fontSize: 16,
+    fontWeight: "800",
+    color: colors.text,
     marginBottom: 8,
+  },
+  footerTextAccent: {
+    color: colors.primary,
   },
   disclaimer: {
     fontSize: 12,

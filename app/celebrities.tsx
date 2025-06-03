@@ -5,7 +5,7 @@ import { useRouter } from "expo-router";
 import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
 import { Platform } from "react-native";
-import { Search, X } from "lucide-react-native";
+import { Search, X, ArrowLeft } from "lucide-react-native";
 import { colors } from "@/constants/colors";
 import { celebrities } from "@/mocks/celebrities";
 import { useUserStore } from "@/store/user-store";
@@ -56,10 +56,21 @@ export default function CelebritiesScreen() {
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <View style={styles.header}>
-        <Text style={styles.title}>Choose a Celebrity</Text>
-        <Text style={styles.subtitle}>
-          Compare yourself with these famous personalities
-        </Text>
+        <TouchableOpacity 
+          style={styles.backButton} 
+          onPress={() => router.back()}
+        >
+          <ArrowLeft size={20} color={colors.text} />
+        </TouchableOpacity>
+        <View style={styles.headerContent}>
+          <Text style={styles.title}>
+            Choose a{" "}
+            <Text style={styles.titleAccent}>Celebrity</Text>
+          </Text>
+          <Text style={styles.subtitle}>
+            Compare yourself with these famous personalities
+          </Text>
+        </View>
       </View>
       
       <View style={styles.searchContainer}>
@@ -126,20 +137,37 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   header: {
+    flexDirection: "row",
+    alignItems: "center",
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.card,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  headerContent: {
+    flex: 1,
+  },
   title: {
-    fontSize: 22,
-    fontWeight: "700",
+    fontSize: 24,
+    fontWeight: "800",
     color: colors.text,
-    marginBottom: 8,
+    marginBottom: 4,
+  },
+  titleAccent: {
+    color: colors.primary,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: colors.textLight,
-    lineHeight: 22,
+    lineHeight: 20,
   },
   searchContainer: {
     paddingHorizontal: 16,

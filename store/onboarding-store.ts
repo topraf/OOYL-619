@@ -65,33 +65,39 @@ export const useOnboardingStore = create<OnboardingState>()(
       },
       
       checkShouldShowNotifications: () => {
-        const { lastNotificationPrompt } = get();
+        const { lastNotificationPrompt, hasCompletedOnboarding } = get();
+        
+        // Only show if onboarding is completed
+        if (!hasCompletedOnboarding) return false;
         
         if (!lastNotificationPrompt) return true;
         
-        // Check if it's been at least 3 days since the last prompt
+        // Check if it's been at least 1 day since the last prompt (for testing)
         const lastPrompt = new Date(lastNotificationPrompt);
         const now = new Date();
         const diffTime = Math.abs(now.getTime() - lastPrompt.getTime());
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         
-        const shouldShow = diffDays >= 3;
+        const shouldShow = diffDays >= 1;
         set({ shouldShowNotifications: shouldShow });
         return shouldShow;
       },
       
       checkShouldShowPremium: () => {
-        const { lastPremiumPrompt } = get();
+        const { lastPremiumPrompt, hasCompletedOnboarding } = get();
+        
+        // Only show if onboarding is completed
+        if (!hasCompletedOnboarding) return false;
         
         if (!lastPremiumPrompt) return true;
         
-        // Check if it's been at least 2 days since the last prompt
+        // Check if it's been at least 1 day since the last prompt (for testing)
         const lastPrompt = new Date(lastPremiumPrompt);
         const now = new Date();
         const diffTime = Math.abs(now.getTime() - lastPrompt.getTime());
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         
-        const shouldShow = diffDays >= 2;
+        const shouldShow = diffDays >= 1;
         set({ shouldShowPremium: shouldShow });
         return shouldShow;
       },

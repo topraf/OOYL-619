@@ -4,12 +4,35 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Check, Star } from "lucide-react-native";
 import { colors } from "@/constants/colors";
-import { subscriptionPlans } from "@/mocks/subscriptions";
 import { useUserStore } from "@/store/user-store";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 
 const { width } = Dimensions.get("window");
+
+const subscriptionPlans = [
+  {
+    id: "weekly",
+    name: "Weekly",
+    price: "€3.99",
+    interval: "week",
+    popular: false,
+  },
+  {
+    id: "monthly",
+    name: "Monthly",
+    price: "€9.00",
+    interval: "month",
+    popular: true,
+  },
+  {
+    id: "lifetime",
+    name: "Lifetime",
+    price: "€29.00",
+    interval: "one-time",
+    popular: false,
+  },
+];
 
 export default function SubscriptionScreen() {
   const router = useRouter();
@@ -41,7 +64,10 @@ export default function SubscriptionScreen() {
     <SafeAreaView style={styles.container} edges={["bottom"]}>
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
         <View style={styles.header}>
-          <Text style={styles.title}>Upgrade to Premium</Text>
+          <Text style={styles.title}>
+            Upgrade to{" "}
+            <Text style={styles.titleAccent}>Premium</Text>
+          </Text>
           <Text style={styles.subtitle}>
             Unlock all features and enjoy unlimited comparisons
           </Text>
@@ -58,6 +84,13 @@ export default function SubscriptionScreen() {
                 ]}
                 onPress={() => setSelectedPlanId(plan.id)}
               >
+                {plan.popular && (
+                  <View style={styles.popularBadge}>
+                    <Star size={10} color={colors.background} />
+                    <Text style={styles.popularText}>POPULAR</Text>
+                  </View>
+                )}
+                
                 <View style={styles.planHeader}>
                   <Text style={styles.planName}>{plan.name}</Text>
                   <Text style={styles.planPrice}>{plan.price}</Text>
@@ -65,13 +98,6 @@ export default function SubscriptionScreen() {
                     {plan.interval === "one-time" ? "" : `per ${plan.interval}`}
                   </Text>
                 </View>
-                
-                {plan.popular && (
-                  <View style={styles.popularBadge}>
-                    <Star size={12} color={colors.background} />
-                    <Text style={styles.popularText}>POPULAR</Text>
-                  </View>
-                )}
                 
                 <View style={[
                   styles.radioButton,
@@ -87,7 +113,10 @@ export default function SubscriptionScreen() {
         </View>
         
         <View style={styles.featuresContainer}>
-          <Text style={styles.featuresTitle}>Premium Features</Text>
+          <Text style={styles.featuresTitle}>
+            Premium{" "}
+            <Text style={styles.featuresTitleAccent}>Features</Text>
+          </Text>
           
           <View style={styles.featureItem}>
             <Check size={20} color={colors.primary} />
@@ -162,10 +191,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   title: {
-    fontSize: 24,
-    fontWeight: "700",
+    fontSize: 28,
+    fontWeight: "800",
     color: colors.text,
     marginBottom: 8,
+  },
+  titleAccent: {
+    color: colors.primary,
   },
   subtitle: {
     fontSize: 16,
@@ -179,12 +211,13 @@ const styles = StyleSheet.create({
   plansRow: {
     flexDirection: "row",
     justifyContent: "space-between",
+    gap: 8,
   },
   planCard: {
-    width: (width - 64) / 3.2,
+    flex: 1,
     backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: 8,
+    borderRadius: 12,
+    padding: 12,
     borderWidth: 2,
     borderColor: "transparent",
     shadowColor: colors.shadow,
@@ -193,6 +226,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
     position: "relative",
+    minHeight: 100,
   },
   selectedPlanCard: {
     borderColor: colors.primary,
@@ -205,13 +239,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     color: colors.text,
-    marginBottom: 2,
+    marginBottom: 4,
   },
   planPrice: {
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: 16,
+    fontWeight: "800",
     color: colors.primary,
-    marginBottom: 0,
+    marginBottom: 2,
   },
   planInterval: {
     fontSize: 10,
@@ -239,14 +273,15 @@ const styles = StyleSheet.create({
   },
   popularBadge: {
     position: "absolute",
-    top: -8,
-    right: -8,
+    top: -6,
+    right: -6,
     backgroundColor: colors.primary,
     paddingHorizontal: 6,
-    paddingVertical: 3,
-    borderRadius: 10,
+    paddingVertical: 2,
+    borderRadius: 8,
     flexDirection: "row",
     alignItems: "center",
+    zIndex: 1,
   },
   popularText: {
     color: colors.background,
@@ -262,10 +297,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   featuresTitle: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 20,
+    fontWeight: "800",
     color: colors.text,
     marginBottom: 16,
+  },
+  featuresTitleAccent: {
+    color: colors.primary,
   },
   featureItem: {
     flexDirection: "row",
@@ -291,8 +329,8 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   trialTitle: {
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: 20,
+    fontWeight: "800",
     color: colors.background,
     marginBottom: 8,
   },
