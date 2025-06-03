@@ -1,11 +1,13 @@
 import { useFonts } from "expo-font";
 import { Stack, Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import { colors } from "@/constants/colors";
+import { Appearance, Platform } from "react-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { trpc, trpcClient } from "@/lib/trpc";
+import { useUserStore } from "@/store/user-store";
+import * as Network from "expo-network";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -37,13 +39,62 @@ export default function RootLayout() {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <RootLayoutNav />
+        <ThemeProvider>
+          <RootLayoutNav />
+        </ThemeProvider>
       </QueryClientProvider>
     </trpc.Provider>
   );
 }
 
+function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const { theme, setTheme, setOfflineStatus, getColors } = useUserStore();
+  const [systemTheme, setSystemTheme] = useState(Appearance.getColorScheme());
+  
+  useEffect(() => {
+    // Listen for system theme changes
+    const subscription = Appearance.addChangeListener(({ colorScheme }) => {
+      setSystemTheme(colorScheme);
+    });
+    
+    return () => subscription?.remove();
+  }, []);
+  
+  useEffect(() => {
+    // Monitor network status
+    const checkNetworkStatus = async () => {
+      if (Platform.OS !== "web") {
+        try {
+          const networkState = await Network.getNetworkStateAsync();
+          setOfflineStatus(!networkState.isConnected);
+        } catch (error) {
+          console.error("Error checking network status:", error);
+        }
+      }
+    };
+    
+    checkNetworkStatus();
+    
+    // Check network status periodically
+    const interval = setInterval(checkNetworkStatus, 30000); // Every 30 seconds
+    
+    return () => clearInterval(interval);
+  }, [setOfflineStatus]);
+  
+  // Apply system theme if theme is set to "system"
+  useEffect(() => {
+    if (theme === "system" && systemTheme) {
+      // The getColors function will handle system theme detection
+    }
+  }, [theme, systemTheme]);
+  
+  return <>{children}</>;
+}
+
 function RootLayoutNav() {
+  const { getColors } = useUserStore();
+  const colors = getColors();
+  
   return (
     <>
       <StatusBar style="light" />

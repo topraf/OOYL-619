@@ -2,6 +2,9 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { User, Target, ComparisonResult, LeagueStatus } from "@/types";
+import { lightColors, darkColors } from "@/constants/colors";
+
+type Theme = "light" | "dark" | "system";
 
 interface UserState {
   user: User;
@@ -10,6 +13,9 @@ interface UserState {
   freeComparisonUsed: boolean;
   isPremium: boolean;
   isLoading: boolean;
+  theme: Theme;
+  isOffline: boolean;
+  cachedComparisons: ComparisonResult[];
   
   setUserGender: (gender: "male" | "female") => void;
   setUserFrontImage: (uri: string) => void;
@@ -20,8 +26,13 @@ interface UserState {
   compareWithTarget: () => Promise<ComparisonResult | null>;
   
   setPremiumStatus: (status: boolean) => void;
+  setTheme: (theme: Theme) => void;
+  getColors: () => typeof lightColors;
   
   clearHistory: () => void;
+  setOfflineStatus: (isOffline: boolean) => void;
+  cacheComparison: (comparison: ComparisonResult) => void;
+  getCachedComparisons: () => ComparisonResult[];
 }
 
 const initialUser: User = {
@@ -40,6 +51,9 @@ export const useUserStore = create<UserState>()(
       freeComparisonUsed: false,
       isPremium: false,
       isLoading: false,
+      theme: "system",
+      isOffline: false,
+      cachedComparisons: [],
       
       setUserGender: (gender: "male" | "female") => {
         set(state => ({
@@ -89,7 +103,7 @@ export const useUserStore = create<UserState>()(
       },
       
       compareWithTarget: async () => {
-        const { user, currentTarget, freeComparisonUsed, isPremium } = get();
+        const { user, currentTarget, freeComparisonUsed, isPremium, cacheComparison } = get();
         
         // Check if user has image and target has an image
         if (!user.frontImage || !currentTarget?.image) {
@@ -103,7 +117,7 @@ export const useUserStore = create<UserState>()(
         
         set({ isLoading: true });
         
-        // Simulate API call delay
+        // Simulate API call delay with progress
         await new Promise(resolve => setTimeout(resolve, 2000));
         
         // Calculate league status based on beauty scores
@@ -136,6 +150,9 @@ export const useUserStore = create<UserState>()(
           isPremium: isPremium,
         };
         
+        // Cache the comparison for offline access
+        cacheComparison(result);
+        
         set(state => ({
           comparisons: [result, ...state.comparisons],
           freeComparisonUsed: true,
@@ -149,8 +166,37 @@ export const useUserStore = create<UserState>()(
         set({ isPremium: status });
       },
       
+      setTheme: (theme: Theme) => {
+        set({ theme });
+      },
+      
+      getColors: () => {
+        const { theme } = get();
+        if (theme === "dark") return darkColors;
+        if (theme === "light") return lightColors;
+        
+        // For system theme, we'd need to check system preference
+        // For now, default to light
+        return lightColors;
+      },
+      
       clearHistory: () => {
-        set({ comparisons: [] });
+        set({ comparisons: [], cachedComparisons: [] });
+      },
+      
+      setOfflineStatus: (isOffline: boolean) => {
+        set({ isOffline });
+      },
+      
+      cacheComparison: (comparison: ComparisonResult) => {
+        set(state => ({
+          cachedComparisons: [comparison, ...state.cachedComparisons.slice(0, 9)] // Keep last 10
+        }));
+      },
+      
+      getCachedComparisons: () => {
+        const { cachedComparisons, isOffline } = get();
+        return isOffline ? cachedComparisons : [];
       },
     }),
     {
@@ -160,6 +206,8 @@ export const useUserStore = create<UserState>()(
         comparisons: state.comparisons,
         freeComparisonUsed: state.freeComparisonUsed,
         isPremium: state.isPremium,
+        theme: state.theme,
+        cachedComparisons: state.cachedComparisons,
       }),
     }
   )

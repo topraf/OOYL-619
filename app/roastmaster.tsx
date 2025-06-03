@@ -6,31 +6,59 @@ import { ArrowLeft, Volume2, Share2, MessageCircle, Star } from "lucide-react-na
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
-import { colors } from "@/constants/colors";
 import { useUserStore } from "@/store/user-store";
 import PaywallModal from "@/components/PaywallModal";
 import BottomNavigation from "@/components/BottomNavigation";
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withSpring, 
+  withSequence, 
+  withTiming,
+  withRepeat
+} from "react-native-reanimated";
 
 export default function RoastmasterScreen() {
   const router = useRouter();
-  const { comparisons, isPremium } = useUserStore();
+  const { comparisons, isPremium, getColors } = useUserStore();
+  const colors = getColors();
   const [loading, setLoading] = useState(true);
   const [roast, setRoast] = useState("");
   const [showPaywall, setShowPaywall] = useState(false);
   
   const buttonScale = useSharedValue(1);
+  const fadeIn = useSharedValue(0);
+  const slideUp = useSharedValue(30);
+  const pulseScale = useSharedValue(1);
+  const typingDots = useSharedValue(0);
+  
   const animatedButtonStyle = useAnimatedStyle(() => {
     return {
       transform: [{ scale: buttonScale.value }]
     };
   });
   
+  const animatedFadeStyle = useAnimatedStyle(() => {
+    return {
+      opacity: fadeIn.value,
+      transform: [{ translateY: slideUp.value }]
+    };
+  });
+  
+  const animatedPulseStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: pulseScale.value }]
+    };
+  });
+  
   const latestResult = comparisons[0];
   
   useEffect(() => {
+    // Entrance animations
+    fadeIn.value = withTiming(1, { duration: 800 });
+    slideUp.value = withTiming(0, { duration: 800 });
+    
     if (!isPremium) {
-      // Don't show paywall immediately, show the example first
       setLoading(false);
       return;
     }
@@ -45,53 +73,71 @@ export default function RoastmasterScreen() {
   const generateRoast = async () => {
     setLoading(true);
     
+    // Typing animation
+    typingDots.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 500 }),
+        withTiming(0, { duration: 500 })
+      ),
+      -1,
+      false
+    );
+    
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 3000));
       
-      // Mock roasts - in a real app, this would come from an AI service
       const roasts = [
-        "I've seen better-looking faces on a potato. And the potato had more personality too!",
-        "Your face is so asymmetrical, it looks like Picasso designed it during his experimental phase.",
-        "If beauty were time, you'd be 3:45 AM on a Monday morning.",
-        "Your selfie game is so weak, even your phone's front camera is trying to auto-delete.",
-        "You're not ugly, you're just... well, let's say you've got a face that's perfect for radio.",
-        "I'd roast your looks, but it seems like genetics already did that for me.",
-        "Your face has more filters than a Starbucks coffee machine, and still couldn't get the job done.",
-        "If you were a spice, you'd be flour. Basic and forgettable.",
-        "Your beauty score is like your credit score - technically a number, but nothing to brag about.",
-        "I've seen more definition in a foggy mirror than in your jawline."
+        "I've seen better-looking faces on a potato. And the potato had more personality too! 🥔",
+        "Your face is so asymmetrical, it looks like Picasso designed it during his experimental phase. 🎨",
+        "If beauty were time, you'd be 3:45 AM on a Monday morning. ⏰",
+        "Your selfie game is so weak, even your phone's front camera is trying to auto-delete. 📱",
+        "You're not ugly, you're just... well, let's say you've got a face that's perfect for radio. 📻",
+        "I'd roast your looks, but it seems like genetics already did that for me. 🧬",
+        "Your face has more filters than a Starbucks coffee machine, and still couldn't get the job done. ☕",
+        "If you were a spice, you'd be flour. Basic and forgettable. 🌾",
+        "Your beauty score is like your credit score - technically a number, but nothing to brag about. 💳",
+        "I've seen more definition in a foggy mirror than in your jawline. 🪞"
       ];
       
-      // Select a random roast
       const randomRoast = roasts[Math.floor(Math.random() * roasts.length)];
       setRoast(randomRoast);
       
       if (Platform.OS !== "web") {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
+      
+      // Celebration animation
+      pulseScale.value = withSequence(
+        withTiming(1.1, { duration: 200 }),
+        withTiming(1, { duration: 200 })
+      );
+      
     } catch (error) {
       console.error("Error generating roast:", error);
-      setRoast("Sorry, our AI roastmaster is taking a coffee break. Try again later!");
+      setRoast("Sorry, our AI roastmaster is taking a coffee break. Try again later! ☕");
     } finally {
       setLoading(false);
+      typingDots.value = 0;
     }
   };
   
   const handleShare = async () => {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      
-      try {
-        const result = await Share.share({
-          message: `AI Roastmaster says: "${roast}" - Get roasted on League Checker!`,
-          title: "AI Roastmaster"
-        });
-      } catch (error) {
-        console.error("Error sharing:", error);
-      }
-    } else {
-      alert("Sharing is not available on web");
+    }
+    
+    buttonScale.value = withSequence(
+      withTiming(0.95, { duration: 100 }),
+      withTiming(1, { duration: 100 })
+    );
+    
+    try {
+      const result = await Share.share({
+        message: `AI Roastmaster says: "${roast}" - Get roasted on League Checker!`,
+        title: "AI Roastmaster"
+      });
+    } catch (error) {
+      console.error("Error sharing:", error);
     }
   };
   
@@ -100,7 +146,11 @@ export default function RoastmasterScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     
-    // Mock audio playback
+    buttonScale.value = withSequence(
+      withTiming(0.95, { duration: 100 }),
+      withTiming(1, { duration: 100 })
+    );
+    
     alert("Audio playback would start here in a real app");
   };
 
@@ -113,95 +163,97 @@ export default function RoastmasterScreen() {
   };
 
   const handleUpgradeToPremium = () => {
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    }
     setShowPaywall(true);
   };
   
   // Show premium gating with example if user is not premium
   if (!isPremium) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.header}>
           <TouchableOpacity 
-            style={styles.backButton} 
+            style={[styles.backButton, { backgroundColor: colors.card }]} 
             onPress={() => router.back()}
           >
             <ArrowLeft size={20} color={colors.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>AI Roastmaster</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>AI Roastmaster</Text>
           <View style={styles.placeholder} />
         </View>
         
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          <View style={styles.exampleContainer}>
-            <Text style={styles.exampleTitle}>
+          <Animated.View style={[styles.exampleContainer, animatedFadeStyle]}>
+            <Text style={[styles.exampleTitle, { color: colors.text }]}>
               Get{" "}
-              <Text style={styles.exampleTitleAccent}>Roasted</Text>
+              <Text style={[styles.exampleTitleAccent, { color: colors.primary }]}>Roasted</Text>
               {" "}by AI
             </Text>
-            <Text style={styles.exampleSubtitle}>
+            <Text style={[styles.exampleSubtitle, { color: colors.textLight }]}>
               Our AI will analyze your photo and give you a hilarious roast
             </Text>
             
-            {/* Example conversation */}
-            <View style={styles.conversationContainer}>
+            <Animated.View style={[styles.conversationContainer, { backgroundColor: colors.card }, animatedPulseStyle]}>
               <View style={styles.messageContainer}>
-                <View style={styles.aiAvatar}>
+                <View style={[styles.aiAvatar, { backgroundColor: colors.primary }]}>
                   <MessageCircle size={16} color={colors.background} />
                 </View>
-                <View style={styles.aiMessage}>
-                  <Text style={styles.aiMessageText}>
-                    "I've seen better selfies on a potato cam from 2005. Your face has more blur than a witness protection program!"
+                <View style={[styles.aiMessage, { backgroundColor: colors.primary + "15" }]}>
+                  <Text style={[styles.aiMessageText, { color: colors.text }]}>
+                    "I've seen better selfies on a potato cam from 2005. Your face has more blur than a witness protection program! 📸"
                   </Text>
                 </View>
               </View>
               
               <View style={styles.messageContainer}>
-                <View style={styles.aiAvatar}>
+                <View style={[styles.aiAvatar, { backgroundColor: colors.primary }]}>
                   <MessageCircle size={16} color={colors.background} />
                 </View>
-                <View style={styles.aiMessage}>
-                  <Text style={styles.aiMessageText}>
-                    "If confidence was beauty, you'd still be in trouble. But hey, at least your phone's camera is working overtime!"
+                <View style={[styles.aiMessage, { backgroundColor: colors.primary + "15" }]}>
+                  <Text style={[styles.aiMessageText, { color: colors.text }]}>
+                    "If confidence was beauty, you'd still be in trouble. But hey, at least your phone's camera is working overtime! 💪"
                   </Text>
                 </View>
               </View>
               
               <View style={styles.messageContainer}>
-                <View style={styles.aiAvatar}>
+                <View style={[styles.aiAvatar, { backgroundColor: colors.primary }]}>
                   <MessageCircle size={16} color={colors.background} />
                 </View>
-                <View style={styles.aiMessage}>
-                  <Text style={styles.aiMessageText}>
+                <View style={[styles.aiMessage, { backgroundColor: colors.primary + "15" }]}>
+                  <Text style={[styles.aiMessageText, { color: colors.text }]}>
                     "Your beauty score is like your WiFi signal - technically there, but barely functional! 😂"
                   </Text>
                 </View>
               </View>
-            </View>
+            </Animated.View>
             
-            <View style={styles.featuresContainer}>
-              <Text style={styles.featuresTitle}>Premium Roast Features</Text>
+            <View style={[styles.featuresContainer, { backgroundColor: colors.card }]}>
+              <Text style={[styles.featuresTitle, { color: colors.text }]}>Premium Roast Features</Text>
               
               <View style={styles.featureItem}>
                 <Text style={styles.featureEmoji}>🤖</Text>
-                <Text style={styles.featureText}>AI-powered personalized roasts</Text>
+                <Text style={[styles.featureText, { color: colors.text }]}>AI-powered personalized roasts</Text>
               </View>
               
               <View style={styles.featureItem}>
                 <Text style={styles.featureEmoji}>🔥</Text>
-                <Text style={styles.featureText}>Multiple roast styles and intensities</Text>
+                <Text style={[styles.featureText, { color: colors.text }]}>Multiple roast styles and intensities</Text>
               </View>
               
               <View style={styles.featureItem}>
                 <Text style={styles.featureEmoji}>🎭</Text>
-                <Text style={styles.featureText}>Celebrity roast comparisons</Text>
+                <Text style={[styles.featureText, { color: colors.text }]}>Celebrity roast comparisons</Text>
               </View>
               
               <View style={styles.featureItem}>
                 <Text style={styles.featureEmoji}>🔊</Text>
-                <Text style={styles.featureText}>Audio roasts with different voices</Text>
+                <Text style={[styles.featureText, { color: colors.text }]}>Audio roasts with different voices</Text>
               </View>
             </View>
-          </View>
+          </Animated.View>
         </ScrollView>
         
         <View style={styles.ctaContainer}>
@@ -219,12 +271,12 @@ export default function RoastmasterScreen() {
                 style={styles.upgradeButtonGradient}
               >
                 <Star size={20} color={colors.background} />
-                <Text style={styles.upgradeButtonText}>Roast Me Now!</Text>
+                <Text style={[styles.upgradeButtonText, { color: colors.background }]}>Roast Me Now!</Text>
               </LinearGradient>
             </TouchableOpacity>
           </Animated.View>
           
-          <Text style={styles.ctaSubtext}>
+          <Text style={[styles.ctaSubtext, { color: colors.textLight }]}>
             Unlock unlimited roasts and premium features
           </Text>
         </View>
@@ -241,31 +293,31 @@ export default function RoastmasterScreen() {
   
   if (!latestResult) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.header}>
           <TouchableOpacity 
-            style={styles.backButton} 
+            style={[styles.backButton, { backgroundColor: colors.card }]} 
             onPress={() => router.back()}
           >
             <ArrowLeft size={20} color={colors.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>AI Roastmaster</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>AI Roastmaster</Text>
           <View style={styles.placeholder} />
         </View>
         
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyTitle}>No Photos Found</Text>
-          <Text style={styles.emptyMessage}>
+          <Text style={[styles.emptyTitle, { color: colors.text }]}>No Photos Found</Text>
+          <Text style={[styles.emptyMessage, { color: colors.textLight }]}>
             Complete a comparison first to get roasted by our AI
           </Text>
           <Animated.View style={animatedButtonStyle}>
             <TouchableOpacity 
-              style={styles.button} 
+              style={[styles.button, { backgroundColor: colors.primary }]} 
               onPress={() => router.push("/")}
               onPressIn={onPressIn}
               onPressOut={onPressOut}
             >
-              <Text style={styles.buttonText}>Start Comparison</Text>
+              <Text style={[styles.buttonText, { color: colors.background }]}>Start Comparison</Text>
             </TouchableOpacity>
           </Animated.View>
         </View>
@@ -275,88 +327,94 @@ export default function RoastmasterScreen() {
   }
   
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top"]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <TouchableOpacity 
-            style={styles.backButton} 
+            style={[styles.backButton, { backgroundColor: colors.card }]} 
             onPress={() => router.back()}
           >
             <ArrowLeft size={20} color={colors.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>AI Roastmaster</Text>
-          <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>AI Roastmaster</Text>
+          <TouchableOpacity 
+            style={[styles.shareButton, { backgroundColor: colors.card }]} 
+            onPress={handleShare}
+          >
             <Share2 size={20} color={colors.text} />
           </TouchableOpacity>
         </View>
         
-        <View style={styles.imageContainer}>
+        <Animated.View style={[styles.imageContainer, animatedFadeStyle]}>
           <Image
             source={{ uri: latestResult.user.frontImage || "" }}
             style={styles.userImage}
             contentFit="cover"
           />
           <LinearGradient
-            colors={["transparent", "rgba(0,0,0,0.8)"]}
+            colors={["transparent", colors.overlay]}
             style={styles.imageGradient}
           />
-        </View>
+        </Animated.View>
         
-        <View style={styles.roastContainer}>
+        <Animated.View style={[styles.roastContainer, { backgroundColor: colors.card }, animatedPulseStyle]}>
           <View style={styles.roastHeader}>
             <MessageCircle size={24} color={colors.primary} />
-            <Text style={styles.roastTitle}>AI Roastmaster Says:</Text>
+            <Text style={[styles.roastTitle, { color: colors.text }]}>AI Roastmaster Says:</Text>
           </View>
           
           {loading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color={colors.primary} />
-              <Text style={styles.loadingText}>Preparing your roast...</Text>
+              <Text style={[styles.loadingText, { color: colors.textLight }]}>Preparing your roast...</Text>
+              <View style={styles.typingIndicator}>
+                <Text style={[styles.typingDots, { color: colors.primary }]}>●●●</Text>
+              </View>
             </View>
           ) : (
             <>
-              <Text style={styles.roastText}>{roast}</Text>
+              <Text style={[styles.roastText, { color: colors.text }]}>{roast}</Text>
               
               <Animated.View style={animatedButtonStyle}>
                 <TouchableOpacity 
-                  style={styles.audioButton}
+                  style={[styles.audioButton, { backgroundColor: colors.primary }]}
                   onPress={handlePlayAudio}
                   onPressIn={onPressIn}
                   onPressOut={onPressOut}
                 >
                   <Volume2 size={20} color={colors.background} />
-                  <Text style={styles.audioButtonText}>Hear Your Roast</Text>
+                  <Text style={[styles.audioButtonText, { color: colors.background }]}>Hear Your Roast</Text>
                 </TouchableOpacity>
               </Animated.View>
             </>
           )}
-        </View>
+        </Animated.View>
         
         {!loading && (
           <Animated.View style={animatedButtonStyle}>
             <TouchableOpacity 
-              style={styles.generateButton}
+              style={[styles.generateButton, { backgroundColor: colors.card, borderColor: colors.primary }]}
               onPress={generateRoast}
               onPressIn={onPressIn}
               onPressOut={onPressOut}
             >
-              <Text style={styles.generateButtonText}>Generate Another Roast</Text>
+              <Text style={[styles.generateButtonText, { color: colors.primary }]}>Generate Another Roast</Text>
             </TouchableOpacity>
           </Animated.View>
         )}
         
         <TouchableOpacity 
-          style={styles.shareFullButton}
+          style={[styles.shareFullButton, { backgroundColor: colors.primary }]}
           onPress={handleShare}
         >
           <Share2 size={20} color={colors.background} />
-          <Text style={styles.shareFullButtonText}>Share Your Roast</Text>
+          <Text style={[styles.shareFullButtonText, { color: colors.background }]}>Share Your Roast</Text>
         </TouchableOpacity>
         
         <View style={styles.disclaimerContainer}>
-          <Text style={styles.disclaimer}>
+          <Text style={[styles.disclaimer, { color: colors.textLight }]}>
             Our AI roasts are meant to be humorous and not to be taken seriously.
-            We believe everyone is beautiful in their own way!
+            We believe everyone is beautiful in their own way! ✨
           </Text>
         </View>
       </ScrollView>
@@ -369,11 +427,10 @@ export default function RoastmasterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingBottom: 80, // Space for bottom navigation
+    paddingBottom: 80,
   },
   header: {
     flexDirection: "row",
@@ -385,20 +442,17 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.card,
     justifyContent: "center",
     alignItems: "center",
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: "600",
-    color: colors.text,
   },
   shareButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.card,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -411,26 +465,23 @@ const styles = StyleSheet.create({
   exampleTitle: {
     fontSize: 28,
     fontWeight: "900",
-    color: colors.text,
     textAlign: "center",
     marginBottom: 8,
   },
   exampleTitleAccent: {
-    color: colors.primary,
+    // Color applied dynamically
   },
   exampleSubtitle: {
     fontSize: 16,
-    color: colors.textLight,
     textAlign: "center",
     marginBottom: 24,
     lineHeight: 24,
   },
   conversationContainer: {
-    backgroundColor: colors.card,
     borderRadius: 16,
     padding: 16,
     marginBottom: 24,
-    shadowColor: colors.shadow,
+    shadowColor: "rgba(0, 0, 0, 0.1)",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -445,25 +496,21 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: colors.primary,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
   },
   aiMessage: {
     flex: 1,
-    backgroundColor: colors.primary + "15",
     borderRadius: 12,
     padding: 12,
   },
   aiMessageText: {
     fontSize: 14,
-    color: colors.text,
     lineHeight: 20,
     fontStyle: "italic",
   },
   featuresContainer: {
-    backgroundColor: colors.card,
     borderRadius: 16,
     padding: 16,
     marginBottom: 24,
@@ -471,7 +518,6 @@ const styles = StyleSheet.create({
   featuresTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: colors.text,
     marginBottom: 16,
   },
   featureItem: {
@@ -485,7 +531,6 @@ const styles = StyleSheet.create({
   },
   featureText: {
     fontSize: 16,
-    color: colors.text,
   },
   ctaContainer: {
     padding: 16,
@@ -494,7 +539,7 @@ const styles = StyleSheet.create({
   upgradeButton: {
     borderRadius: 12,
     overflow: "hidden",
-    shadowColor: colors.shadow,
+    shadowColor: "rgba(0, 0, 0, 0.1)",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
@@ -508,14 +553,12 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   upgradeButtonText: {
-    color: colors.background,
     fontSize: 18,
     fontWeight: "900",
     marginLeft: 8,
   },
   ctaSubtext: {
     fontSize: 14,
-    color: colors.textLight,
     textAlign: "center",
   },
   imageContainer: {
@@ -525,7 +568,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     position: "relative",
     marginBottom: 16,
-    shadowColor: colors.shadow,
+    shadowColor: "rgba(0, 0, 0, 0.1)",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
@@ -534,7 +577,6 @@ const styles = StyleSheet.create({
   userImage: {
     width: "100%",
     height: "100%",
-    backgroundColor: colors.border,
   },
   imageGradient: {
     position: "absolute",
@@ -544,11 +586,10 @@ const styles = StyleSheet.create({
     height: 100,
   },
   roastContainer: {
-    backgroundColor: colors.card,
     margin: 16,
     borderRadius: 16,
     padding: 16,
-    shadowColor: colors.shadow,
+    shadowColor: "rgba(0, 0, 0, 0.1)",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -562,7 +603,6 @@ const styles = StyleSheet.create({
   roastTitle: {
     fontSize: 18,
     fontWeight: "600",
-    color: colors.text,
     marginLeft: 8,
   },
   loadingContainer: {
@@ -572,45 +612,46 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: colors.textLight,
+  },
+  typingIndicator: {
+    marginTop: 12,
+  },
+  typingDots: {
+    fontSize: 20,
+    fontWeight: "bold",
   },
   roastText: {
     fontSize: 18,
-    color: colors.text,
     lineHeight: 28,
     fontStyle: "italic",
     marginBottom: 16,
   },
   audioButton: {
     flexDirection: "row",
-    backgroundColor: colors.primary,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
     marginTop: 8,
-    shadowColor: colors.shadow,
+    shadowColor: "rgba(0, 0, 0, 0.1)",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,
   },
   audioButtonText: {
-    color: colors.background,
     fontSize: 16,
     fontWeight: "600",
     marginLeft: 8,
   },
   generateButton: {
-    backgroundColor: colors.card,
     marginHorizontal: 16,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: colors.primary,
-    shadowColor: colors.shadow,
+    shadowColor: "rgba(0, 0, 0, 0.1)",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -618,12 +659,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   generateButtonText: {
-    color: colors.primary,
     fontSize: 16,
     fontWeight: "600",
   },
   shareFullButton: {
-    backgroundColor: colors.primary,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -633,7 +672,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   shareFullButtonText: {
-    color: colors.background,
     fontSize: 16,
     fontWeight: "600",
     marginLeft: 8,
@@ -644,7 +682,6 @@ const styles = StyleSheet.create({
   },
   disclaimer: {
     fontSize: 12,
-    color: colors.textLight,
     textAlign: "center",
     lineHeight: 18,
   },
@@ -657,28 +694,24 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 20,
     fontWeight: "600",
-    color: colors.text,
     marginBottom: 8,
   },
   emptyMessage: {
     fontSize: 16,
-    color: colors.textLight,
     textAlign: "center",
     marginBottom: 24,
   },
   button: {
-    backgroundColor: colors.primary,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
-    shadowColor: colors.shadow,
+    shadowColor: "rgba(0, 0, 0, 0.1)",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,
   },
   buttonText: {
-    color: colors.background,
     fontSize: 16,
     fontWeight: "600",
   },

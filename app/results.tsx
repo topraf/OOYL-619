@@ -2,11 +2,10 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Platform, Dimensions, Share, FlatList, Linking } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { Home, Camera, MessageCircle, Star, History } from "lucide-react-native";
+import { Home, Camera, MessageCircle, Star, History, Wifi, WifiOff } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { Platform as RNPlatform } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { colors } from "@/constants/colors";
 import { useUserStore } from "@/store/user-store";
 import LeagueGauge from "@/components/LeagueGauge";
 import ImagePreview from "@/components/ImagePreview";
@@ -15,7 +14,7 @@ import FeatureScoreCard from "@/components/FeatureScoreCard";
 import BottomNavigation from "@/components/BottomNavigation";
 import ComparisonCard from "@/components/ComparisonCard";
 import EmptyState from "@/components/EmptyState";
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, withSequence, withTiming, useAnimatedProps } from "react-native-reanimated";
 
 const { width } = Dimensions.get("window");
 
@@ -23,28 +22,58 @@ type FeatureStatus = "High" | "Mid" | "Low";
 
 export default function ResultsScreen() {
   const router = useRouter();
-  const { comparisons, isLoading, isPremium, clearHistory } = useUserStore();
+  const { comparisons, isLoading, isPremium, clearHistory, getColors, isOffline, getCachedComparisons } = useUserStore();
+  const colors = getColors();
   const [showResult, setShowResult] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   
   const buttonScale = useSharedValue(1);
+  const cardScale = useSharedValue(1);
+  const fadeIn = useSharedValue(0);
+  const slideUp = useSharedValue(50);
+  
   const animatedButtonStyle = useAnimatedStyle(() => {
     return {
       transform: [{ scale: buttonScale.value }]
     };
   });
   
+  const animatedCardStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: cardScale.value }],
+      opacity: fadeIn.value,
+    };
+  });
+  
+  const animatedSlideStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateY: slideUp.value }],
+      opacity: fadeIn.value,
+    };
+  });
+  
   const latestResult = comparisons[0];
+  const cachedResults = getCachedComparisons();
+  const displayResults = isOffline ? cachedResults : comparisons;
 
   useEffect(() => {
     if (!isLoading && latestResult) {
-      // Add a small delay for dramatic effect
+      // Enhanced entrance animation
+      fadeIn.value = withTiming(1, { duration: 800 });
+      slideUp.value = withTiming(0, { duration: 800 });
+      
       const timer = setTimeout(() => {
         setShowResult(true);
         if (RNPlatform.OS !== "web") {
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         }
+        
+        // Subtle celebration animation
+        cardScale.value = withSequence(
+          withTiming(1.05, { duration: 200 }),
+          withTiming(1, { duration: 200 })
+        );
       }, 1000);
       
       return () => clearTimeout(timer);
@@ -58,14 +87,12 @@ export default function ResultsScreen() {
       try {
         const message = `I just found out if someone is in my league using League Checker! My score: ${getOverallScore()}/10`;
         
-        // Try to open Instagram app
         const instagramUrl = `instagram://story-camera`;
         const canOpen = await Linking.canOpenURL(instagramUrl);
         
         if (canOpen) {
           await Linking.openURL(instagramUrl);
         } else {
-          // Fallback to regular share
           await Share.share({
             message: message,
             title: "League Checker Results"
@@ -86,14 +113,12 @@ export default function ResultsScreen() {
       try {
         const message = `I just found out if someone is in my league using League Checker! My score: ${getOverallScore()}/10`;
         
-        // Try to open Snapchat app
         const snapchatUrl = `snapchat://`;
         const canOpen = await Linking.canOpenURL(snapchatUrl);
         
         if (canOpen) {
           await Linking.openURL(snapchatUrl);
         } else {
-          // Fallback to regular share
           await Share.share({
             message: message,
             title: "League Checker Results"
@@ -119,7 +144,6 @@ export default function ResultsScreen() {
         if (canOpen) {
           await Linking.openURL(twitterUrl);
         } else {
-          // Fallback to web Twitter
           const webUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}`;
           await Linking.openURL(webUrl);
         }
@@ -135,8 +159,15 @@ export default function ResultsScreen() {
 
   const handleNewComparison = () => {
     if (RNPlatform.OS !== "web") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
+    
+    // Animate button press
+    buttonScale.value = withSequence(
+      withTiming(0.95, { duration: 100 }),
+      withTiming(1, { duration: 100 })
+    );
+    
     router.replace("/");
   };
   
@@ -152,8 +183,11 @@ export default function ResultsScreen() {
   };
 
   const handleClearHistory = () => {
-    // Simple confirmation
-    if (comparisons.length > 0) {
+    if (RNPlatform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    }
+    
+    if (displayResults.length > 0) {
       clearHistory();
     }
   };
@@ -226,7 +260,6 @@ export default function ResultsScreen() {
     return Math.round(latestResult.user.beautyScore * 10);
   };
 
-  // Mock feature scores for demonstration
   const getFeatureScores = () => {
     const scores = [
       { name: "Facial Symmetry", score: Math.round(Math.random() * 4 + 6) },
@@ -250,58 +283,81 @@ export default function ResultsScreen() {
   };
 
   const toggleHistoryView = () => {
+    if (RNPlatform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
     setShowHistory(!showHistory);
   };
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>
-          Analyzing your{" "}
-          <Text style={styles.loadingTextAccent}>photos...</Text>
-        </Text>
-        <ActivityIndicator size="large" color={colors.primary} style={styles.loader} />
-        <Text style={styles.loadingSubtext}>Calculating league status</Text>
+      <SafeAreaView style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
+        <Animated.View style={animatedSlideStyle}>
+          <Text style={[styles.loadingText, { color: colors.text }]}>
+            Analyzing your{" "}
+            <Text style={[styles.loadingTextAccent, { color: colors.primary }]}>photos...</Text>
+          </Text>
+          <ActivityIndicator size="large" color={colors.primary} style={styles.loader} />
+          <Text style={[styles.loadingSubtext, { color: colors.textLight }]}>Calculating league status</Text>
+        </Animated.View>
       </SafeAreaView>
     );
   }
 
   if (showHistory) {
     return (
-      <SafeAreaView style={styles.container} edges={["top"]}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top"]}>
         <View style={styles.header}>
           <TouchableOpacity 
-            style={styles.backButton} 
+            style={[styles.backButton, { backgroundColor: colors.card }]} 
             onPress={toggleHistoryView}
           >
             <Home size={20} color={colors.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>
             Your{" "}
-            <Text style={styles.headerTitleAccent}>History</Text>
+            <Text style={[styles.headerTitleAccent, { color: colors.primary }]}>History</Text>
           </Text>
+          {isOffline && (
+            <View style={[styles.offlineIndicator, { backgroundColor: colors.warning }]}>
+              <WifiOff size={16} color={colors.background} />
+            </View>
+          )}
           <View style={styles.placeholder} />
         </View>
         
-        {comparisons.length === 0 ? (
+        {displayResults.length === 0 ? (
           <EmptyState
             title="No History Yet"
-            message="Your comparisons will appear here after you complete them."
+            message={isOffline ? "No cached comparisons available offline." : "Your comparisons will appear here after you complete them."}
           />
         ) : (
           <FlatList
-            data={comparisons}
+            data={displayResults}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity 
-                style={styles.cardContainer}
-                onPress={() => {
-                  // Navigate to results with this specific comparison
-                  setShowHistory(false);
-                }}
+            renderItem={({ item, index }) => (
+              <Animated.View
+                style={[
+                  animatedCardStyle,
+                  { 
+                    transform: [{ 
+                      translateY: useSharedValue(index * 20).value 
+                    }] 
+                  }
+                ]}
               >
-                <ComparisonCard result={item} compact={true} />
-              </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.cardContainer}
+                  onPress={() => {
+                    if (RNPlatform.OS !== "web") {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }
+                    setShowHistory(false);
+                  }}
+                >
+                  <ComparisonCard result={item} compact={true} />
+                </TouchableOpacity>
+              </Animated.View>
             )}
             contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}
@@ -315,24 +371,24 @@ export default function ResultsScreen() {
 
   if (!latestResult) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyTitle}>
+          <Text style={[styles.emptyTitle, { color: colors.text }]}>
             No{" "}
-            <Text style={styles.emptyTitleAccent}>Results</Text>
+            <Text style={[styles.emptyTitleAccent, { color: colors.primary }]}>Results</Text>
             {" "}Yet
           </Text>
-          <Text style={styles.emptyMessage}>
+          <Text style={[styles.emptyMessage, { color: colors.textLight }]}>
             Take photos to see if someone is in your league!
           </Text>
           <Animated.View style={animatedButtonStyle}>
             <TouchableOpacity 
-              style={styles.button} 
+              style={[styles.button, { backgroundColor: colors.primary }]} 
               onPress={handleNewComparison}
               onPressIn={onPressIn}
               onPressOut={onPressOut}
             >
-              <Text style={styles.buttonText}>Start Comparison</Text>
+              <Text style={[styles.buttonText, { color: colors.background }]}>Start Comparison</Text>
             </TouchableOpacity>
           </Animated.View>
         </View>
@@ -342,7 +398,7 @@ export default function ResultsScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top"]}>
       <ScrollView 
         contentContainerStyle={styles.scrollContent} 
         showsVerticalScrollIndicator={false}
@@ -353,77 +409,79 @@ export default function ResultsScreen() {
           <>
             <View style={styles.header}>
               <TouchableOpacity 
-                style={styles.backButton} 
+                style={[styles.backButton, { backgroundColor: colors.card }]} 
                 onPress={() => router.push("/")}
               >
                 <Home size={20} color={colors.text} />
               </TouchableOpacity>
-              <Text style={styles.headerTitle}>
+              <Text style={[styles.headerTitle, { color: colors.text }]}>
                 Your{" "}
-                <Text style={styles.headerTitleAccent}>Results</Text>
+                <Text style={[styles.headerTitleAccent, { color: colors.primary }]}>Results</Text>
               </Text>
               <TouchableOpacity 
-                style={styles.historyButton} 
+                style={[styles.historyButton, { backgroundColor: colors.card }]} 
                 onPress={toggleHistoryView}
               >
                 <History size={20} color={colors.text} />
               </TouchableOpacity>
             </View>
             
-            <LinearGradient
-              colors={[colors.secondary, colors.primary]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.resultCard}
-            >
-              <Text style={styles.resultTitle}>
-                {getLeagueText()}
-              </Text>
-              
-              <View style={styles.imagesContainer}>
-                <View style={styles.imageColumn}>
-                  <ImagePreview
-                    uri={latestResult.user.frontImage || ""}
-                    style={styles.circleImage}
-                  />
-                  <Text style={styles.imageLabel}>You</Text>
-                  <Text style={styles.scoreText}>{getOverallScore()}/10</Text>
-                </View>
+            <Animated.View style={animatedCardStyle}>
+              <LinearGradient
+                colors={[colors.secondary, colors.primary]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.resultCard}
+              >
+                <Text style={[styles.resultTitle, { color: colors.background }]}>
+                  {getLeagueText()}
+                </Text>
                 
-                <View style={styles.vsContainer}>
-                  <Text style={styles.vsText}>VS</Text>
+                <View style={styles.imagesContainer}>
+                  <View style={styles.imageColumn}>
+                    <ImagePreview
+                      uri={latestResult.user.frontImage || ""}
+                      style={[styles.circleImage, { borderColor: colors.background }]}
+                    />
+                    <Text style={[styles.imageLabel, { color: colors.background }]}>You</Text>
+                    <Text style={[styles.scoreText, { color: colors.background }]}>{getOverallScore()}/10</Text>
+                  </View>
+                  
+                  <View style={styles.vsContainer}>
+                    <Text style={[styles.vsText, { color: colors.background }]}>VS</Text>
+                  </View>
+                  
+                  <View style={styles.imageColumn}>
+                    <ImagePreview
+                      uri={latestResult.target.image}
+                      style={[styles.circleImage, { borderColor: colors.background }]}
+                    />
+                    <Text style={[styles.imageLabel, { color: colors.background }]}>
+                      {latestResult.target.name || "Them"}
+                    </Text>
+                    <Text style={[styles.scoreText, { color: colors.background }]}>
+                      {Math.round((latestResult.target.beautyScore || 0) * 10)}/10
+                    </Text>
+                  </View>
                 </View>
-                
-                <View style={styles.imageColumn}>
-                  <ImagePreview
-                    uri={latestResult.target.image}
-                    style={styles.circleImage}
-                  />
-                  <Text style={styles.imageLabel}>
-                    {latestResult.target.name || "Them"}
-                  </Text>
-                  <Text style={styles.scoreText}>
-                    {Math.round((latestResult.target.beautyScore || 0) * 10)}/10
-                  </Text>
-                </View>
-              </View>
-            </LinearGradient>
+              </LinearGradient>
+            </Animated.View>
             
-            <View style={styles.gaugeContainer}>
+            <Animated.View style={[styles.gaugeContainer, animatedSlideStyle]}>
               <LeagueGauge leagueStatus={latestResult.leagueStatus} />
-              <Text style={styles.leaguePhrase}>
+              <Text style={[styles.leaguePhrase, { color: colors.primary }]}>
                 {getLeaguePhrase()}
               </Text>
-              <Text style={styles.leagueDescription}>
+              <Text style={[styles.leagueDescription, { color: colors.textLight }]}>
                 {getLeagueDescription()}
               </Text>
-            </View>
+            </Animated.View>
             
             {isPremium && (
-              <View style={styles.featureScoresContainer}>
-                <Text style={styles.sectionTitle}>
+              <Animated.View style={[styles.featureScoresContainer, animatedSlideStyle]}>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>
                   Your Beauty{" "}
-                  <Text style={styles.sectionTitleAccent}>Analysis</Text>
+                  <Text style={[styles.sectionTitleAccent, { color: colors.primary }]}>Analysis</Text>
                 </Text>
                 <ScrollView 
                   horizontal 
@@ -439,11 +497,11 @@ export default function ResultsScreen() {
                     />
                   ))}
                 </ScrollView>
-              </View>
+              </Animated.View>
             )}
             
-            <View style={styles.shareContainer}>
-              <Text style={styles.shareTitle}>Share Your Results</Text>
+            <Animated.View style={[styles.shareContainer, { backgroundColor: colors.card }, animatedSlideStyle]}>
+              <Text style={[styles.shareTitle, { color: colors.text }]}>Share Your Results</Text>
               <View style={styles.socialButtonsContainer}>
                 <TouchableOpacity 
                   style={[styles.socialButton, { backgroundColor: "#E4405F" }]}
@@ -466,12 +524,12 @@ export default function ResultsScreen() {
                   <Text style={styles.socialButtonText}>X</Text>
                 </TouchableOpacity>
               </View>
-            </View>
+            </Animated.View>
             
-            <View style={styles.actionsContainer}>
-              <Text style={styles.actionsTitle}>
+            <Animated.View style={[styles.actionsContainer, { backgroundColor: colors.card }, animatedSlideStyle]}>
+              <Text style={[styles.actionsTitle, { color: colors.text }]}>
                 What's{" "}
-                <Text style={styles.actionsTitleAccent}>Next?</Text>
+                <Text style={[styles.actionsTitleAccent, { color: colors.primary }]}>Next?</Text>
               </Text>
               
               <ScrollView 
@@ -480,41 +538,41 @@ export default function ResultsScreen() {
                 contentContainerStyle={styles.actionButtonsRow}
               >
                 <TouchableOpacity 
-                  style={styles.actionButtonCard}
+                  style={[styles.actionButtonCard, { backgroundColor: colors.primary + "10" }]}
                   onPress={handleNewComparison}
                 >
-                  <View style={styles.actionIconCircle}>
+                  <View style={[styles.actionIconCircle, { backgroundColor: colors.background }]}>
                     <Camera size={24} color={colors.primary} />
                   </View>
-                  <Text style={styles.actionButtonCardText}>Try with another photo again</Text>
+                  <Text style={[styles.actionButtonCardText, { color: colors.text }]}>Try with another photo again</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
-                  style={styles.actionButtonCard}
+                  style={[styles.actionButtonCard, { backgroundColor: colors.primary + "10" }]}
                   onPress={() => router.push("/celebrities")}
                 >
-                  <View style={styles.actionIconCircle}>
+                  <View style={[styles.actionIconCircle, { backgroundColor: colors.background }]}>
                     <Star size={24} color={colors.primary} />
                   </View>
-                  <Text style={styles.actionButtonCardText}>Compare with celebrities</Text>
-                  {!isPremium && <Text style={styles.premiumLabel}>Premium</Text>}
+                  <Text style={[styles.actionButtonCardText, { color: colors.text }]}>Compare with celebrities</Text>
+                  {!isPremium && <Text style={[styles.premiumLabel, { color: colors.primary }]}>Premium</Text>}
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
-                  style={styles.actionButtonCard}
+                  style={[styles.actionButtonCard, { backgroundColor: colors.primary + "10" }]}
                   onPress={() => router.push("/roastmaster")}
                 >
-                  <View style={styles.actionIconCircle}>
+                  <View style={[styles.actionIconCircle, { backgroundColor: colors.background }]}>
                     <MessageCircle size={24} color={colors.primary} />
                   </View>
-                  <Text style={styles.actionButtonCardText}>Get roasted by our AI if you dare</Text>
-                  {!isPremium && <Text style={styles.premiumLabel}>Premium</Text>}
+                  <Text style={[styles.actionButtonCardText, { color: colors.text }]}>Get roasted by our AI if you dare</Text>
+                  {!isPremium && <Text style={[styles.premiumLabel, { color: colors.primary }]}>Premium</Text>}
                 </TouchableOpacity>
               </ScrollView>
-            </View>
+            </Animated.View>
             
             <View style={styles.disclaimerContainer}>
-              <Text style={styles.disclaimer}>
+              <Text style={[styles.disclaimer, { color: colors.textLight }]}>
                 This comparison is based on photographic evidence only. Beauty is subjective and
                 not everyone is photogenic. Don't take these results too seriously!
               </Text>
@@ -540,35 +598,31 @@ export default function ResultsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: colors.background,
     padding: 24,
   },
   loadingText: {
     fontSize: 24,
     fontWeight: "800",
-    color: colors.text,
     marginBottom: 24,
   },
   loadingTextAccent: {
-    color: colors.primary,
+    // Color applied dynamically
   },
   loader: {
     marginVertical: 24,
   },
   loadingSubtext: {
     fontSize: 16,
-    color: colors.textLight,
   },
   scrollContent: {
     flexGrow: 1,
     padding: 16,
-    paddingBottom: 120, // Increased space for bottom navigation
+    paddingBottom: 120,
   },
   header: {
     flexDirection: "row",
@@ -580,7 +634,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.card,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -588,17 +641,22 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.card,
     justifyContent: "center",
     alignItems: "center",
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: "900",
-    color: colors.text,
   },
   headerTitleAccent: {
-    color: colors.primary,
+    // Color applied dynamically
+  },
+  offlineIndicator: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
   },
   placeholder: {
     width: 40,
@@ -607,7 +665,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
-    shadowColor: colors.shadow,
+    shadowColor: "rgba(0, 0, 0, 0.1)",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -616,7 +674,6 @@ const styles = StyleSheet.create({
   resultTitle: {
     fontSize: 22,
     fontWeight: "900",
-    color: colors.background,
     textAlign: "center",
     marginBottom: 20,
   },
@@ -634,18 +691,15 @@ const styles = StyleSheet.create({
     height: width * 0.25,
     borderRadius: width * 0.125,
     borderWidth: 3,
-    borderColor: colors.background,
   },
   imageLabel: {
     fontSize: 16,
     fontWeight: "700",
-    color: colors.background,
     marginTop: 8,
   },
   scoreText: {
     fontSize: 20,
     fontWeight: "800",
-    color: colors.background,
     marginTop: 4,
   },
   vsContainer: {
@@ -655,7 +709,6 @@ const styles = StyleSheet.create({
   vsText: {
     fontSize: 18,
     fontWeight: "800",
-    color: colors.background,
   },
   gaugeContainer: {
     marginBottom: 24,
@@ -663,13 +716,11 @@ const styles = StyleSheet.create({
   leaguePhrase: {
     fontSize: 18,
     fontWeight: "800",
-    color: colors.primary,
     textAlign: "center",
     marginTop: 12,
   },
   leagueDescription: {
     fontSize: 16,
-    color: colors.textLight,
     textAlign: "center",
     marginTop: 8,
     lineHeight: 22,
@@ -680,22 +731,20 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     fontWeight: "900",
-    color: colors.text,
     marginBottom: 16,
   },
   sectionTitleAccent: {
-    color: colors.primary,
+    // Color applied dynamically
   },
   featureScoresRow: {
     paddingRight: 16,
     paddingBottom: 8,
   },
   shareContainer: {
-    backgroundColor: colors.card,
     borderRadius: 16,
     padding: 16,
     marginBottom: 24,
-    shadowColor: colors.shadow,
+    shadowColor: "rgba(0, 0, 0, 0.1)",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -704,7 +753,6 @@ const styles = StyleSheet.create({
   shareTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: colors.text,
     marginBottom: 16,
     textAlign: "center",
   },
@@ -719,23 +767,22 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: colors.shadow,
+    shadowColor: "rgba(0, 0, 0, 0.1)",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,
   },
   socialButtonText: {
-    color: colors.background,
+    color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "900",
   },
   actionsContainer: {
-    backgroundColor: colors.card,
     borderRadius: 16,
     padding: 16,
     marginBottom: 24,
-    shadowColor: colors.shadow,
+    shadowColor: "rgba(0, 0, 0, 0.1)",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -744,11 +791,10 @@ const styles = StyleSheet.create({
   actionsTitle: {
     fontSize: 20,
     fontWeight: "900",
-    color: colors.text,
     marginBottom: 16,
   },
   actionsTitleAccent: {
-    color: colors.primary,
+    // Color applied dynamically
   },
   actionButtonsRow: {
     flexDirection: "row",
@@ -756,7 +802,6 @@ const styles = StyleSheet.create({
   },
   actionButtonCard: {
     width: width * 0.3,
-    backgroundColor: colors.primary + "10",
     borderRadius: 12,
     padding: 12,
     alignItems: "center",
@@ -767,14 +812,12 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: colors.background,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 8,
   },
   actionButtonCardText: {
     fontSize: 12,
-    color: colors.text,
     textAlign: "center",
     lineHeight: 16,
   },
@@ -783,7 +826,6 @@ const styles = StyleSheet.create({
     top: 4,
     right: 4,
     fontSize: 10,
-    color: colors.primary,
     fontWeight: "700",
   },
   disclaimerContainer: {
@@ -791,7 +833,6 @@ const styles = StyleSheet.create({
   },
   disclaimer: {
     fontSize: 12,
-    color: colors.textLight,
     textAlign: "center",
     lineHeight: 18,
   },
@@ -809,31 +850,27 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 28,
     fontWeight: "900",
-    color: colors.text,
     marginBottom: 8,
   },
   emptyTitleAccent: {
-    color: colors.primary,
+    // Color applied dynamically
   },
   emptyMessage: {
     fontSize: 16,
-    color: colors.textLight,
     textAlign: "center",
     marginBottom: 24,
   },
   button: {
-    backgroundColor: colors.primary,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
-    shadowColor: colors.shadow,
+    shadowColor: "rgba(0, 0, 0, 0.1)",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,
   },
   buttonText: {
-    color: colors.background,
     fontSize: 16,
     fontWeight: "700",
   },
@@ -843,6 +880,6 @@ const styles = StyleSheet.create({
   },
   listContent: {
     padding: 16,
-    paddingBottom: 120, // Space for bottom navigation
+    paddingBottom: 120,
   },
 });
