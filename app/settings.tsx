@@ -1,16 +1,28 @@
 import React from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Switch, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Info, Heart, Shield, Bell, HelpCircle, CreditCard } from "lucide-react-native";
+import { Info, Heart, Shield, Bell, HelpCircle, CreditCard, RefreshCw, Play } from "lucide-react-native";
 import { colors } from "@/constants/colors";
 import { useUserStore } from "@/store/user-store";
+import { useOnboardingStore } from "@/store/onboarding-store";
 import { useRouter } from "expo-router";
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { isPremium, setPremiumStatus } = useUserStore();
+  const { resetOnboarding, setCurrentStep } = useOnboardingStore();
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
   const [saveHistory, setSaveHistory] = React.useState(true);
+  
+  const handleResetOnboarding = () => {
+    resetOnboarding();
+    router.push("/onboarding/index");
+  };
+
+  const handleGoToOnboardingStep = (step: number, path: string) => {
+    setCurrentStep(step);
+    router.push(path);
+  };
   
   return (
     <SafeAreaView style={styles.container} edges={["bottom"]}>
@@ -87,15 +99,66 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
         
-        {/* For demo purposes only - to toggle premium status */}
-        <TouchableOpacity 
-          style={styles.demoButton}
-          onPress={() => setPremiumStatus(!isPremium)}
-        >
-          <Text style={styles.demoButtonText}>
-            {isPremium ? "Demo: Disable Premium" : "Demo: Enable Premium"}
-          </Text>
-        </TouchableOpacity>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Debug & Testing</Text>
+          
+          <TouchableOpacity 
+            style={styles.debugItem}
+            onPress={handleResetOnboarding}
+          >
+            <RefreshCw size={20} color={colors.primary} />
+            <Text style={styles.debugLabel}>Reset & Show Onboarding</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.debugItem}
+            onPress={() => handleGoToOnboardingStep(0, "/onboarding/index")}
+          >
+            <Play size={20} color={colors.primary} />
+            <Text style={styles.debugLabel}>Welcome Screen</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.debugItem}
+            onPress={() => handleGoToOnboardingStep(1, "/onboarding/features")}
+          >
+            <Play size={20} color={colors.primary} />
+            <Text style={styles.debugLabel}>Features Screen</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.debugItem}
+            onPress={() => handleGoToOnboardingStep(2, "/onboarding/more-features")}
+          >
+            <Play size={20} color={colors.primary} />
+            <Text style={styles.debugLabel}>More Features Screen</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.debugItem}
+            onPress={() => handleGoToOnboardingStep(3, "/onboarding/notifications")}
+          >
+            <Play size={20} color={colors.primary} />
+            <Text style={styles.debugLabel}>Notifications Screen</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.debugItem}
+            onPress={() => handleGoToOnboardingStep(4, "/onboarding/subscription")}
+          >
+            <Play size={20} color={colors.primary} />
+            <Text style={styles.debugLabel}>Subscription Screen</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.demoButton}
+            onPress={() => setPremiumStatus(!isPremium)}
+          >
+            <Text style={styles.demoButtonText}>
+              {isPremium ? "Demo: Disable Premium" : "Demo: Enable Premium"}
+            </Text>
+          </TouchableOpacity>
+        </View>
         
         <View style={styles.footer}>
           <Text style={styles.footerText}>League Checker v1.0.0</Text>
@@ -203,16 +266,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.text,
   },
+  debugItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  debugLabel: {
+    marginLeft: 12,
+    fontSize: 16,
+    color: colors.text,
+  },
   demoButton: {
-    backgroundColor: colors.card,
+    backgroundColor: colors.primary + "20",
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
-    marginBottom: 24,
+    marginTop: 16,
   },
   demoButtonText: {
-    color: colors.textLight,
+    color: colors.primary,
     fontSize: 14,
+    fontWeight: "600",
   },
   footer: {
     marginTop: 24,

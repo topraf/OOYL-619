@@ -16,7 +16,13 @@ const { width } = Dimensions.get("window");
 export default function HomeScreen() {
   const router = useRouter();
   const { resetUserImages, freeComparisonUsed, isPremium } = useUserStore();
-  const { hasCompletedOnboarding, shouldShowNotifications, shouldShowPremium } = useOnboardingStore();
+  const { 
+    hasCompletedOnboarding, 
+    shouldShowNotifications, 
+    shouldShowPremium,
+    checkShouldShowNotifications,
+    checkShouldShowPremium 
+  } = useOnboardingStore();
   
   const buttonScale = useSharedValue(1);
   const animatedButtonStyle = useAnimatedStyle(() => {
@@ -25,21 +31,33 @@ export default function HomeScreen() {
     };
   });
   
-  // Check if onboarding is completed - using a safer approach
+  // Check if onboarding is completed and handle conditional prompts
   useEffect(() => {
     // Use a timeout to ensure the Root Layout is mounted first
     const timer = setTimeout(() => {
       if (!hasCompletedOnboarding) {
         router.push("/onboarding/index");
-      } else if (shouldShowNotifications) {
-        router.push("/onboarding/notifications");
-      } else if (shouldShowPremium) {
-        router.push("/onboarding/subscription");
+      } else {
+        // Check if we should show notifications prompt
+        const shouldShowNotifs = checkShouldShowNotifications();
+        if (shouldShowNotifs) {
+          router.push("/onboarding/notifications");
+          return;
+        }
+        
+        // Check if we should show premium prompt (only if not premium)
+        if (!isPremium) {
+          const shouldShowPrem = checkShouldShowPremium();
+          if (shouldShowPrem) {
+            router.push("/onboarding/subscription");
+            return;
+          }
+        }
       }
     }, 100);
     
     return () => clearTimeout(timer);
-  }, [hasCompletedOnboarding, shouldShowNotifications, shouldShowPremium, router]);
+  }, [hasCompletedOnboarding, isPremium, router, checkShouldShowNotifications, checkShouldShowPremium]);
   
   const handleStartComparison = () => {
     resetUserImages();
