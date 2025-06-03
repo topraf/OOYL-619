@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, View, TouchableOpacity, Text } from "react-native";
 import { useRouter } from "expo-router";
-import { Camera, BarChart3, Star, MessageCircle } from "lucide-react-native";
+import { Camera, Star, MessageCircle, BarChart3 } from "lucide-react-native";
 import { colors } from "@/constants/colors";
 
 interface BottomNavigationProps {
@@ -37,24 +37,6 @@ export default function BottomNavigation({ currentRoute }: BottomNavigationProps
       </TouchableOpacity>
       
       <TouchableOpacity 
-        style={[styles.navItem, (currentRoute === "results" || currentRoute === "history") && styles.activeNavItem]}
-        onPress={() => handleNavigation("results", "/results")}
-        disabled={currentRoute === "results" || currentRoute === "history"}
-      >
-        <BarChart3 
-          size={24} 
-          color={(currentRoute === "results" || currentRoute === "history") ? colors.primary : colors.textLight} 
-          strokeWidth={(currentRoute === "results" || currentRoute === "history") ? 3 : 2}
-        />
-        <Text style={[
-          styles.navText, 
-          (currentRoute === "results" || currentRoute === "history") && styles.activeNavText
-        ]}>
-          Results
-        </Text>
-      </TouchableOpacity>
-      
-      <TouchableOpacity 
         style={[styles.navItem, currentRoute === "celebrities" && styles.activeNavItem]}
         onPress={() => handleNavigation("celebrities", "/celebrities")}
         disabled={currentRoute === "celebrities"}
@@ -86,7 +68,25 @@ export default function BottomNavigation({ currentRoute }: BottomNavigationProps
           styles.navText, 
           currentRoute === "roast" && styles.activeNavText
         ]}>
-          Roast
+          Roasted!
+        </Text>
+      </TouchableOpacity>
+      
+      <TouchableOpacity 
+        style={[styles.navItem, (currentRoute === "results" || currentRoute === "history") && styles.activeNavItem]}
+        onPress={() => handleNavigation("results", "/results")}
+        disabled={currentRoute === "results" || currentRoute === "history"}
+      >
+        <BarChart3 
+          size={24} 
+          color={(currentRoute === "results" || currentRoute === "history") ? colors.primary : colors.textLight} 
+          strokeWidth={(currentRoute === "results" || currentRoute === "history") ? 3 : 2}
+        />
+        <Text style={[
+          styles.navText, 
+          (currentRoute === "results" || currentRoute === "history") && styles.activeNavText
+        ]}>
+          Results
         </Text>
       </TouchableOpacity>
     </View>

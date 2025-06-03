@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Platform, Share } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { ArrowLeft, Volume2, Share2, MessageCircle } from "lucide-react-native";
+import { ArrowLeft, Volume2, Share2, MessageCircle, Star } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
@@ -30,7 +30,8 @@ export default function RoastmasterScreen() {
   
   useEffect(() => {
     if (!isPremium) {
-      setShowPaywall(true);
+      // Don't show paywall immediately, show the example first
+      setLoading(false);
       return;
     }
     
@@ -110,15 +111,130 @@ export default function RoastmasterScreen() {
   const onPressOut = () => {
     buttonScale.value = withSpring(1);
   };
+
+  const handleUpgradeToPremium = () => {
+    setShowPaywall(true);
+  };
   
-  if (!isPremium && showPaywall) {
+  // Show premium gating with example if user is not premium
+  if (!isPremium) {
     return (
       <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity 
+            style={styles.backButton} 
+            onPress={() => router.back()}
+          >
+            <ArrowLeft size={20} color={colors.text} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>AI Roastmaster</Text>
+          <View style={styles.placeholder} />
+        </View>
+        
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={styles.exampleContainer}>
+            <Text style={styles.exampleTitle}>
+              Get{" "}
+              <Text style={styles.exampleTitleAccent}>Roasted</Text>
+              {" "}by AI
+            </Text>
+            <Text style={styles.exampleSubtitle}>
+              Our AI will analyze your photo and give you a hilarious roast
+            </Text>
+            
+            {/* Example conversation */}
+            <View style={styles.conversationContainer}>
+              <View style={styles.messageContainer}>
+                <View style={styles.aiAvatar}>
+                  <MessageCircle size={16} color={colors.background} />
+                </View>
+                <View style={styles.aiMessage}>
+                  <Text style={styles.aiMessageText}>
+                    "I've seen better selfies on a potato cam from 2005. Your face has more blur than a witness protection program!"
+                  </Text>
+                </View>
+              </View>
+              
+              <View style={styles.messageContainer}>
+                <View style={styles.aiAvatar}>
+                  <MessageCircle size={16} color={colors.background} />
+                </View>
+                <View style={styles.aiMessage}>
+                  <Text style={styles.aiMessageText}>
+                    "If confidence was beauty, you'd still be in trouble. But hey, at least your phone's camera is working overtime!"
+                  </Text>
+                </View>
+              </View>
+              
+              <View style={styles.messageContainer}>
+                <View style={styles.aiAvatar}>
+                  <MessageCircle size={16} color={colors.background} />
+                </View>
+                <View style={styles.aiMessage}>
+                  <Text style={styles.aiMessageText}>
+                    "Your beauty score is like your WiFi signal - technically there, but barely functional! 😂"
+                  </Text>
+                </View>
+              </View>
+            </View>
+            
+            <View style={styles.featuresContainer}>
+              <Text style={styles.featuresTitle}>Premium Roast Features</Text>
+              
+              <View style={styles.featureItem}>
+                <Text style={styles.featureEmoji}>🤖</Text>
+                <Text style={styles.featureText}>AI-powered personalized roasts</Text>
+              </View>
+              
+              <View style={styles.featureItem}>
+                <Text style={styles.featureEmoji}>🔥</Text>
+                <Text style={styles.featureText}>Multiple roast styles and intensities</Text>
+              </View>
+              
+              <View style={styles.featureItem}>
+                <Text style={styles.featureEmoji}>🎭</Text>
+                <Text style={styles.featureText}>Celebrity roast comparisons</Text>
+              </View>
+              
+              <View style={styles.featureItem}>
+                <Text style={styles.featureEmoji}>🔊</Text>
+                <Text style={styles.featureText}>Audio roasts with different voices</Text>
+              </View>
+            </View>
+          </View>
+        </ScrollView>
+        
+        <View style={styles.ctaContainer}>
+          <Animated.View style={animatedButtonStyle}>
+            <TouchableOpacity 
+              style={styles.upgradeButton}
+              onPress={handleUpgradeToPremium}
+              onPressIn={onPressIn}
+              onPressOut={onPressOut}
+            >
+              <LinearGradient
+                colors={[colors.secondary, colors.primary]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.upgradeButtonGradient}
+              >
+                <Star size={20} color={colors.background} />
+                <Text style={styles.upgradeButtonText}>Roast Me Now!</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </Animated.View>
+          
+          <Text style={styles.ctaSubtext}>
+            Unlock unlimited roasts and premium features
+          </Text>
+        </View>
+        
+        <BottomNavigation currentRoute="roast" />
+        
         <PaywallModal
           visible={showPaywall}
-          onClose={() => router.back()}
+          onClose={() => setShowPaywall(false)}
         />
-        <BottomNavigation currentRoute="roast" />
       </SafeAreaView>
     );
   }
@@ -288,6 +404,119 @@ const styles = StyleSheet.create({
   },
   placeholder: {
     width: 40,
+  },
+  exampleContainer: {
+    padding: 16,
+  },
+  exampleTitle: {
+    fontSize: 28,
+    fontWeight: "900",
+    color: colors.text,
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  exampleTitleAccent: {
+    color: colors.primary,
+  },
+  exampleSubtitle: {
+    fontSize: 16,
+    color: colors.textLight,
+    textAlign: "center",
+    marginBottom: 24,
+    lineHeight: 24,
+  },
+  conversationContainer: {
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 24,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  messageContainer: {
+    flexDirection: "row",
+    marginBottom: 16,
+    alignItems: "flex-start",
+  },
+  aiAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  aiMessage: {
+    flex: 1,
+    backgroundColor: colors.primary + "15",
+    borderRadius: 12,
+    padding: 12,
+  },
+  aiMessageText: {
+    fontSize: 14,
+    color: colors.text,
+    lineHeight: 20,
+    fontStyle: "italic",
+  },
+  featuresContainer: {
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 24,
+  },
+  featuresTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: colors.text,
+    marginBottom: 16,
+  },
+  featureItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  featureEmoji: {
+    fontSize: 20,
+    marginRight: 12,
+  },
+  featureText: {
+    fontSize: 16,
+    color: colors.text,
+  },
+  ctaContainer: {
+    padding: 16,
+    paddingBottom: 24,
+  },
+  upgradeButton: {
+    borderRadius: 12,
+    overflow: "hidden",
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+    marginBottom: 12,
+  },
+  upgradeButtonGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 16,
+  },
+  upgradeButtonText: {
+    color: colors.background,
+    fontSize: 18,
+    fontWeight: "900",
+    marginLeft: 8,
+  },
+  ctaSubtext: {
+    fontSize: 14,
+    color: colors.textLight,
+    textAlign: "center",
   },
   imageContainer: {
     height: 300,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Platform, Dimensions, Share, FlatList } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Platform, Dimensions, Share, FlatList, Linking } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Home, Camera, MessageCircle, Star, History } from "lucide-react-native";
@@ -51,20 +51,85 @@ export default function ResultsScreen() {
     }
   }, [isLoading, latestResult]);
 
-  const handleShare = async () => {
+  const handleShareInstagram = async () => {
     if (RNPlatform.OS !== "web") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       
       try {
-        const result = await Share.share({
-          message: `I just found out if someone is in my league using League Checker! My score: ${getOverallScore()}/10`,
-          title: "League Checker Results"
-        });
+        const message = `I just found out if someone is in my league using League Checker! My score: ${getOverallScore()}/10`;
+        
+        // Try to open Instagram app
+        const instagramUrl = `instagram://story-camera`;
+        const canOpen = await Linking.canOpenURL(instagramUrl);
+        
+        if (canOpen) {
+          await Linking.openURL(instagramUrl);
+        } else {
+          // Fallback to regular share
+          await Share.share({
+            message: message,
+            title: "League Checker Results"
+          });
+        }
       } catch (error) {
-        console.error("Error sharing:", error);
+        console.error("Error sharing to Instagram:", error);
       }
     } else {
-      alert("Sharing is not available on web");
+      alert("Instagram sharing is not available on web");
+    }
+  };
+
+  const handleShareSnapchat = async () => {
+    if (RNPlatform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      
+      try {
+        const message = `I just found out if someone is in my league using League Checker! My score: ${getOverallScore()}/10`;
+        
+        // Try to open Snapchat app
+        const snapchatUrl = `snapchat://`;
+        const canOpen = await Linking.canOpenURL(snapchatUrl);
+        
+        if (canOpen) {
+          await Linking.openURL(snapchatUrl);
+        } else {
+          // Fallback to regular share
+          await Share.share({
+            message: message,
+            title: "League Checker Results"
+          });
+        }
+      } catch (error) {
+        console.error("Error sharing to Snapchat:", error);
+      }
+    } else {
+      alert("Snapchat sharing is not available on web");
+    }
+  };
+
+  const handleShareX = async () => {
+    if (RNPlatform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      
+      try {
+        const message = `I just found out if someone is in my league using League Checker! My score: ${getOverallScore()}/10`;
+        const twitterUrl = `twitter://post?message=${encodeURIComponent(message)}`;
+        const canOpen = await Linking.canOpenURL(twitterUrl);
+        
+        if (canOpen) {
+          await Linking.openURL(twitterUrl);
+        } else {
+          // Fallback to web Twitter
+          const webUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}`;
+          await Linking.openURL(webUrl);
+        }
+      } catch (error) {
+        console.error("Error sharing to X:", error);
+      }
+    } else {
+      const message = `I just found out if someone is in my league using League Checker! My score: ${getOverallScore()}/10`;
+      const webUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}`;
+      window.open(webUrl, '_blank');
     }
   };
 
@@ -377,23 +442,31 @@ export default function ResultsScreen() {
               </View>
             )}
             
-            <TouchableOpacity 
-              style={styles.shareFullButton}
-              onPress={handleShare}
-            >
-              <Text style={styles.shareFullButtonText}>Share Your Results</Text>
-              <View style={styles.socialIcons}>
-                <View style={[styles.socialIcon, { backgroundColor: "#E4405F" }]}>
-                  <Text style={styles.socialIconText}>IG</Text>
-                </View>
-                <View style={[styles.socialIcon, { backgroundColor: "#FFFC00" }]}>
-                  <Text style={[styles.socialIconText, { color: "#000" }]}>SC</Text>
-                </View>
-                <View style={[styles.socialIcon, { backgroundColor: "#000" }]}>
-                  <Text style={styles.socialIconText}>TT</Text>
-                </View>
+            <View style={styles.shareContainer}>
+              <Text style={styles.shareTitle}>Share Your Results</Text>
+              <View style={styles.socialButtonsContainer}>
+                <TouchableOpacity 
+                  style={[styles.socialButton, { backgroundColor: "#E4405F" }]}
+                  onPress={handleShareInstagram}
+                >
+                  <Text style={styles.socialButtonText}>IG</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={[styles.socialButton, { backgroundColor: "#FFFC00" }]}
+                  onPress={handleShareSnapchat}
+                >
+                  <Text style={[styles.socialButtonText, { color: "#000" }]}>SC</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={[styles.socialButton, { backgroundColor: "#000" }]}
+                  onPress={handleShareX}
+                >
+                  <Text style={styles.socialButtonText}>X</Text>
+                </TouchableOpacity>
               </View>
-            </TouchableOpacity>
+            </View>
             
             <View style={styles.actionsContainer}>
               <Text style={styles.actionsTitle}>
@@ -617,36 +690,45 @@ const styles = StyleSheet.create({
     paddingRight: 16,
     paddingBottom: 8,
   },
-  shareFullButton: {
-    backgroundColor: colors.primary,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    marginBottom: 24,
-  },
-  shareFullButtonText: {
-    color: colors.background,
-    fontSize: 16,
-    fontWeight: "700",
-  },
-  socialIcons: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  socialIcon: {
-    width: 32,
-    height: 32,
+  shareContainer: {
+    backgroundColor: colors.card,
     borderRadius: 16,
+    padding: 16,
+    marginBottom: 24,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  shareTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: colors.text,
+    marginBottom: 16,
+    textAlign: "center",
+  },
+  socialButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 16,
+  },
+  socialButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  socialIconText: {
+  socialButtonText: {
     color: colors.background,
-    fontSize: 12,
-    fontWeight: "700",
+    fontSize: 16,
+    fontWeight: "900",
   },
   actionsContainer: {
     backgroundColor: colors.card,
