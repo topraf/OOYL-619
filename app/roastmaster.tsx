@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Platform, Share } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Platform, Share, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { ArrowLeft, Volume2, Share2, MessageCircle, Star } from "lucide-react-native";
+import { ArrowLeft, Volume2, Share2, MessageCircle, Star, Camera, Upload, X } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
+import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
 import { useUserStore } from "@/store/user-store";
+import { useComparisonStore } from "@/store/comparison-store";
 import PaywallModal from "@/components/PaywallModal";
 import BottomNavigation from "@/components/BottomNavigation";
 import Animated, { 
@@ -20,11 +22,13 @@ import Animated, {
 
 export default function RoastmasterScreen() {
   const router = useRouter();
-  const { comparisons, isPremium, getColors } = useUserStore();
+  const { isPremium, getColors } = useUserStore();
+  const { history } = useComparisonStore();
   const colors = getColors();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [roast, setRoast] = useState("");
   const [showPaywall, setShowPaywall] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   
   const buttonScale = useSharedValue(1);
   const fadeIn = useSharedValue(0);
@@ -51,26 +55,81 @@ export default function RoastmasterScreen() {
     };
   });
   
-  const latestResult = comparisons[0];
+  const latestResult = history[0];
   
   useEffect(() => {
     // Entrance animations
     fadeIn.value = withTiming(1, { duration: 800 });
     slideUp.value = withTiming(0, { duration: 800 });
     
-    if (!isPremium) {
-      setLoading(false);
+    // Set initial image from latest result if available
+    if (latestResult && !selectedImage) {
+      setSelectedImage(latestResult.userImage);
+    }
+  }, [latestResult]);
+  
+  const pickImage = async () => {
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission needed", "We need camera roll permissions to select a photo.");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      setSelectedImage(result.assets[0].uri);
+      setRoast(""); // Clear previous roast
+    }
+  };
+
+  const takePhoto = async () => {
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission needed", "We need camera permissions to take a photo.");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      setSelectedImage(result.assets[0].uri);
+      setRoast(""); // Clear previous roast
+    }
+  };
+
+  const removeImage = () => {
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    
+    setSelectedImage(null);
+    setRoast("");
+  };
+  
+  const generateRoast = async () => {
+    if (!selectedImage) {
+      Alert.alert("No Image", "Please select or take a photo first.");
       return;
     }
     
-    if (latestResult) {
-      generateRoast();
-    } else {
-      setLoading(false);
-    }
-  }, [latestResult, isPremium]);
-  
-  const generateRoast = async () => {
     setLoading(true);
     
     // Typing animation
@@ -291,41 +350,6 @@ export default function RoastmasterScreen() {
     );
   }
   
-  if (!latestResult) {
-    return (
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={styles.header}>
-          <TouchableOpacity 
-            style={[styles.backButton, { backgroundColor: colors.card }]} 
-            onPress={() => router.back()}
-          >
-            <ArrowLeft size={20} color={colors.text} />
-          </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>AI Roastmaster</Text>
-          <View style={styles.placeholder} />
-        </View>
-        
-        <View style={styles.emptyContainer}>
-          <Text style={[styles.emptyTitle, { color: colors.text }]}>No Photos Found</Text>
-          <Text style={[styles.emptyMessage, { color: colors.textLight }]}>
-            Complete a comparison first to get roasted by our AI
-          </Text>
-          <Animated.View style={animatedButtonStyle}>
-            <TouchableOpacity 
-              style={[styles.button, { backgroundColor: colors.primary }]} 
-              onPress={() => router.push("/")}
-              onPressIn={onPressIn}
-              onPressOut={onPressOut}
-            >
-              <Text style={[styles.buttonText, { color: colors.background }]}>Start Comparison</Text>
-            </TouchableOpacity>
-          </Animated.View>
-        </View>
-        <BottomNavigation currentRoute="roast" />
-      </SafeAreaView>
-    );
-  }
-  
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top"]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -337,79 +361,112 @@ export default function RoastmasterScreen() {
             <ArrowLeft size={20} color={colors.text} />
           </TouchableOpacity>
           <Text style={[styles.headerTitle, { color: colors.text }]}>AI Roastmaster</Text>
-          <TouchableOpacity 
-            style={[styles.shareButton, { backgroundColor: colors.card }]} 
-            onPress={handleShare}
-          >
-            <Share2 size={20} color={colors.text} />
-          </TouchableOpacity>
+          {roast && (
+            <TouchableOpacity 
+              style={[styles.shareButton, { backgroundColor: colors.card }]} 
+              onPress={handleShare}
+            >
+              <Share2 size={20} color={colors.text} />
+            </TouchableOpacity>
+          )}
         </View>
         
-        <Animated.View style={[styles.imageContainer, animatedFadeStyle]}>
-          <Image
-            source={{ uri: latestResult.user.frontImage || "" }}
-            style={styles.userImage}
-            contentFit="cover"
-          />
-          <LinearGradient
-            colors={["transparent", colors.overlay]}
-            style={styles.imageGradient}
-          />
-        </Animated.View>
-        
-        <Animated.View style={[styles.roastContainer, { backgroundColor: colors.card }, animatedPulseStyle]}>
-          <View style={styles.roastHeader}>
-            <MessageCircle size={24} color={colors.primary} />
-            <Text style={[styles.roastTitle, { color: colors.text }]}>AI Roastmaster Says:</Text>
-          </View>
-          
-          {loading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={colors.primary} />
-              <Text style={[styles.loadingText, { color: colors.textLight }]}>Preparing your roast...</Text>
-              <View style={styles.typingIndicator}>
-                <Text style={[styles.typingDots, { color: colors.primary }]}>●●●</Text>
-              </View>
+        <Animated.View style={[styles.imageSection, animatedFadeStyle]}>
+          {selectedImage ? (
+            <View style={styles.imageContainer}>
+              <Image
+                source={{ uri: selectedImage }}
+                style={styles.userImage}
+                contentFit="cover"
+              />
+              <TouchableOpacity 
+                style={[styles.removeImageButton, { backgroundColor: colors.error }]}
+                onPress={removeImage}
+              >
+                <X size={16} color={colors.background} />
+              </TouchableOpacity>
             </View>
           ) : (
-            <>
-              <Text style={[styles.roastText, { color: colors.text }]}>{roast}</Text>
-              
-              <Animated.View style={animatedButtonStyle}>
-                <TouchableOpacity 
-                  style={[styles.audioButton, { backgroundColor: colors.primary }]}
-                  onPress={handlePlayAudio}
-                  onPressIn={onPressIn}
-                  onPressOut={onPressOut}
-                >
-                  <Volume2 size={20} color={colors.background} />
-                  <Text style={[styles.audioButtonText, { color: colors.background }]}>Hear Your Roast</Text>
-                </TouchableOpacity>
-              </Animated.View>
-            </>
+            <View style={[styles.placeholderContainer, { backgroundColor: colors.card }]}>
+              <Text style={[styles.placeholderText, { color: colors.textLight }]}>
+                Select a photo to get roasted
+              </Text>
+            </View>
           )}
+          
+          <View style={styles.imageActions}>
+            <TouchableOpacity 
+              style={[styles.imageActionButton, { backgroundColor: colors.card }]}
+              onPress={takePhoto}
+            >
+              <Camera size={20} color={colors.primary} />
+              <Text style={[styles.imageActionText, { color: colors.text }]}>Camera</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.imageActionButton, { backgroundColor: colors.card }]}
+              onPress={pickImage}
+            >
+              <Upload size={20} color={colors.primary} />
+              <Text style={[styles.imageActionText, { color: colors.text }]}>Gallery</Text>
+            </TouchableOpacity>
+          </View>
         </Animated.View>
         
-        {!loading && (
-          <Animated.View style={animatedButtonStyle}>
-            <TouchableOpacity 
-              style={[styles.generateButton, { backgroundColor: colors.card, borderColor: colors.primary }]}
-              onPress={generateRoast}
-              onPressIn={onPressIn}
-              onPressOut={onPressOut}
-            >
-              <Text style={[styles.generateButtonText, { color: colors.primary }]}>Generate Another Roast</Text>
-            </TouchableOpacity>
+        {selectedImage && (
+          <Animated.View style={[styles.roastContainer, { backgroundColor: colors.card }, animatedPulseStyle]}>
+            <View style={styles.roastHeader}>
+              <MessageCircle size={24} color={colors.primary} />
+              <Text style={[styles.roastTitle, { color: colors.text }]}>AI Roastmaster Says:</Text>
+            </View>
+            
+            {loading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={colors.primary} />
+                <Text style={[styles.loadingText, { color: colors.textLight }]}>Preparing your roast...</Text>
+                <View style={styles.typingIndicator}>
+                  <Text style={[styles.typingDots, { color: colors.primary }]}>●●●</Text>
+                </View>
+              </View>
+            ) : roast ? (
+              <>
+                <Text style={[styles.roastText, { color: colors.text }]}>{roast}</Text>
+                
+                <Animated.View style={animatedButtonStyle}>
+                  <TouchableOpacity 
+                    style={[styles.audioButton, { backgroundColor: colors.primary }]}
+                    onPress={handlePlayAudio}
+                    onPressIn={onPressIn}
+                    onPressOut={onPressOut}
+                  >
+                    <Volume2 size={20} color={colors.background} />
+                    <Text style={[styles.audioButtonText, { color: colors.background }]}>Hear Your Roast</Text>
+                  </TouchableOpacity>
+                </Animated.View>
+              </>
+            ) : (
+              <Text style={[styles.noRoastText, { color: colors.textLight }]}>
+                Tap "Generate Roast" to get roasted by our AI!
+              </Text>
+            )}
           </Animated.View>
         )}
         
-        <TouchableOpacity 
-          style={[styles.shareFullButton, { backgroundColor: colors.primary }]}
-          onPress={handleShare}
-        >
-          <Share2 size={20} color={colors.background} />
-          <Text style={[styles.shareFullButtonText, { color: colors.background }]}>Share Your Roast</Text>
-        </TouchableOpacity>
+        {selectedImage && (
+          <Animated.View style={animatedButtonStyle}>
+            <TouchableOpacity 
+              style={[styles.generateButton, { backgroundColor: colors.primary }]}
+              onPress={generateRoast}
+              onPressIn={onPressIn}
+              onPressOut={onPressOut}
+              disabled={loading}
+            >
+              <Text style={[styles.generateButtonText, { color: colors.background }]}>
+                {loading ? "Generating..." : roast ? "Generate Another Roast" : "Generate Roast"}
+              </Text>
+            </TouchableOpacity>
+          </Animated.View>
+        )}
         
         <View style={styles.disclaimerContainer}>
           <Text style={[styles.disclaimer, { color: colors.textLight }]}>
@@ -458,6 +515,71 @@ const styles = StyleSheet.create({
   },
   placeholder: {
     width: 40,
+  },
+  imageSection: {
+    padding: 16,
+  },
+  imageContainer: {
+    height: 300,
+    borderRadius: 16,
+    overflow: "hidden",
+    position: "relative",
+    marginBottom: 16,
+    shadowColor: "rgba(0, 0, 0, 0.1)",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  userImage: {
+    width: "100%",
+    height: "100%",
+  },
+  removeImageButton: {
+    position: "absolute",
+    top: 12,
+    right: 12,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  placeholderContainer: {
+    height: 300,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 16,
+    borderWidth: 2,
+    borderStyle: "dashed",
+    borderColor: "rgba(0,0,0,0.1)",
+  },
+  placeholderText: {
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  imageActions: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  imageActionButton: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    borderRadius: 8,
+    shadowColor: "rgba(0, 0, 0, 0.1)",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  imageActionText: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginLeft: 8,
   },
   exampleContainer: {
     padding: 16,
@@ -561,30 +683,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "center",
   },
-  imageContainer: {
-    height: 300,
-    marginHorizontal: 16,
-    borderRadius: 16,
-    overflow: "hidden",
-    position: "relative",
-    marginBottom: 16,
-    shadowColor: "rgba(0, 0, 0, 0.1)",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  userImage: {
-    width: "100%",
-    height: "100%",
-  },
-  imageGradient: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 100,
-  },
   roastContainer: {
     margin: 16,
     borderRadius: 16,
@@ -626,6 +724,12 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     marginBottom: 16,
   },
+  noRoastText: {
+    fontSize: 16,
+    textAlign: "center",
+    fontStyle: "italic",
+    padding: 24,
+  },
   audioButton: {
     flexDirection: "row",
     paddingVertical: 12,
@@ -650,31 +754,16 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: "center",
-    borderWidth: 1,
     shadowColor: "rgba(0, 0, 0, 0.1)",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 3,
     marginBottom: 16,
   },
   generateButtonText: {
     fontSize: 16,
     fontWeight: "600",
-  },
-  shareFullButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 16,
-    borderRadius: 12,
-    marginHorizontal: 16,
-    marginBottom: 16,
-  },
-  shareFullButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginLeft: 8,
   },
   disclaimerContainer: {
     margin: 16,
@@ -684,35 +773,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: "center",
     lineHeight: 18,
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
-  },
-  emptyTitle: {
-    fontSize: 20,
-    fontWeight: "600",
-    marginBottom: 8,
-  },
-  emptyMessage: {
-    fontSize: 16,
-    textAlign: "center",
-    marginBottom: 24,
-  },
-  button: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    shadowColor: "rgba(0, 0, 0, 0.1)",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "600",
   },
 });

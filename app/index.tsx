@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Dimensions, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { Settings, Camera, Image as ImageIcon, Star, MessageCircle, Moon, Sun } from "lucide-react-native";
+import { Settings, Camera, Image as ImageIcon, Star, MessageCircle } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
@@ -23,7 +23,7 @@ const { width } = Dimensions.get("window");
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { resetUserImages, freeComparisonUsed, isPremium, getColors, theme, setTheme } = useUserStore();
+  const { resetUserImages, freeComparisonUsed, isPremium, getColors } = useUserStore();
   const { hasCompletedOnboarding } = useOnboardingStore();
   const colors = getColors();
   
@@ -125,15 +125,6 @@ export default function HomeScreen() {
     }
   };
 
-  const handleThemeToggle = () => {
-    if (Platform.OS !== "web") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-    
-    const newTheme = theme === "light" ? "dark" : "light";
-    setTheme(newTheme);
-  };
-
   const onPressIn = () => {
     buttonScale.value = withSpring(0.95);
   };
@@ -155,16 +146,6 @@ export default function HomeScreen() {
             style={styles.heroGradient}
           />
           <View style={styles.headerButtons}>
-            <TouchableOpacity
-              style={[styles.headerButton, { backgroundColor: colors.overlay }]}
-              onPress={handleThemeToggle}
-            >
-              {theme === "light" ? (
-                <Moon size={20} color={colors.background} />
-              ) : (
-                <Sun size={20} color={colors.background} />
-              )}
-            </TouchableOpacity>
             <TouchableOpacity
               style={[styles.headerButton, { backgroundColor: colors.overlay }]}
               onPress={() => router.push("/settings")}
@@ -206,6 +187,14 @@ export default function HomeScreen() {
             style={[styles.quickActionButton, { backgroundColor: colors.card }]}
             onPress={handleCelebrities}
           >
+            <View style={styles.gradientBorder}>
+              <LinearGradient
+                colors={[colors.secondary, colors.primary]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.gradientBorderInner}
+              />
+            </View>
             <View style={styles.quickActionContent}>
               <Star size={20} color={colors.primary} />
               <Text style={[styles.quickActionText, { color: colors.text }]}>Celebrities</Text>
@@ -221,6 +210,14 @@ export default function HomeScreen() {
             style={[styles.quickActionButton, { backgroundColor: colors.card }]}
             onPress={handleAIRoast}
           >
+            <View style={styles.gradientBorder}>
+              <LinearGradient
+                colors={[colors.secondary, colors.primary]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.gradientBorderInner}
+              />
+            </View>
             <View style={styles.quickActionContent}>
               <MessageCircle size={20} color={colors.primary} />
               <Text style={[styles.quickActionText, { color: colors.text }]}>AI Roast</Text>
@@ -416,11 +413,25 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+    overflow: "hidden",
+  },
+  gradientBorder: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    padding: 2,
+  },
+  gradientBorderInner: {
+    flex: 1,
+    borderRadius: 10,
   },
   quickActionContent: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    zIndex: 1,
   },
   quickActionText: {
     fontSize: 16,
@@ -436,6 +447,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 2,
   },
   featuresContainer: {
     marginTop: 32,

@@ -18,15 +18,16 @@ export interface Celebrity {
   name: string;
   image: string;
   beautyScore: number;
+  category?: string;
 }
 
 export interface ComparisonResult {
   id: string;
   date: string;
-  user: User;
-  target: Target;
-  leagueStatus: LeagueStatus;
-  isPremium: boolean;
+  userImage: string;
+  celebrity: Celebrity;
+  score: number;
+  feedback: string;
 }
 
 export type LeagueStatus = 

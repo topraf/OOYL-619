@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, FlatList, Dimensions, TextInput } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, FlatList, Dimensions, TextInput, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Image } from "expo-image";
@@ -7,7 +7,7 @@ import * as Haptics from "expo-haptics";
 import { Platform } from "react-native";
 import { Search, X, ArrowLeft } from "lucide-react-native";
 import { colors } from "@/constants/colors";
-import { celebrities } from "@/mocks/celebrities";
+import { celebrities, celebrityCategories } from "@/mocks/celebrities";
 import { useUserStore } from "@/store/user-store";
 import BottomNavigation from "@/components/BottomNavigation";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
@@ -20,6 +20,7 @@ export default function CelebritiesScreen() {
   const router = useRouter();
   const { setTargetImage } = useUserStore();
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   
   const buttonScale = useSharedValue(1);
   const animatedButtonStyle = useAnimatedStyle(() => {
@@ -28,9 +29,11 @@ export default function CelebritiesScreen() {
     };
   });
   
-  const filteredCelebrities = celebrities.filter(celebrity => 
-    celebrity.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredCelebrities = celebrities.filter(celebrity => {
+    const matchesSearch = celebrity.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === "all" || celebrity.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
   
   const handleSelectCelebrity = (id: string, image: string, name: string) => {
     if (Platform.OS !== "web") {
@@ -39,6 +42,13 @@ export default function CelebritiesScreen() {
     
     setTargetImage(image, name, true);
     router.push("/user-photo");
+  };
+
+  const handleCategorySelect = (categoryId: string) => {
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    setSelectedCategory(categoryId);
   };
 
   const onPressIn = () => {
@@ -89,6 +99,40 @@ export default function CelebritiesScreen() {
             </TouchableOpacity>
           )}
         </View>
+      </View>
+      
+      <View style={styles.categoriesContainer}>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.categoriesContent}
+        >
+          {celebrityCategories.map((category) => (
+            <TouchableOpacity
+              key={category.id}
+              style={[
+                styles.categoryButton,
+                {
+                  backgroundColor: selectedCategory === category.id ? colors.primary : colors.card,
+                }
+              ]}
+              onPress={() => handleCategorySelect(category.id)}
+            >
+              <Text style={styles.categoryEmoji}>{category.emoji}</Text>
+              <Text
+                style={[
+                  styles.categoryText,
+                  {
+                    color: selectedCategory === category.id ? colors.background : colors.text,
+                    fontWeight: selectedCategory === category.id ? "700" : "500",
+                  }
+                ]}
+              >
+                {category.name}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
       </View>
       
       <FlatList
@@ -190,6 +234,30 @@ const styles = StyleSheet.create({
     height: 40,
     color: colors.text,
     fontSize: 16,
+  },
+  categoriesContainer: {
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  categoriesContent: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 8,
+  },
+  categoryButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginRight: 8,
+  },
+  categoryEmoji: {
+    fontSize: 16,
+    marginRight: 6,
+  },
+  categoryText: {
+    fontSize: 14,
   },
   listContent: {
     padding: 16,
