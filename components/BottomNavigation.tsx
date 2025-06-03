@@ -33,7 +33,7 @@ export default function BottomNavigation({ currentRoute }: BottomNavigationProps
   return (
     <View style={styles.container}>
       <TouchableOpacity 
-        style={styles.tab} 
+        style={[styles.tab, currentRoute === "scan" && styles.disabledTab]} 
         onPress={() => handleNavigation("scan", "/")}
         disabled={currentRoute === "scan"}
       >
@@ -42,7 +42,7 @@ export default function BottomNavigation({ currentRoute }: BottomNavigationProps
       </TouchableOpacity>
 
       <TouchableOpacity 
-        style={styles.tab} 
+        style={[styles.tab, currentRoute === "celebrities" && styles.disabledTab]} 
         onPress={() => handleNavigation("celebrities", "/celebrities")}
         disabled={currentRoute === "celebrities"}
       >
@@ -51,7 +51,7 @@ export default function BottomNavigation({ currentRoute }: BottomNavigationProps
       </TouchableOpacity>
 
       <TouchableOpacity 
-        style={styles.tab} 
+        style={[styles.tab, currentRoute === "roast" && styles.disabledTab]} 
         onPress={() => handleNavigation("roast", "/roastmaster")}
         disabled={currentRoute === "roast"}
       >
@@ -60,7 +60,7 @@ export default function BottomNavigation({ currentRoute }: BottomNavigationProps
       </TouchableOpacity>
 
       <TouchableOpacity 
-        style={styles.tab} 
+        style={[styles.tab, currentRoute === "results" && styles.disabledTab]} 
         onPress={() => handleNavigation("results", "/results")}
         disabled={currentRoute === "results"}
       >
@@ -94,6 +94,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingTop: 8,
+  },
+  disabledTab: {
+    opacity: 0.6,
   },
   tabText: {
     fontSize: 12,

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Dimensions, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { Check, ArrowRight, Star } from "lucide-react-native";
+import { ArrowRight, Star } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { Platform } from "react-native";
 import { colors } from "@/constants/colors";
@@ -72,10 +72,6 @@ export default function OnboardingSubscriptionScreen() {
   
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.stepText}>Step 4 of 4</Text>
-      </View>
-      
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
         <Text style={styles.title}>
           Get the{" "}
@@ -129,22 +125,22 @@ export default function OnboardingSubscriptionScreen() {
           <Text style={styles.featuresTitle}>Premium Features</Text>
           
           <View style={styles.featureItem}>
-            <Check size={20} color={colors.primary} />
+            <Text style={styles.featureEmoji}>🚀</Text>
             <Text style={styles.featureText}>Unlimited comparisons</Text>
           </View>
           
           <View style={styles.featureItem}>
-            <Check size={20} color={colors.primary} />
+            <Text style={styles.featureEmoji}>⭐</Text>
             <Text style={styles.featureText}>Celebrity comparisons</Text>
           </View>
           
           <View style={styles.featureItem}>
-            <Check size={20} color={colors.primary} />
+            <Text style={styles.featureEmoji}>🤖</Text>
             <Text style={styles.featureText}>AI beauty analysis and tips</Text>
           </View>
           
           <View style={styles.featureItem}>
-            <Check size={20} color={colors.primary} />
+            <Text style={styles.featureEmoji}>🔥</Text>
             <Text style={styles.featureText}>AI roast feature</Text>
           </View>
         </View>
@@ -201,16 +197,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-  },
-  header: {
-    paddingHorizontal: 24,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  stepText: {
-    fontSize: 14,
-    color: colors.textLight,
   },
   content: {
     flex: 1,
@@ -334,8 +320,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 12,
   },
+  featureEmoji: {
+    fontSize: 20,
+    marginRight: 12,
+  },
   featureText: {
-    marginLeft: 12,
     fontSize: 16,
     color: colors.text,
   },
@@ -364,8 +353,6 @@ const styles = StyleSheet.create({
   },
   footer: {
     padding: 24,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
   },
   subscribeButton: {
     backgroundColor: colors.primary,

@@ -36,7 +36,11 @@ export const useOnboardingStore = create<OnboardingState>()(
       },
       
       completeOnboarding: () => {
-        set({ hasCompletedOnboarding: true });
+        set({ 
+          hasCompletedOnboarding: true,
+          shouldShowNotifications: false,
+          shouldShowPremium: false
+        });
       },
       
       resetOnboarding: () => {

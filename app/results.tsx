@@ -139,12 +139,17 @@ export default function ResultsScreen() {
 
   // Mock feature scores for demonstration
   const getFeatureScores = () => {
-    return [
-      { name: "Facial Symmetry", score: Math.round(Math.random() * 40 + 60), status: "High" as const },
-      { name: "Jawline", score: Math.round(Math.random() * 40 + 40), status: "Mid" as const },
-      { name: "Eyes", score: Math.round(Math.random() * 40 + 50), status: "Mid" as const },
-      { name: "Skin", score: Math.round(Math.random() * 40 + 60), status: "High" as const },
+    const scores = [
+      { name: "Facial Symmetry", score: Math.round(Math.random() * 40 + 60) },
+      { name: "Jawline", score: Math.round(Math.random() * 40 + 40) },
+      { name: "Eyes", score: Math.round(Math.random() * 40 + 50) },
+      { name: "Skin", score: Math.round(Math.random() * 40 + 60) },
     ];
+
+    return scores.map(item => ({
+      ...item,
+      status: item.score >= 70 ? "High" as const : item.score >= 50 ? "Mid" as const : "Low" as const
+    }));
   };
 
   const onPressIn = () => {
@@ -245,7 +250,7 @@ export default function ResultsScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {showResult ? (
           <>
             <View style={styles.header}>

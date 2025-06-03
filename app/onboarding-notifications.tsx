@@ -66,10 +66,6 @@ export default function OnboardingNotificationsScreen() {
   
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.stepText}>Step 3 of 4</Text>
-      </View>
-      
       <View style={styles.content}>
         <View style={styles.iconContainer}>
           <Bell size={48} color={colors.primary} />
@@ -135,16 +131,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  header: {
-    paddingHorizontal: 24,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  stepText: {
-    fontSize: 14,
-    color: colors.textLight,
-  },
   content: {
     flex: 1,
     padding: 24,
@@ -201,8 +187,6 @@ const styles = StyleSheet.create({
   },
   footer: {
     padding: 24,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
   },
   enableButton: {
     backgroundColor: colors.primary,

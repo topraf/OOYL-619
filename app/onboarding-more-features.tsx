@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Dimensions, Image } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, Dimensions, Image, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Star, MessageCircle, ArrowRight } from "lucide-react-native";
@@ -7,7 +7,7 @@ import * as Haptics from "expo-haptics";
 import { Platform } from "react-native";
 import { colors } from "@/constants/colors";
 import { useOnboardingStore } from "@/store/onboarding-store";
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, withRepeat, withTiming } from "react-native-reanimated";
 
 const { width } = Dimensions.get("window");
 
@@ -16,11 +16,27 @@ export default function OnboardingMoreFeaturesScreen() {
   const { setCurrentStep } = useOnboardingStore();
   
   const buttonScale = useSharedValue(1);
+  const titleScale = useSharedValue(1);
+  
   const animatedButtonStyle = useAnimatedStyle(() => {
     return {
       transform: [{ scale: buttonScale.value }]
     };
   });
+  
+  const animatedTitleStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: titleScale.value }]
+    };
+  });
+  
+  React.useEffect(() => {
+    titleScale.value = withRepeat(
+      withTiming(1.05, { duration: 2000 }),
+      -1,
+      true
+    );
+  }, []);
   
   const handleContinue = () => {
     if (Platform.OS !== "web") {
@@ -40,15 +56,13 @@ export default function OnboardingMoreFeaturesScreen() {
   
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.stepText}>Step 2 of 4</Text>
-      </View>
-      
-      <View style={styles.content}>
-        <Text style={styles.title}>
-          Try our{" "}
-          <Text style={styles.titleAccent}>special features</Text>
-        </Text>
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+        <Animated.View style={animatedTitleStyle}>
+          <Text style={styles.title}>
+            Try our{" "}
+            <Text style={styles.titleAccent}>special features</Text>
+          </Text>
+        </Animated.View>
         
         <View style={styles.featuresContainer}>
           <View style={styles.featureCard}>
@@ -60,10 +74,22 @@ export default function OnboardingMoreFeaturesScreen() {
               <Text style={styles.featureDescription}>
                 Compare your beauty score with famous celebrities and see if you're in their league
               </Text>
-              <Image
-                source={{ uri: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" }}
-                style={styles.celebrityImage}
-              />
+              <View style={styles.celebrityImages}>
+                <View style={styles.celebrityImageContainer}>
+                  <Image
+                    source={{ uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" }}
+                    style={styles.celebrityImage}
+                  />
+                  <Text style={styles.celebrityName}>Ryan Gosling</Text>
+                </View>
+                <View style={styles.celebrityImageContainer}>
+                  <Image
+                    source={{ uri: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" }}
+                    style={styles.celebrityImage}
+                  />
+                  <Text style={styles.celebrityName}>Emma Stone</Text>
+                </View>
+              </View>
             </View>
           </View>
           
@@ -90,7 +116,7 @@ export default function OnboardingMoreFeaturesScreen() {
             With our AI-powered analysis, you'll get personalized results and insights about your appearance
           </Text>
         </View>
-      </View>
+      </ScrollView>
       
       <View style={styles.footer}>
         <Animated.View style={animatedButtonStyle}>
@@ -114,18 +140,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  header: {
-    paddingHorizontal: 24,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  stepText: {
-    fontSize: 14,
-    color: colors.textLight,
+  scrollView: {
+    flex: 1,
   },
   content: {
-    flex: 1,
     padding: 24,
   },
   title: {
@@ -178,11 +196,26 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     lineHeight: 20,
   },
+  celebrityImages: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  celebrityImageContainer: {
+    alignItems: "center",
+    width: "48%",
+  },
   celebrityImage: {
-    width: "100%",
-    height: 120,
+    width: 60,
+    height: 60,
     borderRadius: 8,
     backgroundColor: colors.border,
+    marginBottom: 4,
+  },
+  celebrityName: {
+    fontSize: 12,
+    color: colors.text,
+    fontWeight: "600",
+    textAlign: "center",
   },
   roastBubble: {
     backgroundColor: colors.primary + "20",
@@ -208,8 +241,6 @@ const styles = StyleSheet.create({
   },
   footer: {
     padding: 24,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
   },
   button: {
     backgroundColor: colors.primary,

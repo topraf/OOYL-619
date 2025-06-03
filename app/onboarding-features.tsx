@@ -41,10 +41,6 @@ export default function OnboardingFeaturesScreen() {
   
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.stepText}>Step 1 of 4</Text>
-      </View>
-      
       <View style={styles.content}>
         <Text style={styles.title}>
           Take a selfie and see your{" "}
@@ -58,15 +54,15 @@ export default function OnboardingFeaturesScreen() {
                 source={{ uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" }}
                 style={styles.faceImage}
               />
-              <Text style={styles.imageLabel}>Front View</Text>
+              <Text style={styles.imageLabel}>You</Text>
             </View>
             
             <View style={styles.imageBox}>
               <Image
-                source={{ uri: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" }}
+                source={{ uri: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" }}
                 style={styles.faceImage}
               />
-              <Text style={styles.imageLabel}>Side View</Text>
+              <Text style={styles.imageLabel}>Someone Else</Text>
             </View>
           </View>
           
@@ -88,19 +84,24 @@ export default function OnboardingFeaturesScreen() {
             <View style={styles.gaugeLabels}>
               <Text style={styles.gaugeLabel}>You can do better</Text>
               <Text style={styles.gaugeLabel}>In your league</Text>
-              <Text style={styles.gaugeLabel}>Out of your league</Text>
+              <Text style={[styles.gaugeLabel, styles.outOfLeagueLabel]}>Out of your league</Text>
             </View>
           </View>
         </View>
         
-        <View style={styles.infoContainer}>
+        <LinearGradient
+          colors={[colors.primary + "10", colors.secondary + "10"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.infoContainer}
+        >
           <View style={styles.infoIconContainer}>
             <Camera size={24} color={colors.primary} />
           </View>
           <Text style={styles.infoText}>
             With our AI-powered face analysis, we'll calculate your beauty score and compare it with others
           </Text>
-        </View>
+        </LinearGradient>
       </View>
       
       <View style={styles.footer}>
@@ -124,16 +125,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-  },
-  header: {
-    paddingHorizontal: 24,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  stepText: {
-    fontSize: 14,
-    color: colors.textLight,
   },
   content: {
     flex: 1,
@@ -205,10 +196,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.textLight,
   },
+  outOfLeagueLabel: {
+    color: colors.gauge.red,
+    fontWeight: "700",
+  },
   infoContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.primary + "10",
     borderRadius: 12,
     padding: 16,
   },
@@ -229,8 +223,6 @@ const styles = StyleSheet.create({
   },
   footer: {
     padding: 24,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
   },
   button: {
     backgroundColor: colors.primary,
