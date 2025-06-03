@@ -141,7 +141,10 @@ export default function ResultsScreen() {
   if (isLoading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>Analyzing your photos...</Text>
+        <Text style={styles.loadingText}>
+          Analyzing your{" "}
+          <Text style={styles.loadingTextAccent}>photos...</Text>
+        </Text>
         <ActivityIndicator size="large" color={colors.primary} style={styles.loader} />
         <Text style={styles.loadingSubtext}>Calculating league status</Text>
       </SafeAreaView>
@@ -158,7 +161,10 @@ export default function ResultsScreen() {
           >
             <ArrowLeft size={20} color={colors.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Your History</Text>
+          <Text style={styles.headerTitle}>
+            Your{" "}
+            <Text style={styles.headerTitleAccent}>History</Text>
+          </Text>
           <TouchableOpacity style={styles.clearButton} onPress={handleClearHistory}>
             <Trash2 size={16} color={colors.error} />
           </TouchableOpacity>
@@ -192,7 +198,11 @@ export default function ResultsScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyTitle}>No Results Yet</Text>
+          <Text style={styles.emptyTitle}>
+            No{" "}
+            <Text style={styles.emptyTitleAccent}>Results</Text>
+            {" "}Yet
+          </Text>
           <Text style={styles.emptyMessage}>
             Take photos to see if someone is in your league!
           </Text>
@@ -224,7 +234,10 @@ export default function ResultsScreen() {
               >
                 <ArrowLeft size={20} color={colors.text} />
               </TouchableOpacity>
-              <Text style={styles.headerTitle}>Your Results</Text>
+              <Text style={styles.headerTitle}>
+                Your{" "}
+                <Text style={styles.headerTitleAccent}>Results</Text>
+              </Text>
               <View style={styles.headerActions}>
                 <TouchableOpacity style={styles.historyButton} onPress={toggleHistoryView}>
                   <Text style={styles.historyButtonText}>History</Text>
@@ -280,7 +293,10 @@ export default function ResultsScreen() {
             
             {isPremium && (
               <View style={styles.featureScoresContainer}>
-                <Text style={styles.sectionTitle}>Your Beauty Analysis</Text>
+                <Text style={styles.sectionTitle}>
+                  Your Beauty{" "}
+                  <Text style={styles.sectionTitleAccent}>Analysis</Text>
+                </Text>
                 <ScrollView 
                   horizontal 
                   showsHorizontalScrollIndicator={false}
@@ -299,7 +315,10 @@ export default function ResultsScreen() {
             )}
             
             <View style={styles.actionsContainer}>
-              <Text style={styles.actionsTitle}>What's Next?</Text>
+              <Text style={styles.actionsTitle}>
+                What's{" "}
+                <Text style={styles.actionsTitleAccent}>Next?</Text>
+              </Text>
               
               <View style={styles.actionButtonsRow}>
                 <TouchableOpacity 
@@ -381,10 +400,13 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   loadingText: {
-    fontSize: 20,
-    fontWeight: "600",
+    fontSize: 24,
+    fontWeight: "800",
     color: colors.text,
     marginBottom: 24,
+  },
+  loadingTextAccent: {
+    color: colors.primary,
   },
   loader: {
     marginVertical: 24,
@@ -413,9 +435,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 20,
+    fontWeight: "800",
     color: colors.text,
+  },
+  headerTitleAccent: {
+    color: colors.primary,
   },
   headerActions: {
     flexDirection: "row",
@@ -430,7 +455,7 @@ const styles = StyleSheet.create({
   },
   historyButtonText: {
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.text,
   },
   shareButton: {
@@ -461,7 +486,7 @@ const styles = StyleSheet.create({
   },
   resultTitle: {
     fontSize: 22,
-    fontWeight: "700",
+    fontWeight: "800",
     color: colors.background,
     textAlign: "center",
     marginBottom: 20,
@@ -484,13 +509,13 @@ const styles = StyleSheet.create({
   },
   imageLabel: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.background,
     marginTop: 8,
   },
   scoreText: {
     fontSize: 20,
-    fontWeight: "700",
+    fontWeight: "800",
     color: colors.background,
     marginTop: 4,
   },
@@ -500,7 +525,7 @@ const styles = StyleSheet.create({
   },
   vsText: {
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: "800",
     color: colors.background,
   },
   gaugeContainer: {
@@ -510,10 +535,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 20,
+    fontWeight: "800",
     color: colors.text,
     marginBottom: 16,
+  },
+  sectionTitleAccent: {
+    color: colors.primary,
   },
   featureScoresRow: {
     paddingRight: 16,
@@ -531,10 +559,13 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   actionsTitle: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 18,
+    fontWeight: "800",
     color: colors.text,
     marginBottom: 16,
+  },
+  actionsTitleAccent: {
+    color: colors.primary,
   },
   actionButtonsRow: {
     flexDirection: "row",
@@ -571,7 +602,7 @@ const styles = StyleSheet.create({
     right: 4,
     fontSize: 10,
     color: colors.primary,
-    fontWeight: "600",
+    fontWeight: "700",
   },
   shareFullButton: {
     backgroundColor: colors.primary,
@@ -585,7 +616,7 @@ const styles = StyleSheet.create({
   shareFullButtonText: {
     color: colors.background,
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
     marginLeft: 8,
   },
   disclaimerContainer: {
@@ -609,10 +640,13 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   emptyTitle: {
-    fontSize: 20,
-    fontWeight: "600",
+    fontSize: 24,
+    fontWeight: "800",
     color: colors.text,
     marginBottom: 8,
+  },
+  emptyTitleAccent: {
+    color: colors.primary,
   },
   emptyMessage: {
     fontSize: 16,
@@ -634,7 +668,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: colors.background,
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
   },
   cardContainer: {
     alignItems: "center",

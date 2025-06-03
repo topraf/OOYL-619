@@ -36,12 +36,12 @@ export default function HomeScreen() {
     // Use a timeout to ensure the Root Layout is mounted first
     const timer = setTimeout(() => {
       if (!hasCompletedOnboarding) {
-        router.push("/onboarding/index");
+        router.push("/onboarding");
       } else {
         // Check if we should show notifications prompt
         const shouldShowNotifs = checkShouldShowNotifications();
         if (shouldShowNotifs) {
-          router.push("/onboarding/notifications");
+          router.push("/onboarding-notifications");
           return;
         }
         
@@ -49,7 +49,7 @@ export default function HomeScreen() {
         if (!isPremium) {
           const shouldShowPrem = checkShouldShowPremium();
           if (shouldShowPrem) {
-            router.push("/onboarding/subscription");
+            router.push("/onboarding-subscription");
             return;
           }
         }
@@ -120,7 +120,10 @@ export default function HomeScreen() {
         </View>
         
         <View style={styles.featuresContainer}>
-          <Text style={styles.featuresTitle}>How It Works</Text>
+          <Text style={styles.featuresTitle}>
+            How It{" "}
+            <Text style={styles.featuresTitleAccent}>Works</Text>
+          </Text>
           
           <View style={styles.featureItem}>
             <View style={styles.featureIconContainer}>
@@ -167,7 +170,10 @@ export default function HomeScreen() {
               end={{ x: 1, y: 0 }}
               style={styles.premiumBanner}
             >
-              <Text style={styles.premiumTitle}>Upgrade to Premium</Text>
+              <Text style={styles.premiumTitle}>
+                Upgrade to{" "}
+                <Text style={styles.premiumTitleAccent}>Premium</Text>
+              </Text>
               <Text style={styles.premiumDescription}>
                 Unlimited comparisons, celebrity matches, and AI beauty analysis
               </Text>
@@ -265,7 +271,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: colors.background,
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
     marginLeft: 8,
   },
   freeTagContainer: {
@@ -280,17 +286,20 @@ const styles = StyleSheet.create({
   freeTag: {
     color: colors.background,
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: "700",
   },
   featuresContainer: {
     marginTop: 32,
     paddingHorizontal: 16,
   },
   featuresTitle: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 20,
+    fontWeight: "800",
     color: colors.text,
     marginBottom: 16,
+  },
+  featuresTitleAccent: {
+    color: colors.primary,
   },
   featureItem: {
     flexDirection: "row",
@@ -315,7 +324,7 @@ const styles = StyleSheet.create({
   },
   gaugeIcon: {
     fontSize: 20,
-    fontWeight: "700",
+    fontWeight: "800",
     color: colors.primary,
   },
   featureContent: {
@@ -323,7 +332,7 @@ const styles = StyleSheet.create({
   },
   featureTitle: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.text,
     marginBottom: 4,
   },
@@ -346,10 +355,16 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   premiumTitle: {
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: 20,
+    fontWeight: "800",
     color: colors.background,
     marginBottom: 8,
+  },
+  premiumTitleAccent: {
+    color: colors.background,
+    textShadowColor: "rgba(255,255,255,0.3)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   premiumDescription: {
     fontSize: 14,
@@ -366,7 +381,7 @@ const styles = StyleSheet.create({
   },
   premiumButtonText: {
     color: colors.primary,
-    fontWeight: "600",
+    fontWeight: "700",
   },
   disclaimerContainer: {
     marginTop: 32,

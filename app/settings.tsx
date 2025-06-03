@@ -16,7 +16,7 @@ export default function SettingsScreen() {
   
   const handleResetOnboarding = () => {
     resetOnboarding();
-    router.push("/onboarding/index");
+    router.push("/onboarding");
   };
 
   const handleGoToOnboardingStep = (step: number, path: string) => {
@@ -100,7 +100,10 @@ export default function SettingsScreen() {
         </View>
         
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Debug & Testing</Text>
+          <Text style={styles.sectionTitle}>
+            Debug &{" "}
+            <Text style={styles.sectionTitleAccent}>Testing</Text>
+          </Text>
           
           <TouchableOpacity 
             style={styles.debugItem}
@@ -112,7 +115,7 @@ export default function SettingsScreen() {
           
           <TouchableOpacity 
             style={styles.debugItem}
-            onPress={() => handleGoToOnboardingStep(0, "/onboarding/index")}
+            onPress={() => handleGoToOnboardingStep(0, "/onboarding")}
           >
             <Play size={20} color={colors.primary} />
             <Text style={styles.debugLabel}>Welcome Screen</Text>
@@ -120,7 +123,7 @@ export default function SettingsScreen() {
           
           <TouchableOpacity 
             style={styles.debugItem}
-            onPress={() => handleGoToOnboardingStep(1, "/onboarding/features")}
+            onPress={() => handleGoToOnboardingStep(1, "/onboarding-features")}
           >
             <Play size={20} color={colors.primary} />
             <Text style={styles.debugLabel}>Features Screen</Text>
@@ -128,7 +131,7 @@ export default function SettingsScreen() {
           
           <TouchableOpacity 
             style={styles.debugItem}
-            onPress={() => handleGoToOnboardingStep(2, "/onboarding/more-features")}
+            onPress={() => handleGoToOnboardingStep(2, "/onboarding-more-features")}
           >
             <Play size={20} color={colors.primary} />
             <Text style={styles.debugLabel}>More Features Screen</Text>
@@ -136,7 +139,7 @@ export default function SettingsScreen() {
           
           <TouchableOpacity 
             style={styles.debugItem}
-            onPress={() => handleGoToOnboardingStep(3, "/onboarding/notifications")}
+            onPress={() => handleGoToOnboardingStep(3, "/onboarding-notifications")}
           >
             <Play size={20} color={colors.primary} />
             <Text style={styles.debugLabel}>Notifications Screen</Text>
@@ -144,7 +147,7 @@ export default function SettingsScreen() {
           
           <TouchableOpacity 
             style={styles.debugItem}
-            onPress={() => handleGoToOnboardingStep(4, "/onboarding/subscription")}
+            onPress={() => handleGoToOnboardingStep(4, "/onboarding-subscription")}
           >
             <Play size={20} color={colors.primary} />
             <Text style={styles.debugLabel}>Subscription Screen</Text>
@@ -189,7 +192,7 @@ const styles = StyleSheet.create({
   },
   premiumTitle: {
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: "800",
     color: colors.background,
     marginBottom: 4,
   },
@@ -222,7 +225,7 @@ const styles = StyleSheet.create({
   getPremiumText: {
     color: colors.background,
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
     marginLeft: 8,
   },
   section: {
@@ -232,10 +235,13 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 18,
+    fontWeight: "800",
     color: colors.text,
     marginBottom: 16,
+  },
+  sectionTitleAccent: {
+    color: colors.primary,
   },
   settingItem: {
     flexDirection: "row",
@@ -288,7 +294,7 @@ const styles = StyleSheet.create({
   demoButtonText: {
     color: colors.primary,
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "700",
   },
   footer: {
     marginTop: 24,

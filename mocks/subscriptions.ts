@@ -1,47 +1,51 @@
-import { SubscriptionPlan } from "@/types";
+export interface SubscriptionPlan {
+  id: string;
+  name: string;
+  price: string;
+  interval: "week" | "month" | "one-time";
+  popular?: boolean;
+  features: string[];
+}
 
 export const subscriptionPlans: SubscriptionPlan[] = [
   {
     id: "weekly",
     name: "Weekly",
-    price: "3.99€",
+    price: "€3.99",
     interval: "week",
     features: [
       "Unlimited comparisons",
       "Celebrity comparisons",
       "AI beauty analysis",
-      "AI roast feature",
-      "Save history"
+      "AI roast feature"
     ]
   },
   {
     id: "monthly",
     name: "Monthly",
-    price: "9€",
+    price: "€9.00",
     interval: "month",
+    popular: true,
     features: [
       "Unlimited comparisons",
       "Celebrity comparisons",
       "AI beauty analysis",
       "AI roast feature",
-      "Save history",
-      "Save 10% vs weekly"
-    ],
-    popular: true
+      "Priority support"
+    ]
   },
   {
     id: "lifetime",
     name: "Lifetime",
-    price: "29€",
+    price: "€29.00",
     interval: "one-time",
     features: [
       "Unlimited comparisons",
       "Celebrity comparisons",
       "AI beauty analysis",
       "AI roast feature",
-      "Save history",
-      "All future updates",
-      "No recurring payments"
+      "Priority support",
+      "Future features included"
     ]
   }
 ];

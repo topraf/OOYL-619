@@ -155,48 +155,12 @@ function RootLayoutNav() {
           }}
         />
         <Stack.Screen
-          name="onboarding/index"
+          name="onboarding"
           options={{
             title: "Welcome",
             headerTitleAlign: "center",
             headerShown: false,
             animation: "fade",
-          }}
-        />
-        <Stack.Screen
-          name="onboarding/features"
-          options={{
-            title: "Features",
-            headerTitleAlign: "center",
-            headerShown: false,
-            animation: "slide_from_right",
-          }}
-        />
-        <Stack.Screen
-          name="onboarding/more-features"
-          options={{
-            title: "More Features",
-            headerTitleAlign: "center",
-            headerShown: false,
-            animation: "slide_from_right",
-          }}
-        />
-        <Stack.Screen
-          name="onboarding/notifications"
-          options={{
-            title: "Notifications",
-            headerTitleAlign: "center",
-            headerShown: false,
-            animation: "slide_from_right",
-          }}
-        />
-        <Stack.Screen
-          name="onboarding/subscription"
-          options={{
-            title: "Subscription",
-            headerTitleAlign: "center",
-            headerShown: false,
-            animation: "slide_from_right",
           }}
         />
       </Stack>
