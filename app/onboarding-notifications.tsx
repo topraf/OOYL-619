@@ -13,7 +13,7 @@ const { width } = Dimensions.get("window");
 
 export default function OnboardingNotificationsScreen() {
   const router = useRouter();
-  const { setCurrentStep, skipNotifications } = useOnboardingStore();
+  const { setCurrentStep, skipNotifications, hasCompletedOnboarding } = useOnboardingStore();
   
   const enableButtonScale = useSharedValue(1);
   const skipButtonScale = useSharedValue(1);
@@ -29,6 +29,13 @@ export default function OnboardingNotificationsScreen() {
       transform: [{ scale: skipButtonScale.value }]
     };
   });
+  
+  // Redirect if onboarding is already completed
+  React.useEffect(() => {
+    if (hasCompletedOnboarding) {
+      router.replace("/");
+    }
+  }, [hasCompletedOnboarding]);
   
   const handleEnableNotifications = () => {
     if (Platform.OS !== "web") {

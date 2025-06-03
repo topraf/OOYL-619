@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Platform, Dimensions, Share, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { Home, Camera, MessageCircle, Star } from "lucide-react-native";
+import { Home, Camera, MessageCircle, Star, History } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { Platform as RNPlatform } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -297,7 +297,12 @@ export default function ResultsScreen() {
                 Your{" "}
                 <Text style={styles.headerTitleAccent}>Results</Text>
               </Text>
-              <View style={styles.placeholder} />
+              <TouchableOpacity 
+                style={styles.historyButton} 
+                onPress={toggleHistoryView}
+              >
+                <History size={20} color={colors.text} />
+              </TouchableOpacity>
             </View>
             
             <LinearGradient
@@ -499,6 +504,14 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.card,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  historyButton: {
     width: 40,
     height: 40,
     borderRadius: 20,

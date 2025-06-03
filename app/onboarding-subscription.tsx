@@ -16,7 +16,7 @@ const { width } = Dimensions.get("window");
 
 export default function OnboardingSubscriptionScreen() {
   const router = useRouter();
-  const { completeOnboarding, skipPremium } = useOnboardingStore();
+  const { completeOnboarding, skipPremium, hasCompletedOnboarding } = useOnboardingStore();
   const { setPremiumStatus } = useUserStore();
   const [selectedPlan, setSelectedPlan] = useState(subscriptionPlans.find(p => p.id === "monthly"));
   
@@ -35,6 +35,13 @@ export default function OnboardingSubscriptionScreen() {
     };
   });
   
+  // Redirect if onboarding is already completed
+  React.useEffect(() => {
+    if (hasCompletedOnboarding) {
+      router.replace("/");
+    }
+  }, [hasCompletedOnboarding]);
+  
   const handleSubscribe = () => {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -42,7 +49,7 @@ export default function OnboardingSubscriptionScreen() {
     // In a real app, this would handle payment processing
     setPremiumStatus(true);
     completeOnboarding();
-    router.push("/");
+    router.replace("/");
   };
   
   const handleSkip = () => {
@@ -51,7 +58,7 @@ export default function OnboardingSubscriptionScreen() {
     }
     skipPremium();
     completeOnboarding();
-    router.push("/");
+    router.replace("/");
   };
 
   const onSubscribePressIn = () => {

@@ -14,10 +14,6 @@ interface OnboardingState {
   resetOnboarding: () => void;
   skipNotifications: () => void;
   skipPremium: () => void;
-  
-  // Conditional checks (disabled to prevent loops)
-  checkShouldShowNotifications: () => boolean;
-  checkShouldShowPremium: () => boolean;
 }
 
 export const useOnboardingStore = create<OnboardingState>()(
@@ -33,7 +29,8 @@ export const useOnboardingStore = create<OnboardingState>()(
       completeOnboarding: () => set({ 
         hasCompletedOnboarding: true,
         hasShownNotifications: true,
-        hasShownPremium: true
+        hasShownPremium: true,
+        currentStep: 0
       }),
       
       resetOnboarding: () => set({ 
@@ -46,10 +43,6 @@ export const useOnboardingStore = create<OnboardingState>()(
       skipNotifications: () => set({ hasShownNotifications: true }),
       
       skipPremium: () => set({ hasShownPremium: true }),
-      
-      // Always return false to prevent loops
-      checkShouldShowNotifications: () => false,
-      checkShouldShowPremium: () => false,
     }),
     {
       name: "onboarding-storage",

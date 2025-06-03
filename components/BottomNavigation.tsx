@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, View, TouchableOpacity, Text } from "react-native";
 import { useRouter } from "expo-router";
-import { Camera, BarChart3, Settings, History } from "lucide-react-native";
+import { Camera, BarChart3, Star, MessageCircle } from "lucide-react-native";
 import { colors } from "@/constants/colors";
 
 interface BottomNavigationProps {
@@ -37,56 +37,56 @@ export default function BottomNavigation({ currentRoute }: BottomNavigationProps
       </TouchableOpacity>
       
       <TouchableOpacity 
-        style={[styles.navItem, currentRoute === "results" && styles.activeNavItem]}
+        style={[styles.navItem, (currentRoute === "results" || currentRoute === "history") && styles.activeNavItem]}
         onPress={() => handleNavigation("results", "/results")}
-        disabled={currentRoute === "results"}
+        disabled={currentRoute === "results" || currentRoute === "history"}
       >
         <BarChart3 
           size={24} 
-          color={currentRoute === "results" ? colors.primary : colors.textLight} 
-          strokeWidth={currentRoute === "results" ? 3 : 2}
+          color={(currentRoute === "results" || currentRoute === "history") ? colors.primary : colors.textLight} 
+          strokeWidth={(currentRoute === "results" || currentRoute === "history") ? 3 : 2}
         />
         <Text style={[
           styles.navText, 
-          currentRoute === "results" && styles.activeNavText
+          (currentRoute === "results" || currentRoute === "history") && styles.activeNavText
         ]}>
           Results
         </Text>
       </TouchableOpacity>
       
       <TouchableOpacity 
-        style={[styles.navItem, currentRoute === "history" && styles.activeNavItem]}
-        onPress={() => handleNavigation("history", "/history")}
-        disabled={currentRoute === "history"}
+        style={[styles.navItem, currentRoute === "celebrities" && styles.activeNavItem]}
+        onPress={() => handleNavigation("celebrities", "/celebrities")}
+        disabled={currentRoute === "celebrities"}
       >
-        <History 
+        <Star 
           size={24} 
-          color={currentRoute === "history" ? colors.primary : colors.textLight} 
-          strokeWidth={currentRoute === "history" ? 3 : 2}
+          color={currentRoute === "celebrities" ? colors.primary : colors.textLight} 
+          strokeWidth={currentRoute === "celebrities" ? 3 : 2}
         />
         <Text style={[
           styles.navText, 
-          currentRoute === "history" && styles.activeNavText
+          currentRoute === "celebrities" && styles.activeNavText
         ]}>
-          History
+          Celebrities
         </Text>
       </TouchableOpacity>
       
       <TouchableOpacity 
-        style={[styles.navItem, currentRoute === "settings" && styles.activeNavItem]}
-        onPress={() => handleNavigation("settings", "/settings")}
-        disabled={currentRoute === "settings"}
+        style={[styles.navItem, currentRoute === "roast" && styles.activeNavItem]}
+        onPress={() => handleNavigation("roast", "/roastmaster")}
+        disabled={currentRoute === "roast"}
       >
-        <Settings 
+        <MessageCircle 
           size={24} 
-          color={currentRoute === "settings" ? colors.primary : colors.textLight} 
-          strokeWidth={currentRoute === "settings" ? 3 : 2}
+          color={currentRoute === "roast" ? colors.primary : colors.textLight} 
+          strokeWidth={currentRoute === "roast" ? 3 : 2}
         />
         <Text style={[
           styles.navText, 
-          currentRoute === "settings" && styles.activeNavText
+          currentRoute === "roast" && styles.activeNavText
         ]}>
-          Settings
+          Roast
         </Text>
       </TouchableOpacity>
     </View>
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   activeNavItem: {
-    backgroundColor: colors.primary + "10",
+    backgroundColor: colors.primary + "15",
   },
   navText: {
     fontSize: 12,
@@ -128,6 +128,6 @@ const styles = StyleSheet.create({
   },
   activeNavText: {
     color: colors.primary,
-    fontWeight: "800",
+    fontWeight: "900",
   },
 });

@@ -102,6 +102,7 @@ function RootLayoutNav() {
             title: "History",
             headerTitleAlign: "center",
             animation: "slide_from_bottom",
+            headerShown: false,
           }}
         />
         <Stack.Screen
