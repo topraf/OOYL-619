@@ -8,6 +8,7 @@ import { Platform as RNPlatform } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
 import { useUserStore } from "@/store/user-store";
+import { useComparisonStore } from "@/store/comparison-store";
 import LeagueGauge from "@/components/LeagueGauge";
 import ImagePreview from "@/components/ImagePreview";
 import PaywallModal from "@/components/PaywallModal";
@@ -24,6 +25,7 @@ type FeatureStatus = "High" | "Mid" | "Low";
 export default function ResultsScreen() {
   const router = useRouter();
   const { comparisons, isLoading, isPremium, clearHistory, getColors, isOffline, getCachedComparisons } = useUserStore();
+  const { history } = useComparisonStore();
   const colors = getColors();
   const [showResult, setShowResult] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
@@ -54,9 +56,10 @@ export default function ResultsScreen() {
     };
   });
   
-  const latestResult = comparisons[0];
+  // Use comparison store history instead of user store
+  const latestResult = history[0] || comparisons[0];
   const cachedResults = getCachedComparisons();
-  const displayResults = isOffline ? cachedResults : comparisons;
+  const displayResults = isOffline ? cachedResults : (history.length > 0 ? history : comparisons);
 
   useEffect(() => {
     if (!isLoading && latestResult) {

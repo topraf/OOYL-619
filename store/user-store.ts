@@ -7,7 +7,7 @@ import { lightColors, darkColors } from "@/constants/colors";
 type Theme = "light" | "dark" | "system";
 
 interface UserState {
-  user: User;
+  user: User & { gender?: "male" | "female" };
   currentTarget: Target | null;
   comparisons: ComparisonResult[];
   freeComparisonUsed: boolean;
@@ -35,11 +35,12 @@ interface UserState {
   getCachedComparisons: () => ComparisonResult[];
 }
 
-const initialUser: User = {
+const initialUser: User & { gender?: "male" | "female" } = {
   id: "user_" + Date.now().toString(),
   gender: "male",
   frontImage: null,
-  beautyScore: null,
+  sideImage: null,
+  beautyScore: 0,
 };
 
 export const useUserStore = create<UserState>()(
@@ -51,7 +52,7 @@ export const useUserStore = create<UserState>()(
       freeComparisonUsed: false,
       isPremium: false,
       isLoading: false,
-      theme: "system",
+      theme: "dark", // Default to dark theme
       isOffline: false,
       cachedComparisons: [],
       
@@ -70,7 +71,7 @@ export const useUserStore = create<UserState>()(
             ...state.user,
             frontImage: uri,
             // Simulate beauty score calculation when image is set
-            beautyScore: uri ? Math.random() * 0.5 + 0.3 : null,
+            beautyScore: uri ? Math.random() * 0.5 + 0.3 : 0,
           }
         }));
       },
@@ -96,7 +97,8 @@ export const useUserStore = create<UserState>()(
           user: {
             ...state.user,
             frontImage: null,
-            beautyScore: null,
+            sideImage: null,
+            beautyScore: 0,
           },
           currentTarget: null
         }));
@@ -147,7 +149,7 @@ export const useUserStore = create<UserState>()(
           user: { ...user },
           target: { ...currentTarget },
           leagueStatus,
-          isPremium: isPremium,
+          feedback: `Comparison completed with ${currentTarget.name || "target"}`,
         };
         
         // Cache the comparison for offline access
@@ -172,12 +174,8 @@ export const useUserStore = create<UserState>()(
       
       getColors: () => {
         const { theme } = get();
-        if (theme === "dark") return darkColors;
-        if (theme === "light") return lightColors;
-        
-        // For system theme, we'd need to check system preference
-        // For now, default to light
-        return lightColors;
+        // Always return dark colors as requested
+        return darkColors;
       },
       
       clearHistory: () => {

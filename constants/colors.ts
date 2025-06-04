@@ -1,4 +1,34 @@
-export const colors = {
+export const lightColors = {
+  // Main colors
+  primary: "#4361EE",
+  secondary: "#3A0CA3",
+  
+  // UI colors
+  background: "#FFFFFF",
+  card: "#F8F9FA",
+  text: "#1A1A1A",
+  textLight: "#6C757D",
+  border: "#E9ECEF",
+  overlay: "rgba(0, 0, 0, 0.5)",
+  shadow: "#000000",
+  
+  // Status colors
+  success: "#4CC9F0",
+  warning: "#F72585",
+  error: "#FF5252",
+  
+  // Gauge colors
+  gauge: {
+    purple: "#7209B7",
+    blue: "#4361EE",
+    green: "#4CC9F0",
+    yellow: "#4CC9F0",
+    orange: "#F72585",
+    red: "#F72585",
+  }
+};
+
+export const darkColors = {
   // Main colors
   primary: "#4361EE",
   secondary: "#3A0CA3",
@@ -27,3 +57,6 @@ export const colors = {
     red: "#F72585",
   }
 };
+
+// Default export for backward compatibility
+export const colors = darkColors;
