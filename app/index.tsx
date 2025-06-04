@@ -189,7 +189,7 @@ export default function HomeScreen() {
             style={[styles.quickActionCard, { backgroundColor: colors.card }]}
             onPress={handleCelebrities}
           >
-            <View style={styles.plusIconContainer}>
+            <View style={[styles.plusIconContainer, { backgroundColor: colors.primary }]}>
               <Plus size={20} color={colors.background} />
             </View>
             <LinearGradient
@@ -216,7 +216,7 @@ export default function HomeScreen() {
             style={[styles.quickActionCard, { backgroundColor: colors.card }]}
             onPress={handleAIRoast}
           >
-            <View style={styles.plusIconContainer}>
+            <View style={[styles.plusIconContainer, { backgroundColor: colors.primary }]}>
               <Plus size={20} color={colors.background} />
             </View>
             <LinearGradient
@@ -455,7 +455,6 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: colors.primary,
     justifyContent: "center",
     alignItems: "center",
     zIndex: 10,
