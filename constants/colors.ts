@@ -27,3 +27,6 @@ export const darkColors = {
   error: "#EF4444",
   shadow: "rgba(0, 0, 0, 0.3)",
 };
+
+// Export default colors for components that don't use the store
+export const colors = darkColors;

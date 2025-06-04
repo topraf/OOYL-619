@@ -23,8 +23,20 @@ type FeatureStatus = "High" | "Mid" | "Low";
 
 export default function ResultsScreen() {
   const router = useRouter();
-  const { comparisons, isLoading, isPremium, clearHistory, getColors, isOffline, getCachedComparisons } = useUserStore();
-  const { history } = useComparisonStore();
+  const userStore = useUserStore();
+  const comparisonStore = useComparisonStore();
+  
+  // Safely destructure from stores
+  const comparisons = userStore?.comparisons || [];
+  const isLoading = userStore?.isLoading || false;
+  const isPremium = userStore?.isPremium || false;
+  const clearHistory = userStore?.clearHistory || (() => {});
+  const getColors = userStore?.getColors || (() => ({ background: "#0A0A0A", card: "#1A1A1A", text: "#FFFFFF", textLight: "#9CA3AF", primary: "#FF6B35", secondary: "#FF8E9B", accent: "#FFB347", border: "#374151", success: "#10B981", warning: "#F59E0B", error: "#EF4444", shadow: "rgba(0, 0, 0, 0.3)" }));
+  const isOffline = userStore?.isOffline || false;
+  const getCachedComparisons = userStore?.getCachedComparisons || (() => []);
+  
+  const history = comparisonStore?.history || [];
+  
   const colors = getColors();
   const [showResult, setShowResult] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
@@ -382,7 +394,7 @@ export default function ResultsScreen() {
               onPressIn={onPressIn}
               onPressOut={onPressOut}
             >
-              <Text style={[styles.buttonText, { color: colors.text }]}>Start Comparison</Text>
+              <Text style={[styles.buttonText, { color: "#FFFFFF" }]}>Start Comparison</Text>
             </TouchableOpacity>
           </Animated.View>
         </View>
@@ -427,7 +439,7 @@ export default function ResultsScreen() {
                 end={{ x: 1, y: 1 }}
                 style={styles.resultCard}
               >
-                <Text style={[styles.resultTitle, { color: colors.text }]}>
+                <Text style={[styles.resultTitle, { color: "#FFFFFF" }]}>
                   {getLeagueText()}
                 </Text>
                 
@@ -435,25 +447,25 @@ export default function ResultsScreen() {
                   <View style={styles.imageColumn}>
                     <ImagePreview
                       uri={latestResult.userImage || ""}
-                      style={[styles.circleImage, { borderColor: colors.text }]}
+                      style={[styles.circleImage, { borderColor: "#FFFFFF" }]}
                     />
-                    <Text style={[styles.imageLabel, { color: colors.text }]}>You</Text>
-                    <Text style={[styles.scoreText, { color: colors.text }]}>{getOverallScore()}/100</Text>
+                    <Text style={[styles.imageLabel, { color: "#FFFFFF" }]}>You</Text>
+                    <Text style={[styles.scoreText, { color: "#FFFFFF" }]}>{getOverallScore()}/100</Text>
                   </View>
                   
                   <View style={styles.vsContainer}>
-                    <Text style={[styles.vsText, { color: colors.text }]}>VS</Text>
+                    <Text style={[styles.vsText, { color: "#FFFFFF" }]}>VS</Text>
                   </View>
                   
                   <View style={styles.imageColumn}>
                     <ImagePreview
                       uri={latestResult.celebrity.image}
-                      style={[styles.circleImage, { borderColor: colors.text }]}
+                      style={[styles.circleImage, { borderColor: "#FFFFFF" }]}
                     />
-                    <Text style={[styles.imageLabel, { color: colors.text }]}>
+                    <Text style={[styles.imageLabel, { color: "#FFFFFF" }]}>
                       {latestResult.celebrity.name || "Them"}
                     </Text>
-                    <Text style={[styles.scoreText, { color: colors.text }]}>
+                    <Text style={[styles.scoreText, { color: "#FFFFFF" }]}>
                       {Math.round((latestResult.celebrity.beautyScore || 0) * 100)}/100
                     </Text>
                   </View>

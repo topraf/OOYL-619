@@ -126,8 +126,8 @@ export default function HomeScreen() {
           >
             <View style={styles.cardContent}>
               <View style={styles.cardHeader}>
-                <Text style={[styles.cardTitle, { color: colors.text }]}>Start Your Analysis</Text>
-                <Text style={[styles.cardSubtitle, { color: colors.text }]}>
+                <Text style={[styles.cardTitle, { color: "#FFFFFF" }]}>Start Your Analysis</Text>
+                <Text style={[styles.cardSubtitle, { color: "#FFFFFF" }]}>
                   Upload your photo and compare with anyone
                 </Text>
               </View>
@@ -168,7 +168,7 @@ export default function HomeScreen() {
                       style={styles.featureImage}
                     />
                     <View style={[styles.plusIcon, { backgroundColor: colors.primary }]}>
-                      <Plus size={16} color={colors.text} />
+                      <Plus size={16} color="#FFFFFF" />
                     </View>
                   </View>
                   <Text style={[styles.featureTitle, { color: colors.text }]}>Celebrity Match</Text>
@@ -199,7 +199,7 @@ export default function HomeScreen() {
                       style={styles.featureImage}
                     />
                     <View style={[styles.plusIcon, { backgroundColor: colors.primary }]}>
-                      <Plus size={16} color={colors.text} />
+                      <Plus size={16} color="#FFFFFF" />
                     </View>
                   </View>
                   <Text style={[styles.featureTitle, { color: colors.text }]}>AI Roast</Text>
@@ -218,19 +218,19 @@ export default function HomeScreen() {
           <View style={styles.stepsList}>
             <View style={styles.step}>
               <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
-                <Text style={[styles.stepNumberText, { color: colors.text }]}>1</Text>
+                <Text style={[styles.stepNumberText, { color: "#FFFFFF" }]}>1</Text>
               </View>
               <Text style={[styles.stepText, { color: colors.textLight }]}>Upload your photo</Text>
             </View>
             <View style={styles.step}>
               <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
-                <Text style={[styles.stepNumberText, { color: colors.text }]}>2</Text>
+                <Text style={[styles.stepNumberText, { color: "#FFFFFF" }]}>2</Text>
               </View>
               <Text style={[styles.stepText, { color: colors.textLight }]}>Choose who to compare with</Text>
             </View>
             <View style={styles.step}>
               <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
-                <Text style={[styles.stepNumberText, { color: colors.text }]}>3</Text>
+                <Text style={[styles.stepNumberText, { color: "#FFFFFF" }]}>3</Text>
               </View>
               <Text style={[styles.stepText, { color: colors.textLight }]}>Get your league status</Text>
             </View>
