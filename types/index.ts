@@ -28,9 +28,9 @@ export interface ComparisonResult {
   target: Target;
   leagueStatus: LeagueStatus;
   feedback: string;
-  userImage: string; // Added for compatibility with comparison-store
-  celebrity: Celebrity; // Added for compatibility with comparison-store
-  score: number; // Added for compatibility with comparison-store
+  userImage: string; // User's image for compatibility
+  celebrity: Celebrity; // Celebrity data for compatibility
+  score: number; // Overall score for compatibility
 }
 
 export interface Celebrity {

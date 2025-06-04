@@ -64,7 +64,7 @@ export default function RoastmasterScreen() {
     
     // Set initial image from latest result if available
     if (latestResult && !selectedImage) {
-      setSelectedImage(latestResult.userImage);
+      setSelectedImage(latestResult.user.frontImage);
     }
   }, [latestResult]);
   

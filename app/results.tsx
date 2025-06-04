@@ -25,7 +25,7 @@ type FeatureStatus = "High" | "Mid" | "Low";
 export default function ResultsScreen() {
   const router = useRouter();
   const { comparisons, isLoading, isPremium, clearHistory, getColors, isOffline, getCachedComparisons } = useUserStore();
-  const { history } = useComparisonStore();
+  const { history, clearHistory: clearComparisonHistory } = useComparisonStore();
   const colors = getColors();
   const [showResult, setShowResult] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
@@ -193,6 +193,7 @@ export default function ResultsScreen() {
     
     if (displayResults.length > 0) {
       clearHistory();
+      clearComparisonHistory();
     }
   };
 

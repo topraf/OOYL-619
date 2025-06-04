@@ -193,7 +193,7 @@ export default function HomeScreen() {
               <Plus size={20} color={colors.background} />
             </View>
             <LinearGradient
-              colors={[colors.secondary, colors.primary]}
+              colors={[colors.secondary, colors.primary, "#9C27B0"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.cardGradientBorder}
@@ -220,7 +220,7 @@ export default function HomeScreen() {
               <Plus size={20} color={colors.background} />
             </View>
             <LinearGradient
-              colors={[colors.secondary, colors.primary]}
+              colors={[colors.primary, "#9C27B0", colors.secondary]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.cardGradientBorder}

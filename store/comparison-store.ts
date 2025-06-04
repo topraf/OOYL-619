@@ -72,6 +72,9 @@ export const useComparisonStore = create<ComparisonState>()(
                         score >= 80 ? "slightly_below" : 
                         score >= 75 ? "out_of_league" : "way_beyond",
           feedback,
+          userImage: userImage, // Add for compatibility
+          celebrity: randomCelebrity, // Add for compatibility
+          score: score, // Add for compatibility
         };
         
         // Cache the result for offline access

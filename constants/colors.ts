@@ -1,7 +1,7 @@
 export const lightColors = {
-  // Main colors
-  primary: "#4361EE",
-  secondary: "#3A0CA3",
+  // Main colors - Orange/Pink gradient theme
+  primary: "#FF6B35", // Vibrant orange
+  secondary: "#FF1744", // Pink/red
   
   // UI colors
   background: "#FFFFFF",
@@ -14,24 +14,24 @@ export const lightColors = {
   
   // Status colors
   success: "#4CC9F0",
-  warning: "#F72585",
-  error: "#FF5252",
+  warning: "#FF6B35",
+  error: "#FF1744",
   
   // Gauge colors
   gauge: {
-    purple: "#7209B7",
-    blue: "#4361EE",
+    purple: "#9C27B0",
+    blue: "#FF6B35",
     green: "#4CC9F0",
-    yellow: "#4CC9F0",
-    orange: "#F72585",
-    red: "#F72585",
+    yellow: "#FFC107",
+    orange: "#FF6B35",
+    red: "#FF1744",
   }
 };
 
 export const darkColors = {
-  // Main colors
-  primary: "#4361EE",
-  secondary: "#3A0CA3",
+  // Main colors - Orange/Pink gradient theme
+  primary: "#FF6B35", // Vibrant orange
+  secondary: "#FF1744", // Pink/red
   
   // UI colors
   background: "#121212",
@@ -44,17 +44,17 @@ export const darkColors = {
   
   // Status colors
   success: "#4CC9F0",
-  warning: "#F72585",
-  error: "#FF5252",
+  warning: "#FF6B35",
+  error: "#FF1744",
   
   // Gauge colors
   gauge: {
-    purple: "#7209B7",
-    blue: "#4361EE",
+    purple: "#9C27B0",
+    blue: "#FF6B35",
     green: "#4CC9F0",
-    yellow: "#4CC9F0",
-    orange: "#F72585",
-    red: "#F72585",
+    yellow: "#FFC107",
+    orange: "#FF6B35",
+    red: "#FF1744",
   }
 };
 

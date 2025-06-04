@@ -6,9 +6,8 @@ import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
 import { Platform } from "react-native";
 import { Search, X, ArrowLeft, Plus } from "lucide-react-native";
-import { colors } from "@/constants/colors";
-import { celebrities, celebrityCategories } from "@/mocks/celebrities";
 import { useUserStore } from "@/store/user-store";
+import { celebrities, celebrityCategories } from "@/mocks/celebrities";
 import BottomNavigation from "@/components/BottomNavigation";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 
@@ -18,7 +17,8 @@ const itemWidth = (width - 48) / numColumns;
 
 export default function CelebritiesScreen() {
   const router = useRouter();
-  const { setTargetImage } = useUserStore();
+  const { setTargetImage, getColors } = useUserStore();
+  const colors = getColors();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   
@@ -64,30 +64,30 @@ export default function CelebritiesScreen() {
   };
   
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top"]}>
       <View style={styles.header}>
         <TouchableOpacity 
-          style={styles.backButton} 
+          style={[styles.backButton, { backgroundColor: colors.card }]} 
           onPress={() => router.back()}
         >
           <ArrowLeft size={20} color={colors.text} />
         </TouchableOpacity>
         <View style={styles.headerContent}>
-          <Text style={styles.title}>
+          <Text style={[styles.title, { color: colors.text }]}>
             Choose a{" "}
-            <Text style={styles.titleAccent}>Celebrity</Text>
+            <Text style={[styles.titleAccent, { color: colors.primary }]}>Celebrity</Text>
           </Text>
-          <Text style={styles.subtitle}>
+          <Text style={[styles.subtitle, { color: colors.textLight }]}>
             Compare yourself with these famous personalities
           </Text>
         </View>
       </View>
       
-      <View style={styles.searchContainer}>
-        <View style={styles.searchInputContainer}>
+      <View style={[styles.searchContainer, { borderBottomColor: colors.border }]}>
+        <View style={[styles.searchInputContainer, { backgroundColor: colors.card }]}>
           <Search size={20} color={colors.textLight} style={styles.searchIcon} />
           <TextInput
-            style={styles.searchInput}
+            style={[styles.searchInput, { color: colors.text }]}
             placeholder="Search celebrities..."
             placeholderTextColor={colors.textLight}
             value={searchQuery}
@@ -101,7 +101,7 @@ export default function CelebritiesScreen() {
         </View>
       </View>
       
-      <View style={styles.categoriesContainer}>
+      <View style={[styles.categoriesContainer, { borderBottomColor: colors.border }]}>
         <ScrollView 
           horizontal 
           showsHorizontalScrollIndicator={false}
@@ -142,30 +142,30 @@ export default function CelebritiesScreen() {
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No celebrities found</Text>
+            <Text style={[styles.emptyText, { color: colors.textLight }]}>No celebrities found</Text>
           </View>
         }
         renderItem={({ item }) => (
           <Animated.View style={animatedButtonStyle}>
             <TouchableOpacity
-              style={styles.celebrityItem}
+              style={[styles.celebrityItem, { backgroundColor: colors.card, shadowColor: colors.shadow }]}
               onPress={() => handleSelectCelebrity(item.id, item.image, item.name)}
               onPressIn={onPressIn}
               onPressOut={onPressOut}
             >
-              <View style={styles.plusIconContainer}>
+              <View style={[styles.plusIconContainer, { backgroundColor: colors.primary }]}>
                 <Plus size={16} color={colors.background} />
               </View>
               <Image
                 source={{ uri: item.image }}
-                style={styles.celebrityImage}
+                style={[styles.celebrityImage, { backgroundColor: colors.border }]}
                 contentFit="cover"
               />
               <View style={styles.celebrityInfo}>
-                <Text style={styles.celebrityName}>{item.name}</Text>
+                <Text style={[styles.celebrityName, { color: colors.text }]}>{item.name}</Text>
                 <View style={styles.scoreContainer}>
-                  <Text style={styles.scoreText}>{Math.round(item.beautyScore * 10)}/10</Text>
-                  <Text style={styles.scoreLabel}>Beauty Score</Text>
+                  <Text style={[styles.scoreText, { color: colors.primary }]}>{Math.round(item.beautyScore * 10)}/10</Text>
+                  <Text style={[styles.scoreLabel, { color: colors.textLight }]}>Beauty Score</Text>
                 </View>
               </View>
             </TouchableOpacity>
@@ -181,20 +181,17 @@ export default function CelebritiesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.card,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
@@ -205,27 +202,23 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "800",
-    color: colors.text,
     marginBottom: 4,
   },
   titleAccent: {
-    color: colors.primary,
+    // Color applied dynamically
   },
   subtitle: {
     fontSize: 14,
-    color: colors.textLight,
     lineHeight: 20,
   },
   searchContainer: {
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
   searchInputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.card,
     borderRadius: 8,
     paddingHorizontal: 12,
   },
@@ -235,12 +228,10 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     height: 40,
-    color: colors.text,
     fontSize: 16,
   },
   categoriesContainer: {
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
   categoriesContent: {
     paddingHorizontal: 16,
@@ -272,8 +263,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
     borderRadius: 12,
     overflow: "hidden",
-    backgroundColor: colors.card,
-    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -287,7 +276,6 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: colors.primary,
     justifyContent: "center",
     alignItems: "center",
     zIndex: 10,
@@ -295,7 +283,6 @@ const styles = StyleSheet.create({
   celebrityImage: {
     width: "100%",
     height: itemWidth * 1.2,
-    backgroundColor: colors.border,
   },
   celebrityInfo: {
     padding: 12,
@@ -303,7 +290,6 @@ const styles = StyleSheet.create({
   celebrityName: {
     fontSize: 14,
     fontWeight: "600",
-    color: colors.text,
     marginBottom: 8,
   },
   scoreContainer: {
@@ -313,12 +299,10 @@ const styles = StyleSheet.create({
   scoreText: {
     fontSize: 18,
     fontWeight: "700",
-    color: colors.primary,
     marginRight: 4,
   },
   scoreLabel: {
     fontSize: 12,
-    color: colors.textLight,
   },
   emptyContainer: {
     padding: 24,
@@ -326,6 +310,5 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: colors.textLight,
   },
 });

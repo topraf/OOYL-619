@@ -2,9 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { User, Target, ComparisonResult, LeagueStatus } from "@/types";
-import { lightColors, darkColors } from "@/constants/colors";
-
-type Theme = "light" | "dark" | "system";
+import { darkColors } from "@/constants/colors";
 
 interface UserState {
   user: User & { gender?: "male" | "female" };
@@ -13,7 +11,6 @@ interface UserState {
   freeComparisonUsed: boolean;
   isPremium: boolean;
   isLoading: boolean;
-  theme: Theme;
   isOffline: boolean;
   cachedComparisons: ComparisonResult[];
   
@@ -26,8 +23,7 @@ interface UserState {
   compareWithTarget: () => Promise<ComparisonResult | null>;
   
   setPremiumStatus: (status: boolean) => void;
-  setTheme: (theme: Theme) => void;
-  getColors: () => typeof lightColors;
+  getColors: () => typeof darkColors;
   
   clearHistory: () => void;
   setOfflineStatus: (isOffline: boolean) => void;
@@ -52,7 +48,6 @@ export const useUserStore = create<UserState>()(
       freeComparisonUsed: false,
       isPremium: false,
       isLoading: false,
-      theme: "dark", // Default to dark theme
       isOffline: false,
       cachedComparisons: [],
       
@@ -150,6 +145,15 @@ export const useUserStore = create<UserState>()(
           target: { ...currentTarget },
           leagueStatus,
           feedback: `Comparison completed with ${currentTarget.name || "target"}`,
+          userImage: user.frontImage || "", // Add for compatibility
+          celebrity: {
+            id: currentTarget.id,
+            name: currentTarget.name || "Unknown",
+            image: currentTarget.image,
+            beautyScore: currentTarget.beautyScore || 0.5,
+            category: "unknown"
+          }, // Add for compatibility
+          score: Math.round((user.beautyScore || 0.5) * 100), // Add for compatibility
         };
         
         // Cache the comparison for offline access
@@ -168,13 +172,8 @@ export const useUserStore = create<UserState>()(
         set({ isPremium: status });
       },
       
-      setTheme: (theme: Theme) => {
-        set({ theme });
-      },
-      
       getColors: () => {
-        const { theme } = get();
-        // Always return dark colors as requested
+        // Always return dark colors with orange/pink theme
         return darkColors;
       },
       
@@ -204,7 +203,6 @@ export const useUserStore = create<UserState>()(
         comparisons: state.comparisons,
         freeComparisonUsed: state.freeComparisonUsed,
         isPremium: state.isPremium,
-        theme: state.theme,
         cachedComparisons: state.cachedComparisons,
       }),
     }

@@ -3,7 +3,7 @@ import { Stack, Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import { Appearance, Platform } from "react-native";
+import { Platform } from "react-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { trpc, trpcClient } from "@/lib/trpc";
 import { useUserStore } from "@/store/user-store";
@@ -39,26 +39,16 @@ export default function RootLayout() {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
+        <NetworkProvider>
           <RootLayoutNav />
-        </ThemeProvider>
+        </NetworkProvider>
       </QueryClientProvider>
     </trpc.Provider>
   );
 }
 
-function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const { theme, setTheme, setOfflineStatus, getColors } = useUserStore();
-  const [systemTheme, setSystemTheme] = useState(Appearance.getColorScheme());
-  
-  useEffect(() => {
-    // Listen for system theme changes
-    const subscription = Appearance.addChangeListener(({ colorScheme }) => {
-      setSystemTheme(colorScheme);
-    });
-    
-    return () => subscription?.remove();
-  }, []);
+function NetworkProvider({ children }: { children: React.ReactNode }) {
+  const { setOfflineStatus } = useUserStore();
   
   useEffect(() => {
     // Monitor network status
@@ -80,13 +70,6 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
     
     return () => clearInterval(interval);
   }, [setOfflineStatus]);
-  
-  // Apply system theme if theme is set to "system"
-  useEffect(() => {
-    if (theme === "system" && systemTheme) {
-      // The getColors function will handle system theme detection
-    }
-  }, [theme, systemTheme]);
   
   return <>{children}</>;
 }
