@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { User, Target, ComparisonResult, LeagueStatus } from "@/types";
 import { lightColors, darkColors } from "@/constants/colors";
 
-type Theme = "light" | "dark" | "system";
+type Theme = "dark"; // Only dark theme now
 
 interface UserState {
   user: User & { gender?: "male" | "female" };
@@ -27,7 +27,7 @@ interface UserState {
   
   setPremiumStatus: (status: boolean) => void;
   setTheme: (theme: Theme) => void;
-  getColors: () => typeof lightColors;
+  getColors: () => typeof darkColors;
   
   clearHistory: () => void;
   setOfflineStatus: (isOffline: boolean) => void;
@@ -52,7 +52,7 @@ export const useUserStore = create<UserState>()(
       freeComparisonUsed: false,
       isPremium: false,
       isLoading: false,
-      theme: "dark", // Default to dark theme
+      theme: "dark", // Only dark theme
       isOffline: false,
       cachedComparisons: [],
       
@@ -173,8 +173,7 @@ export const useUserStore = create<UserState>()(
       },
       
       getColors: () => {
-        const { theme } = get();
-        // Always return dark colors as requested
+        // Always return dark colors
         return darkColors;
       },
       

@@ -13,6 +13,14 @@ export interface Target {
   isCelebrity?: boolean;
 }
 
+export interface Celebrity {
+  id: string;
+  name: string;
+  image: string;
+  beautyScore: number;
+  category: string;
+}
+
 export type LeagueStatus = 
   | "way_beyond"
   | "out_of_league" 
@@ -30,16 +38,12 @@ export interface ComparisonResult {
   feedback: string;
 }
 
-export interface Celebrity {
+export interface SubscriptionPlan {
   id: string;
   name: string;
-  image: string;
-  beautyScore: number;
-  category: string;
-}
-
-export interface CelebrityCategory {
-  id: string;
-  name: string;
-  emoji: string;
+  price: string;
+  period: string;
+  features: string[];
+  isPopular?: boolean;
+  originalPrice?: string;
 }
