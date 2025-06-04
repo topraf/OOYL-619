@@ -4,7 +4,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Home, Camera, MessageCircle, Star, History, Wifi, WifiOff } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
-import { Platform as RNPlatform } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
 import { useUserStore } from "@/store/user-store";
@@ -16,7 +15,7 @@ import FeatureScoreCard from "@/components/FeatureScoreCard";
 import BottomNavigation from "@/components/BottomNavigation";
 import ComparisonCard from "@/components/ComparisonCard";
 import EmptyState from "@/components/EmptyState";
-import Animated, { useSharedValue, useAnimatedStyle, withSpring, withSequence, withTiming, useAnimatedProps } from "react-native-reanimated";
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, withSequence, withTiming } from "react-native-reanimated";
 
 const { width } = Dimensions.get("window");
 
@@ -69,7 +68,7 @@ export default function ResultsScreen() {
       
       const timer = setTimeout(() => {
         setShowResult(true);
-        if (RNPlatform.OS !== "web") {
+        if (Platform.OS !== "web") {
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         }
         
@@ -85,7 +84,7 @@ export default function ResultsScreen() {
   }, [isLoading, latestResult]);
 
   const handleShareInstagram = async () => {
-    if (RNPlatform.OS !== "web") {
+    if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       
       try {
@@ -111,7 +110,7 @@ export default function ResultsScreen() {
   };
 
   const handleShareSnapchat = async () => {
-    if (RNPlatform.OS !== "web") {
+    if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       
       try {
@@ -137,7 +136,7 @@ export default function ResultsScreen() {
   };
 
   const handleShareX = async () => {
-    if (RNPlatform.OS !== "web") {
+    if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       
       try {
@@ -162,7 +161,7 @@ export default function ResultsScreen() {
   };
 
   const handleNewComparison = () => {
-    if (RNPlatform.OS !== "web") {
+    if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
     
@@ -177,7 +176,7 @@ export default function ResultsScreen() {
   
   const handlePremiumFeature = (feature: string) => {
     if (isPremium) {
-      if (RNPlatform.OS !== "web") {
+      if (Platform.OS !== "web") {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
       alert(`${feature} feature coming soon!`);
@@ -187,7 +186,7 @@ export default function ResultsScreen() {
   };
 
   const handleClearHistory = () => {
-    if (RNPlatform.OS !== "web") {
+    if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     }
     
@@ -260,8 +259,8 @@ export default function ResultsScreen() {
   };
 
   const getOverallScore = () => {
-    if (!latestResult?.user.beautyScore) return 0;
-    return Math.round(latestResult.user.beautyScore * 10);
+    if (!latestResult?.score) return 0;
+    return latestResult.score;
   };
 
   const getFeatureScores = () => {
@@ -287,7 +286,7 @@ export default function ResultsScreen() {
   };
 
   const toggleHistoryView = () => {
-    if (RNPlatform.OS !== "web") {
+    if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     setShowHistory(!showHistory);
@@ -339,21 +338,12 @@ export default function ResultsScreen() {
           <FlatList
             data={displayResults}
             keyExtractor={(item) => item.id}
-            renderItem={({ item, index }) => (
-              <Animated.View
-                style={[
-                  animatedCardStyle,
-                  { 
-                    transform: [{ 
-                      translateY: useSharedValue(index * 20).value 
-                    }] 
-                  }
-                ]}
-              >
+            renderItem={({ item }) => (
+              <Animated.View style={animatedCardStyle}>
                 <TouchableOpacity 
                   style={styles.cardContainer}
                   onPress={() => {
-                    if (RNPlatform.OS !== "web") {
+                    if (Platform.OS !== "web") {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     }
                     setShowHistory(false);
@@ -444,11 +434,11 @@ export default function ResultsScreen() {
                 <View style={styles.imagesContainer}>
                   <View style={styles.imageColumn}>
                     <ImagePreview
-                      uri={latestResult.user.frontImage || ""}
+                      uri={latestResult.userImage || ""}
                       style={[styles.circleImage, { borderColor: colors.text }]}
                     />
                     <Text style={[styles.imageLabel, { color: colors.text }]}>You</Text>
-                    <Text style={[styles.scoreText, { color: colors.text }]}>{getOverallScore()}/10</Text>
+                    <Text style={[styles.scoreText, { color: colors.text }]}>{getOverallScore()}/100</Text>
                   </View>
                   
                   <View style={styles.vsContainer}>
@@ -457,14 +447,14 @@ export default function ResultsScreen() {
                   
                   <View style={styles.imageColumn}>
                     <ImagePreview
-                      uri={latestResult.target.image}
+                      uri={latestResult.celebrity.image}
                       style={[styles.circleImage, { borderColor: colors.text }]}
                     />
                     <Text style={[styles.imageLabel, { color: colors.text }]}>
-                      {latestResult.target.name || "Them"}
+                      {latestResult.celebrity.name || "Them"}
                     </Text>
                     <Text style={[styles.scoreText, { color: colors.text }]}>
-                      {Math.round((latestResult.target.beautyScore || 0) * 10)}/10
+                      {Math.round((latestResult.celebrity.beautyScore || 0) * 100)}/100
                     </Text>
                   </View>
                 </View>

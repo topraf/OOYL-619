@@ -32,6 +32,9 @@ export type LeagueStatus =
 export interface ComparisonResult {
   id: string;
   date: string;
+  userImage: string;
+  celebrity: Celebrity;
+  score: number;
   user: User;
   target: Target;
   leagueStatus: LeagueStatus;

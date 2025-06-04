@@ -51,7 +51,7 @@ export default function HomeScreen() {
   }, []);
 
   const handleStartComparison = () => {
-    if (RNPlatform.OS !== "web") {
+    if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
     
@@ -71,7 +71,7 @@ export default function HomeScreen() {
   };
 
   const handleCelebrityComparison = () => {
-    if (RNPlatform.OS !== "web") {
+    if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     
@@ -84,7 +84,7 @@ export default function HomeScreen() {
   };
 
   const handleAIRoast = () => {
-    if (RNPlatform.OS !== "web") {
+    if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     

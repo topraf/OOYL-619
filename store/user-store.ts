@@ -1,8 +1,9 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { User, Target, ComparisonResult, LeagueStatus } from "@/types";
+import { User, Target, ComparisonResult, LeagueStatus, Celebrity } from "@/types";
 import { lightColors, darkColors } from "@/constants/colors";
+import { celebrities } from "@/mocks/celebrities";
 
 type Theme = "dark"; // Only dark theme now
 
@@ -143,9 +144,24 @@ export const useUserStore = create<UserState>()(
           leagueStatus = "you_can_do_better";
         }
         
+        // Generate a score between 70-95
+        const score = Math.floor(Math.random() * 26) + 70;
+        
+        // Find a random celebrity for the comparison
+        const randomCelebrity = celebrities[Math.floor(Math.random() * celebrities.length)];
+        
         const result: ComparisonResult = {
           id: Date.now().toString(),
           date: new Date().toISOString(),
+          userImage: user.frontImage || "",
+          celebrity: currentTarget.isCelebrity ? {
+            id: currentTarget.id,
+            name: currentTarget.name || "Unknown",
+            image: currentTarget.image,
+            beautyScore: currentTarget.beautyScore,
+            category: "Celebrity"
+          } : randomCelebrity,
+          score: score,
           user: { ...user },
           target: { ...currentTarget },
           leagueStatus,
