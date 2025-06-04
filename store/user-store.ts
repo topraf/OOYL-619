@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { User, Target, ComparisonResult, LeagueStatus, Celebrity } from "@/types";
-import { lightColors, darkColors } from "@/constants/colors";
+import { darkColors } from "@/constants/colors";
 import { celebrities } from "@/mocks/celebrities";
 
 type Theme = "dark"; // Only dark theme now

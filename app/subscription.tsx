@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Dimensions } from
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Check, Star } from "lucide-react-native";
-import { colors } from "@/constants/colors";
+import { darkColors } from "@/constants/colors";
 import { useUserStore } from "@/store/user-store";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
@@ -38,6 +38,7 @@ export default function SubscriptionScreen() {
   const router = useRouter();
   const [selectedPlanId, setSelectedPlanId] = useState("monthly");
   const setPremiumStatus = useUserStore(state => state.setPremiumStatus);
+  const colors = darkColors;
   
   const buttonScale = useSharedValue(1);
   const animatedButtonStyle = useAnimatedStyle(() => {
@@ -61,14 +62,14 @@ export default function SubscriptionScreen() {
   };
   
   return (
-    <SafeAreaView style={styles.container} edges={["bottom"]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["bottom"]}>
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
         <View style={styles.header}>
-          <Text style={styles.title}>
+          <Text style={[styles.title, { color: colors.text }]}>
             Upgrade to{" "}
-            <Text style={styles.titleAccent}>Premium</Text>
+            <Text style={[styles.titleAccent, { color: colors.primary }]}>Premium</Text>
           </Text>
-          <Text style={styles.subtitle}>
+          <Text style={[styles.subtitle, { color: colors.textLight }]}>
             Unlock all features and enjoy unlimited comparisons
           </Text>
         </View>
@@ -80,31 +81,32 @@ export default function SubscriptionScreen() {
                 key={plan.id}
                 style={[
                   styles.planCard,
-                  selectedPlanId === plan.id && styles.selectedPlanCard
+                  { backgroundColor: colors.card },
+                  selectedPlanId === plan.id && { borderColor: colors.primary }
                 ]}
                 onPress={() => setSelectedPlanId(plan.id)}
               >
                 {plan.popular && (
-                  <View style={styles.popularBadge}>
+                  <View style={[styles.popularBadge, { backgroundColor: colors.primary }]}>
                     <Star size={10} color={colors.text} />
-                    <Text style={styles.popularText}>POPULAR</Text>
+                    <Text style={[styles.popularText, { color: colors.text }]}>POPULAR</Text>
                   </View>
                 )}
                 
                 <View style={styles.planHeader}>
-                  <Text style={styles.planName}>{plan.name}</Text>
-                  <Text style={styles.planPrice}>{plan.price}</Text>
-                  <Text style={styles.planInterval}>
+                  <Text style={[styles.planName, { color: colors.text }]}>{plan.name}</Text>
+                  <Text style={[styles.planPrice, { color: colors.primary }]}>{plan.price}</Text>
+                  <Text style={[styles.planInterval, { color: colors.textLight }]}>
                     {plan.interval === "one-time" ? "" : `per ${plan.interval}`}
                   </Text>
                 </View>
                 
                 <View style={[
                   styles.radioButton,
-                  selectedPlanId === plan.id && styles.radioButtonSelected
+                  { borderColor: selectedPlanId === plan.id ? colors.primary : colors.border }
                 ]}>
                   {selectedPlanId === plan.id && (
-                    <View style={styles.radioButtonInner} />
+                    <View style={[styles.radioButtonInner, { backgroundColor: colors.primary }]} />
                   )}
                 </View>
               </TouchableOpacity>
@@ -112,30 +114,30 @@ export default function SubscriptionScreen() {
           </View>
         </View>
         
-        <View style={styles.featuresContainer}>
-          <Text style={styles.featuresTitle}>
+        <View style={[styles.featuresContainer, { backgroundColor: colors.card }]}>
+          <Text style={[styles.featuresTitle, { color: colors.text }]}>
             Premium{" "}
-            <Text style={styles.featuresTitleAccent}>Features</Text>
+            <Text style={[styles.featuresTitleAccent, { color: colors.primary }]}>Features</Text>
           </Text>
           
           <View style={styles.featureItem}>
             <Check size={20} color={colors.primary} />
-            <Text style={styles.featureText}>Unlimited comparisons</Text>
+            <Text style={[styles.featureText, { color: colors.text }]}>Unlimited comparisons</Text>
           </View>
           
           <View style={styles.featureItem}>
             <Check size={20} color={colors.primary} />
-            <Text style={styles.featureText}>Celebrity comparisons</Text>
+            <Text style={[styles.featureText, { color: colors.text }]}>Celebrity comparisons</Text>
           </View>
           
           <View style={styles.featureItem}>
             <Check size={20} color={colors.primary} />
-            <Text style={styles.featureText}>AI beauty analysis and tips</Text>
+            <Text style={[styles.featureText, { color: colors.text }]}>AI beauty analysis and tips</Text>
           </View>
           
           <View style={styles.featureItem}>
             <Check size={20} color={colors.primary} />
-            <Text style={styles.featureText}>AI roast feature</Text>
+            <Text style={[styles.featureText, { color: colors.text }]}>AI roast feature</Text>
           </View>
         </View>
         
@@ -146,27 +148,27 @@ export default function SubscriptionScreen() {
             end={{ x: 1, y: 0 }}
             style={styles.trialBanner}
           >
-            <Text style={styles.trialTitle}>3-Day Free Trial</Text>
-            <Text style={styles.trialDescription}>
+            <Text style={[styles.trialTitle, { color: colors.text }]}>3-Day Free Trial</Text>
+            <Text style={[styles.trialDescription, { color: colors.text }]}>
               Try all premium features for free. Cancel anytime before the trial ends.
             </Text>
           </LinearGradient>
         </View>
       </ScrollView>
       
-      <View style={styles.footer}>
+      <View style={[styles.footer, { borderTopColor: colors.border }]}>
         <Animated.View style={animatedButtonStyle}>
           <TouchableOpacity 
-            style={styles.subscribeButton} 
+            style={[styles.subscribeButton, { backgroundColor: colors.primary }]} 
             onPress={handleSubscribe}
             onPressIn={onPressIn}
             onPressOut={onPressOut}
           >
-            <Text style={styles.subscribeText}>Start 3-Day Free Trial</Text>
+            <Text style={[styles.subscribeText, { color: colors.text }]}>Start 3-Day Free Trial</Text>
           </TouchableOpacity>
         </Animated.View>
         
-        <Text style={styles.disclaimer}>
+        <Text style={[styles.disclaimer, { color: colors.textLight }]}>
           Subscription will auto-renew after the trial. Cancel anytime in your App Store settings.
           By subscribing you agree to our Terms and Privacy Policy.
         </Text>
@@ -178,7 +180,6 @@ export default function SubscriptionScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   content: {
     flex: 1,
@@ -193,15 +194,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "800",
-    color: colors.text,
     marginBottom: 8,
   },
   titleAccent: {
-    color: colors.primary,
+    // Color applied dynamically
   },
   subtitle: {
     fontSize: 16,
-    color: colors.textLight,
     lineHeight: 22,
   },
   plansContainer: {
@@ -215,21 +214,17 @@ const styles = StyleSheet.create({
   },
   planCard: {
     flex: 1,
-    backgroundColor: colors.card,
     borderRadius: 12,
     padding: 12,
     borderWidth: 2,
     borderColor: "transparent",
-    shadowColor: colors.shadow,
+    shadowColor: "rgba(0, 0, 0, 0.3)",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
     position: "relative",
     minHeight: 100,
-  },
-  selectedPlanCard: {
-    borderColor: colors.primary,
   },
   planHeader: {
     alignItems: "center",
@@ -238,44 +233,35 @@ const styles = StyleSheet.create({
   planName: {
     fontSize: 14,
     fontWeight: "600",
-    color: colors.text,
     marginBottom: 4,
   },
   planPrice: {
     fontSize: 16,
     fontWeight: "800",
-    color: colors.primary,
     marginBottom: 2,
   },
   planInterval: {
     fontSize: 10,
-    color: colors.textLight,
   },
   radioButton: {
     width: 16,
     height: 16,
     borderRadius: 8,
     borderWidth: 2,
-    borderColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "center",
     marginTop: 4,
   },
-  radioButtonSelected: {
-    borderColor: colors.primary,
-  },
   radioButtonInner: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: colors.primary,
   },
   popularBadge: {
     position: "absolute",
     top: -6,
     right: -6,
-    backgroundColor: colors.primary,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 8,
@@ -284,13 +270,11 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   popularText: {
-    color: colors.text,
     fontSize: 8,
     fontWeight: "700",
     marginLeft: 2,
   },
   featuresContainer: {
-    backgroundColor: colors.card,
     margin: 16,
     padding: 16,
     borderRadius: 16,
@@ -299,11 +283,10 @@ const styles = StyleSheet.create({
   featuresTitle: {
     fontSize: 20,
     fontWeight: "800",
-    color: colors.text,
     marginBottom: 16,
   },
   featuresTitleAccent: {
-    color: colors.primary,
+    // Color applied dynamically
   },
   featureItem: {
     flexDirection: "row",
@@ -313,7 +296,6 @@ const styles = StyleSheet.create({
   featureText: {
     marginLeft: 12,
     fontSize: 16,
-    color: colors.text,
   },
   trialContainer: {
     marginHorizontal: 16,
@@ -322,7 +304,7 @@ const styles = StyleSheet.create({
   trialBanner: {
     borderRadius: 16,
     padding: 16,
-    shadowColor: colors.shadow,
+    shadowColor: "rgba(0, 0, 0, 0.3)",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -331,39 +313,33 @@ const styles = StyleSheet.create({
   trialTitle: {
     fontSize: 20,
     fontWeight: "800",
-    color: colors.text,
     marginBottom: 8,
   },
   trialDescription: {
     fontSize: 14,
-    color: colors.text,
     opacity: 0.9,
   },
   footer: {
     padding: 16,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
   },
   subscribeButton: {
-    backgroundColor: colors.primary,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: "center",
     marginBottom: 16,
-    shadowColor: colors.shadow,
+    shadowColor: "rgba(0, 0, 0, 0.3)",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,
   },
   subscribeText: {
-    color: colors.text,
     fontSize: 16,
     fontWeight: "600",
   },
   disclaimer: {
     fontSize: 12,
-    color: colors.textLight,
     textAlign: "center",
     lineHeight: 18,
   },

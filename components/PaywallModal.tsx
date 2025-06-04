@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Modal, Dimensions } from "react-native";
 import { X, Star } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { colors } from "@/constants/colors";
+import { darkColors } from "@/constants/colors";
 import { subscriptionPlans } from "@/mocks/subscriptions";
 import { useUserStore } from "@/store/user-store";
 
@@ -17,6 +17,7 @@ interface PaywallModalProps {
 export default function PaywallModal({ visible, onClose, onSuccess }: PaywallModalProps) {
   const [selectedPlanId, setSelectedPlanId] = useState("monthly");
   const setPremiumStatus = useUserStore(state => state.setPremiumStatus);
+  const colors = darkColors;
   
   const handleSubscribe = () => {
     // In a real app, this would handle payment processing
@@ -34,12 +35,12 @@ export default function PaywallModal({ visible, onClose, onSuccess }: PaywallMod
       transparent={true}
     >
       <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
+        <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
           <View style={styles.header}>
             <TouchableOpacity style={styles.closeButton} onPress={onClose}>
               <X size={24} color={colors.text} />
             </TouchableOpacity>
-            <Text style={styles.title}>Upgrade to Premium</Text>
+            <Text style={[styles.title, { color: colors.text }]}>Upgrade to Premium</Text>
           </View>
           
           <LinearGradient
@@ -48,7 +49,7 @@ export default function PaywallModal({ visible, onClose, onSuccess }: PaywallMod
             end={{ x: 1, y: 0 }}
             style={styles.banner}
           >
-            <Text style={styles.bannerText}>
+            <Text style={[styles.bannerText, { color: colors.text }]}>
               Unlock unlimited comparisons and premium features
             </Text>
           </LinearGradient>
@@ -60,31 +61,32 @@ export default function PaywallModal({ visible, onClose, onSuccess }: PaywallMod
                   key={plan.id}
                   style={[
                     styles.planCard,
-                    selectedPlanId === plan.id && styles.selectedPlanCard
+                    { backgroundColor: colors.card },
+                    selectedPlanId === plan.id && { borderColor: colors.primary }
                   ]}
                   onPress={() => setSelectedPlanId(plan.id)}
                 >
                   <View style={styles.planHeader}>
-                    <Text style={styles.planName}>{plan.name}</Text>
-                    <Text style={styles.planPrice}>{plan.price}</Text>
-                    <Text style={styles.planInterval}>
+                    <Text style={[styles.planName, { color: colors.text }]}>{plan.name}</Text>
+                    <Text style={[styles.planPrice, { color: colors.primary }]}>{plan.price}</Text>
+                    <Text style={[styles.planInterval, { color: colors.textLight }]}>
                       {plan.interval === "one-time" ? "One-time" : `per ${plan.interval}`}
                     </Text>
                   </View>
                   
                   {plan.popular && (
-                    <View style={styles.popularBadge}>
+                    <View style={[styles.popularBadge, { backgroundColor: colors.primary }]}>
                       <Star size={12} color={colors.text} />
-                      <Text style={styles.popularText}>POPULAR</Text>
+                      <Text style={[styles.popularText, { color: colors.text }]}>POPULAR</Text>
                     </View>
                   )}
                   
                   <View style={[
                     styles.radioButton,
-                    selectedPlanId === plan.id && styles.radioButtonSelected
+                    { borderColor: selectedPlanId === plan.id ? colors.primary : colors.border }
                   ]}>
                     {selectedPlanId === plan.id && (
-                      <View style={styles.radioButtonInner} />
+                      <View style={[styles.radioButtonInner, { backgroundColor: colors.primary }]} />
                     )}
                   </View>
                 </TouchableOpacity>
@@ -93,11 +95,14 @@ export default function PaywallModal({ visible, onClose, onSuccess }: PaywallMod
           </View>
           
           <View style={styles.footer}>
-            <TouchableOpacity style={styles.subscribeButton} onPress={handleSubscribe}>
-              <Text style={styles.subscribeText}>Start 3-Day Free Trial</Text>
+            <TouchableOpacity 
+              style={[styles.subscribeButton, { backgroundColor: colors.primary }]} 
+              onPress={handleSubscribe}
+            >
+              <Text style={[styles.subscribeText, { color: colors.text }]}>Start 3-Day Free Trial</Text>
             </TouchableOpacity>
             
-            <Text style={styles.disclaimer}>
+            <Text style={[styles.disclaimer, { color: colors.textLight }]}>
               Subscription will auto-renew. Cancel anytime in your App Store settings.
               By subscribing you agree to our Terms and Privacy Policy.
             </Text>
@@ -115,7 +120,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   modalContent: {
-    backgroundColor: colors.background,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingTop: 16,
@@ -138,7 +142,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "600",
-    color: colors.text,
   },
   banner: {
     marginHorizontal: 16,
@@ -147,7 +150,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   bannerText: {
-    color: colors.text,
     fontSize: 16,
     fontWeight: "500",
     textAlign: "center",
@@ -162,20 +164,16 @@ const styles = StyleSheet.create({
   },
   planCard: {
     width: (width - 64) / 3.2,
-    backgroundColor: colors.card,
     borderRadius: 16,
     padding: 12,
     borderWidth: 2,
     borderColor: "transparent",
-    shadowColor: colors.shadow,
+    shadowColor: "rgba(0, 0, 0, 0.3)",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
     position: "relative",
-  },
-  selectedPlanCard: {
-    borderColor: colors.primary,
   },
   planHeader: {
     alignItems: "center",
@@ -184,44 +182,35 @@ const styles = StyleSheet.create({
   planName: {
     fontSize: 14,
     fontWeight: "600",
-    color: colors.text,
     marginBottom: 4,
   },
   planPrice: {
     fontSize: 18,
     fontWeight: "700",
-    color: colors.primary,
     marginBottom: 2,
   },
   planInterval: {
     fontSize: 12,
-    color: colors.textLight,
   },
   radioButton: {
     width: 20,
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "center",
     marginTop: 8,
   },
-  radioButtonSelected: {
-    borderColor: colors.primary,
-  },
   radioButtonInner: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: colors.primary,
   },
   popularBadge: {
     position: "absolute",
     top: -8,
     right: -8,
-    backgroundColor: colors.primary,
     paddingHorizontal: 6,
     paddingVertical: 3,
     borderRadius: 10,
@@ -229,7 +218,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   popularText: {
-    color: colors.text,
     fontSize: 8,
     fontWeight: "700",
     marginLeft: 2,
@@ -238,20 +226,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   subscribeButton: {
-    backgroundColor: colors.primary,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: "center",
     marginBottom: 16,
   },
   subscribeText: {
-    color: colors.text,
     fontSize: 16,
     fontWeight: "600",
   },
   disclaimer: {
     fontSize: 12,
-    color: colors.textLight,
     textAlign: "center",
     lineHeight: 18,
   },
