@@ -1,225 +1,180 @@
-import React, { useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Switch, Alert } from "react-native";
+import React from "react";
+import { StyleSheet, View, Text, TouchableOpacity, Switch, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import { ArrowLeft, Crown, Trash2, Info, Mail, Shield, Bell } from "lucide-react-native";
-import * as Haptics from "expo-haptics";
-import { Platform as RNPlatform } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
+import { Info, Heart, Shield, Bell, HelpCircle, CreditCard, RefreshCw, Play } from "lucide-react-native";
+import { colors } from "@/constants/colors";
 import { useUserStore } from "@/store/user-store";
-import { useComparisonStore } from "@/store/comparison-store";
+import { useOnboardingStore } from "@/store/onboarding-store";
+import { useRouter } from "expo-router";
 import BottomNavigation from "@/components/BottomNavigation";
-import PaywallModal from "@/components/PaywallModal";
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { isPremium, setPremiumStatus, clearHistory, getColors } = useUserStore();
-  const { clearHistory: clearComparisonHistory } = useComparisonStore();
-  const colors = getColors();
-  const [showPaywall, setShowPaywall] = useState(false);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [dataSavingMode, setDataSavingMode] = useState(false);
-
-  const handleUpgradeToPremium = () => {
-    if (RNPlatform.OS !== "web") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-    setShowPaywall(true);
+  const { isPremium, setPremiumStatus } = useUserStore();
+  const { resetOnboarding, setCurrentStep, setHasCompletedOnboarding } = useOnboardingStore();
+  const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
+  const [saveHistory, setSaveHistory] = React.useState(true);
+  
+  const handleResetOnboarding = () => {
+    resetOnboarding();
+    setHasCompletedOnboarding(false);
+    router.push("/onboarding");
   };
 
-  const handleClearHistory = () => {
-    if (RNPlatform.OS !== "web") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    }
-    
-    Alert.alert(
-      "Clear History",
-      "Are you sure you want to clear all your comparison history? This action cannot be undone.",
-      [
-        { text: "Cancel", style: "cancel" },
-        { 
-          text: "Clear", 
-          style: "destructive",
-          onPress: () => {
-            clearHistory();
-            clearComparisonHistory();
-            Alert.alert("Success", "Your history has been cleared.");
-          }
-        }
-      ]
-    );
+  const handleGoToOnboardingStep = (step: number, path: string) => {
+    setCurrentStep(step);
+    router.push(path);
   };
-
-  const handleContactSupport = () => {
-    if (RNPlatform.OS !== "web") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-    Alert.alert("Contact Support", "Email us at support@leaguechecker.com for any questions or issues.");
-  };
-
-  const handlePrivacyPolicy = () => {
-    if (RNPlatform.OS !== "web") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-    Alert.alert("Privacy Policy", "Your privacy is important to us. We don't store your photos permanently and all comparisons are processed securely.");
-  };
-
-  const handleAbout = () => {
-    if (RNPlatform.OS !== "web") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-    Alert.alert("About League Checker", "League Checker v1.0\n\nFind out if someone is in your league using AI-powered beauty analysis. Remember, beauty is subjective and this is just for fun!");
-  };
-
-  const toggleNotifications = (value: boolean) => {
-    if (RNPlatform.OS !== "web") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-    setNotificationsEnabled(value);
-  };
-
-  const toggleDataSaving = (value: boolean) => {
-    if (RNPlatform.OS !== "web") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-    setDataSavingMode(value);
-  };
-
+  
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top"]}>
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={[styles.backButton, { backgroundColor: colors.card }]} 
-          onPress={() => router.back()}
-        >
-          <ArrowLeft size={20} color={colors.text} />
-        </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Settings</Text>
-        <View style={styles.placeholder} />
-      </View>
-
-      <ScrollView 
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
+    <SafeAreaView style={styles.container} edges={["bottom"]}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {isPremium && (
+          <View style={styles.premiumBanner}>
+            <Text style={styles.premiumTitle}>
+              Premium{" "}
+              <Text style={styles.premiumTitleAccent}>Subscription</Text>
+            </Text>
+            <Text style={styles.premiumStatus}>Active</Text>
+            <TouchableOpacity 
+              style={styles.managePremiumButton}
+              onPress={() => alert("Subscription management would open here")}
+            >
+              <Text style={styles.managePremiumText}>Manage Subscription</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        
         {!isPremium && (
           <TouchableOpacity 
-            style={styles.premiumCard}
-            onPress={handleUpgradeToPremium}
+            style={styles.getPremiumButton}
+            onPress={() => router.push("/subscription")}
           >
-            <LinearGradient
-              colors={[colors.primary, colors.secondary]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.premiumGradient}
-            >
-              <View style={styles.premiumContent}>
-                <Crown size={32} color={colors.text} />
-                <View style={styles.premiumText}>
-                  <Text style={[styles.premiumTitle, { color: colors.text }]}>Get Pro</Text>
-                  <Text style={[styles.premiumSubtitle, { color: colors.text }]}>
-                    Unlock unlimited comparisons and exclusive features
-                  </Text>
-                </View>
-              </View>
-              <View style={styles.premiumFeatures}>
-                <Text style={[styles.premiumFeature, { color: colors.text }]}>✓ Unlimited comparisons</Text>
-                <Text style={[styles.premiumFeature, { color: colors.text }]}>✓ Celebrity matching</Text>
-                <Text style={[styles.premiumFeature, { color: colors.text }]}>✓ AI roasting</Text>
-                <Text style={[styles.premiumFeature, { color: colors.text }]}>✓ Detailed analysis</Text>
-              </View>
-              <View style={[styles.tryNowButton, { backgroundColor: colors.background }]}>
-                <Text style={[styles.tryNowText, { color: colors.primary }]}>Try now</Text>
-              </View>
-            </LinearGradient>
+            <CreditCard size={20} color={colors.background} />
+            <Text style={styles.getPremiumText}>
+              Get{" "}
+              <Text style={styles.getPremiumTextAccent}>Premium</Text>
+            </Text>
           </TouchableOpacity>
         )}
-
-        <View style={[styles.section, { backgroundColor: colors.card }]}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Preferences</Text>
+        
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            App{" "}
+            <Text style={styles.sectionTitleAccent}>Settings</Text>
+          </Text>
           
           <View style={styles.settingItem}>
-            <View style={styles.settingLeft}>
-              <Bell size={20} color={colors.textLight} />
-              <Text style={[styles.settingText, { color: colors.text }]}>Notifications</Text>
+            <View style={styles.settingInfo}>
+              <Bell size={20} color={colors.text} />
+              <Text style={styles.settingLabel}>Notifications</Text>
             </View>
             <Switch
               value={notificationsEnabled}
-              onValueChange={toggleNotifications}
+              onValueChange={setNotificationsEnabled}
               trackColor={{ false: colors.border, true: colors.primary }}
-              thumbColor={colors.text}
+              thumbColor={colors.background}
             />
           </View>
-
+          
           <View style={styles.settingItem}>
-            <View style={styles.settingLeft}>
-              <Text style={[styles.settingText, { color: colors.text }]}>Enable Data Saving Mode</Text>
+            <View style={styles.settingInfo}>
+              <Shield size={20} color={colors.text} />
+              <Text style={styles.settingLabel}>Save History</Text>
             </View>
             <Switch
-              value={dataSavingMode}
-              onValueChange={toggleDataSaving}
+              value={saveHistory}
+              onValueChange={setSaveHistory}
               trackColor={{ false: colors.border, true: colors.primary }}
-              thumbColor={colors.text}
+              thumbColor={colors.background}
             />
           </View>
+        </View>
+        
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            About{" "}
+            <Text style={styles.sectionTitleAccent}>& Support</Text>
+          </Text>
           
-          <Text style={[styles.settingDescription, { color: colors.textLight }]}>
-            Less data usage for quicker load times.
+          <TouchableOpacity style={styles.aboutItem}>
+            <Info size={20} color={colors.text} />
+            <Text style={styles.aboutLabel}>How It Works</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.aboutItem}>
+            <Heart size={20} color={colors.text} />
+            <Text style={styles.aboutLabel}>Rate the App</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.aboutItem}>
+            <HelpCircle size={20} color={colors.text} />
+            <Text style={styles.aboutLabel}>Help & Support</Text>
+          </TouchableOpacity>
+        </View>
+        
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            Debug &{" "}
+            <Text style={styles.sectionTitleAccent}>Testing</Text>
+          </Text>
+          
+          <TouchableOpacity 
+            style={styles.debugItem}
+            onPress={handleResetOnboarding}
+          >
+            <RefreshCw size={20} color={colors.primary} />
+            <Text style={styles.debugLabel}>Reset & Show Onboarding</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.debugItem}
+            onPress={() => handleGoToOnboardingStep(0, "/onboarding")}
+          >
+            <Play size={20} color={colors.primary} />
+            <Text style={styles.debugLabel}>Welcome Screen</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.debugItem}
+            onPress={() => handleGoToOnboardingStep(1, "/onboarding-features")}
+          >
+            <Play size={20} color={colors.primary} />
+            <Text style={styles.debugLabel}>Features Screen</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.debugItem}
+            onPress={() => handleGoToOnboardingStep(2, "/onboarding-more-features")}
+          >
+            <Play size={20} color={colors.primary} />
+            <Text style={styles.debugLabel}>More Features Screen</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.demoButton}
+            onPress={() => setPremiumStatus(!isPremium)}
+          >
+            <Text style={styles.demoButtonText}>
+              {isPremium ? "Demo: Disable Premium" : "Demo: Enable Premium"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+        
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>
+            League{" "}
+            <Text style={styles.footerTextAccent}>Checker</Text>
+            {" "}v1.0.0
+          </Text>
+          <Text style={styles.disclaimer}>
+            This app is for entertainment purposes only. Beauty is subjective and our algorithm
+            provides an approximation based on photographic evidence.
           </Text>
         </View>
-
-        <View style={[styles.section, { backgroundColor: colors.card }]}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Data</Text>
-          
-          <TouchableOpacity style={styles.settingItem} onPress={handleClearHistory}>
-            <View style={styles.settingLeft}>
-              <Trash2 size={20} color={colors.error} />
-              <Text style={[styles.settingText, { color: colors.error }]}>Clear History</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        <View style={[styles.section, { backgroundColor: colors.card }]}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Support</Text>
-          
-          <TouchableOpacity style={styles.settingItem} onPress={handleContactSupport}>
-            <View style={styles.settingLeft}>
-              <Mail size={20} color={colors.textLight} />
-              <Text style={[styles.settingText, { color: colors.text }]}>Contact Support</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.settingItem} onPress={handlePrivacyPolicy}>
-            <View style={styles.settingLeft}>
-              <Shield size={20} color={colors.textLight} />
-              <Text style={[styles.settingText, { color: colors.text }]}>Privacy Policy</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.settingItem} onPress={handleAbout}>
-            <View style={styles.settingLeft}>
-              <Info size={20} color={colors.textLight} />
-              <Text style={[styles.settingText, { color: colors.text }]}>About</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        {isPremium && (
-          <View style={[styles.premiumBadge, { backgroundColor: colors.primary + "20" }]}>
-            <Crown size={16} color={colors.primary} />
-            <Text style={[styles.premiumBadgeText, { color: colors.primary }]}>
-              Premium Member
-            </Text>
-          </View>
-        )}
       </ScrollView>
-
-      <BottomNavigation currentRoute="settings" />
       
-      <PaywallModal
-        visible={showPaywall}
-        onClose={() => setShowPaywall(false)}
-      />
+      <BottomNavigation currentRoute="settings" />
     </SafeAreaView>
   );
 }
@@ -227,123 +182,154 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.background,
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+  scrollContent: {
     padding: 16,
-    paddingBottom: 8,
+    paddingBottom: 120, // Space for bottom navigation
   },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: "900",
-  },
-  placeholder: {
-    width: 40,
-  },
-  content: {
+  premiumBanner: {
+    backgroundColor: colors.primary,
+    borderRadius: 16,
     padding: 16,
-    paddingBottom: 120,
-  },
-  premiumCard: {
-    borderRadius: 16,
-    marginBottom: 24,
-    shadowColor: "rgba(0, 0, 0, 0.1)",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  premiumGradient: {
-    borderRadius: 16,
-    padding: 20,
-  },
-  premiumContent: {
-    flexDirection: "row",
-    alignItems: "center",
     marginBottom: 16,
-  },
-  premiumText: {
-    marginLeft: 12,
-    flex: 1,
+    alignItems: "center",
   },
   premiumTitle: {
-    fontSize: 24,
-    fontWeight: "800",
+    fontSize: 20,
+    fontWeight: "900",
+    color: colors.background,
     marginBottom: 4,
   },
-  premiumSubtitle: {
-    fontSize: 14,
-    opacity: 0.9,
+  premiumTitleAccent: {
+    color: colors.background,
+    textShadowColor: "rgba(255,255,255,0.3)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
-  premiumFeatures: {
+  premiumStatus: {
+    fontSize: 14,
+    color: colors.background,
+    opacity: 0.9,
     marginBottom: 16,
   },
-  premiumFeature: {
+  managePremiumButton: {
+    backgroundColor: "rgba(255,255,255,0.2)",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  managePremiumText: {
+    color: colors.background,
     fontSize: 14,
-    marginBottom: 4,
-    opacity: 0.9,
+    fontWeight: "600",
   },
-  tryNowButton: {
-    alignSelf: "flex-start",
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
+  getPremiumButton: {
+    backgroundColor: colors.primary,
+    borderRadius: 12,
+    paddingVertical: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
   },
-  tryNowText: {
-    fontSize: 16,
-    fontWeight: "700",
+  getPremiumText: {
+    color: colors.background,
+    fontSize: 18,
+    fontWeight: "900",
+    marginLeft: 8,
+  },
+  getPremiumTextAccent: {
+    color: colors.background,
+    textShadowColor: "rgba(255,255,255,0.3)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   section: {
+    marginBottom: 24,
+    backgroundColor: colors.card,
     borderRadius: 16,
     padding: 16,
-    marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: 20,
+    fontWeight: "900",
+    color: colors.text,
     marginBottom: 16,
+  },
+  sectionTitleAccent: {
+    color: colors.primary,
   },
   settingItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
-  settingLeft: {
+  settingInfo: {
     flexDirection: "row",
     alignItems: "center",
-    flex: 1,
   },
-  settingText: {
-    fontSize: 16,
+  settingLabel: {
     marginLeft: 12,
+    fontSize: 16,
+    color: colors.text,
   },
-  settingDescription: {
-    fontSize: 14,
-    marginTop: 8,
-    lineHeight: 20,
-  },
-  premiumBadge: {
+  aboutItem: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
     paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  aboutLabel: {
+    marginLeft: 12,
+    fontSize: 16,
+    color: colors.text,
+  },
+  debugItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  debugLabel: {
+    marginLeft: 12,
+    fontSize: 16,
+    color: colors.text,
+  },
+  demoButton: {
+    backgroundColor: colors.primary + "20",
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: "center",
     marginTop: 16,
   },
-  premiumBadgeText: {
-    fontSize: 16,
+  demoButtonText: {
+    color: colors.primary,
+    fontSize: 14,
     fontWeight: "700",
-    marginLeft: 8,
+  },
+  footer: {
+    marginTop: 24,
+    alignItems: "center",
+  },
+  footerText: {
+    fontSize: 16,
+    fontWeight: "900",
+    color: colors.text,
+    marginBottom: 8,
+  },
+  footerTextAccent: {
+    color: colors.primary,
+  },
+  disclaimer: {
+    fontSize: 12,
+    color: colors.textLight,
+    textAlign: "center",
+    lineHeight: 18,
   },
 });

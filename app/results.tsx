@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Home, Camera, MessageCircle, Star, History, Wifi, WifiOff } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
+import { Platform as RNPlatform } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
 import { useUserStore } from "@/store/user-store";
@@ -15,7 +16,7 @@ import FeatureScoreCard from "@/components/FeatureScoreCard";
 import BottomNavigation from "@/components/BottomNavigation";
 import ComparisonCard from "@/components/ComparisonCard";
 import EmptyState from "@/components/EmptyState";
-import Animated, { useSharedValue, useAnimatedStyle, withSpring, withSequence, withTiming } from "react-native-reanimated";
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, withSequence, withTiming, useAnimatedProps } from "react-native-reanimated";
 
 const { width } = Dimensions.get("window");
 
@@ -23,20 +24,8 @@ type FeatureStatus = "High" | "Mid" | "Low";
 
 export default function ResultsScreen() {
   const router = useRouter();
-  const userStore = useUserStore();
-  const comparisonStore = useComparisonStore();
-  
-  // Safely destructure from stores
-  const comparisons = userStore?.comparisons || [];
-  const isLoading = userStore?.isLoading || false;
-  const isPremium = userStore?.isPremium || false;
-  const clearHistory = userStore?.clearHistory || (() => {});
-  const getColors = userStore?.getColors || (() => ({ background: "#0A0A0A", card: "#1A1A1A", text: "#FFFFFF", textLight: "#9CA3AF", primary: "#FF6B35", secondary: "#FF8E9B", accent: "#FFB347", border: "#374151", success: "#10B981", warning: "#F59E0B", error: "#EF4444", shadow: "rgba(0, 0, 0, 0.3)" }));
-  const isOffline = userStore?.isOffline || false;
-  const getCachedComparisons = userStore?.getCachedComparisons || (() => []);
-  
-  const history = comparisonStore?.history || [];
-  
+  const { comparisons, isLoading, isPremium, clearHistory, getColors, isOffline, getCachedComparisons } = useUserStore();
+  const { history } = useComparisonStore();
   const colors = getColors();
   const [showResult, setShowResult] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
@@ -80,7 +69,7 @@ export default function ResultsScreen() {
       
       const timer = setTimeout(() => {
         setShowResult(true);
-        if (Platform.OS !== "web") {
+        if (RNPlatform.OS !== "web") {
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         }
         
@@ -96,7 +85,7 @@ export default function ResultsScreen() {
   }, [isLoading, latestResult]);
 
   const handleShareInstagram = async () => {
-    if (Platform.OS !== "web") {
+    if (RNPlatform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       
       try {
@@ -122,7 +111,7 @@ export default function ResultsScreen() {
   };
 
   const handleShareSnapchat = async () => {
-    if (Platform.OS !== "web") {
+    if (RNPlatform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       
       try {
@@ -148,7 +137,7 @@ export default function ResultsScreen() {
   };
 
   const handleShareX = async () => {
-    if (Platform.OS !== "web") {
+    if (RNPlatform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       
       try {
@@ -173,7 +162,7 @@ export default function ResultsScreen() {
   };
 
   const handleNewComparison = () => {
-    if (Platform.OS !== "web") {
+    if (RNPlatform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
     
@@ -188,7 +177,7 @@ export default function ResultsScreen() {
   
   const handlePremiumFeature = (feature: string) => {
     if (isPremium) {
-      if (Platform.OS !== "web") {
+      if (RNPlatform.OS !== "web") {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
       alert(`${feature} feature coming soon!`);
@@ -198,7 +187,7 @@ export default function ResultsScreen() {
   };
 
   const handleClearHistory = () => {
-    if (Platform.OS !== "web") {
+    if (RNPlatform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     }
     
@@ -271,8 +260,8 @@ export default function ResultsScreen() {
   };
 
   const getOverallScore = () => {
-    if (!latestResult?.score) return 0;
-    return latestResult.score;
+    if (!latestResult?.user.beautyScore) return 0;
+    return Math.round(latestResult.user.beautyScore * 10);
   };
 
   const getFeatureScores = () => {
@@ -298,7 +287,7 @@ export default function ResultsScreen() {
   };
 
   const toggleHistoryView = () => {
-    if (Platform.OS !== "web") {
+    if (RNPlatform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     setShowHistory(!showHistory);
@@ -335,7 +324,7 @@ export default function ResultsScreen() {
           </Text>
           {isOffline && (
             <View style={[styles.offlineIndicator, { backgroundColor: colors.warning }]}>
-              <WifiOff size={16} color={colors.text} />
+              <WifiOff size={16} color={colors.background} />
             </View>
           )}
           <View style={styles.placeholder} />
@@ -350,12 +339,21 @@ export default function ResultsScreen() {
           <FlatList
             data={displayResults}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <Animated.View style={animatedCardStyle}>
+            renderItem={({ item, index }) => (
+              <Animated.View
+                style={[
+                  animatedCardStyle,
+                  { 
+                    transform: [{ 
+                      translateY: useSharedValue(index * 20).value 
+                    }] 
+                  }
+                ]}
+              >
                 <TouchableOpacity 
                   style={styles.cardContainer}
                   onPress={() => {
-                    if (Platform.OS !== "web") {
+                    if (RNPlatform.OS !== "web") {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     }
                     setShowHistory(false);
@@ -394,7 +392,7 @@ export default function ResultsScreen() {
               onPressIn={onPressIn}
               onPressOut={onPressOut}
             >
-              <Text style={[styles.buttonText, { color: "#FFFFFF" }]}>Start Comparison</Text>
+              <Text style={[styles.buttonText, { color: colors.background }]}>Start Comparison</Text>
             </TouchableOpacity>
           </Animated.View>
         </View>
@@ -439,34 +437,34 @@ export default function ResultsScreen() {
                 end={{ x: 1, y: 1 }}
                 style={styles.resultCard}
               >
-                <Text style={[styles.resultTitle, { color: "#FFFFFF" }]}>
+                <Text style={[styles.resultTitle, { color: colors.background }]}>
                   {getLeagueText()}
                 </Text>
                 
                 <View style={styles.imagesContainer}>
                   <View style={styles.imageColumn}>
                     <ImagePreview
-                      uri={latestResult.userImage || ""}
-                      style={[styles.circleImage, { borderColor: "#FFFFFF" }]}
+                      uri={latestResult.user.frontImage || ""}
+                      style={[styles.circleImage, { borderColor: colors.background }]}
                     />
-                    <Text style={[styles.imageLabel, { color: "#FFFFFF" }]}>You</Text>
-                    <Text style={[styles.scoreText, { color: "#FFFFFF" }]}>{getOverallScore()}/100</Text>
+                    <Text style={[styles.imageLabel, { color: colors.background }]}>You</Text>
+                    <Text style={[styles.scoreText, { color: colors.background }]}>{getOverallScore()}/10</Text>
                   </View>
                   
                   <View style={styles.vsContainer}>
-                    <Text style={[styles.vsText, { color: "#FFFFFF" }]}>VS</Text>
+                    <Text style={[styles.vsText, { color: colors.background }]}>VS</Text>
                   </View>
                   
                   <View style={styles.imageColumn}>
                     <ImagePreview
-                      uri={latestResult.celebrity.image}
-                      style={[styles.circleImage, { borderColor: "#FFFFFF" }]}
+                      uri={latestResult.target.image}
+                      style={[styles.circleImage, { borderColor: colors.background }]}
                     />
-                    <Text style={[styles.imageLabel, { color: "#FFFFFF" }]}>
-                      {latestResult.celebrity.name || "Them"}
+                    <Text style={[styles.imageLabel, { color: colors.background }]}>
+                      {latestResult.target.name || "Them"}
                     </Text>
-                    <Text style={[styles.scoreText, { color: "#FFFFFF" }]}>
-                      {Math.round((latestResult.celebrity.beautyScore || 0) * 100)}/100
+                    <Text style={[styles.scoreText, { color: colors.background }]}>
+                      {Math.round((latestResult.target.beautyScore || 0) * 10)}/10
                     </Text>
                   </View>
                 </View>
@@ -519,7 +517,7 @@ export default function ResultsScreen() {
                       style={styles.socialIcon} 
                     />
                   </View>
-                  <Text style={[styles.socialButtonText, { color: "#FFFFFF" }]}>Instagram</Text>
+                  <Text style={styles.socialButtonText}>Instagram</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
@@ -545,7 +543,7 @@ export default function ResultsScreen() {
                       style={styles.socialIcon} 
                     />
                   </View>
-                  <Text style={[styles.socialButtonText, { color: "#FFFFFF" }]}>X</Text>
+                  <Text style={styles.socialButtonText}>X</Text>
                 </TouchableOpacity>
               </View>
             </Animated.View>
@@ -811,6 +809,7 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   socialButtonText: {
+    color: "#FFFFFF",
     fontSize: 14,
     fontWeight: "700",
   },

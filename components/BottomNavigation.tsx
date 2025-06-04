@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, View, TouchableOpacity, Text } from "react-native";
 import { useRouter } from "expo-router";
 import { Camera, Star, MessageCircle, BarChart3 } from "lucide-react-native";
-import { darkColors } from "@/constants/colors";
+import { colors } from "@/constants/colors";
 
 interface BottomNavigationProps {
   currentRoute: string;
@@ -10,7 +10,6 @@ interface BottomNavigationProps {
 
 export default function BottomNavigation({ currentRoute }: BottomNavigationProps) {
   const router = useRouter();
-  const colors = darkColors;
 
   const handleNavigation = (route: string, path: string) => {
     if (route === currentRoute) return; // Don't navigate if already on this route
@@ -18,9 +17,9 @@ export default function BottomNavigation({ currentRoute }: BottomNavigationProps
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.card, borderTopColor: colors.border }]}>
+    <View style={styles.container}>
       <TouchableOpacity 
-        style={[styles.navItem, currentRoute === "scan" && [styles.activeNavItem, { backgroundColor: colors.primary + "15" }]]}
+        style={[styles.navItem, currentRoute === "scan" && styles.activeNavItem]}
         onPress={() => handleNavigation("scan", "/")}
         disabled={currentRoute === "scan"}
       >
@@ -31,15 +30,14 @@ export default function BottomNavigation({ currentRoute }: BottomNavigationProps
         />
         <Text style={[
           styles.navText, 
-          { color: colors.textLight },
-          currentRoute === "scan" && [styles.activeNavText, { color: colors.primary }]
+          currentRoute === "scan" && styles.activeNavText
         ]}>
           Scan
         </Text>
       </TouchableOpacity>
       
       <TouchableOpacity 
-        style={[styles.navItem, currentRoute === "celebrities" && [styles.activeNavItem, { backgroundColor: colors.primary + "15" }]]}
+        style={[styles.navItem, currentRoute === "celebrities" && styles.activeNavItem]}
         onPress={() => handleNavigation("celebrities", "/celebrities")}
         disabled={currentRoute === "celebrities"}
       >
@@ -50,15 +48,14 @@ export default function BottomNavigation({ currentRoute }: BottomNavigationProps
         />
         <Text style={[
           styles.navText, 
-          { color: colors.textLight },
-          currentRoute === "celebrities" && [styles.activeNavText, { color: colors.primary }]
+          currentRoute === "celebrities" && styles.activeNavText
         ]}>
           Celebrities
         </Text>
       </TouchableOpacity>
       
       <TouchableOpacity 
-        style={[styles.navItem, currentRoute === "roast" && [styles.activeNavItem, { backgroundColor: colors.primary + "15" }]]}
+        style={[styles.navItem, currentRoute === "roast" && styles.activeNavItem]}
         onPress={() => handleNavigation("roast", "/roastmaster")}
         disabled={currentRoute === "roast"}
       >
@@ -69,15 +66,14 @@ export default function BottomNavigation({ currentRoute }: BottomNavigationProps
         />
         <Text style={[
           styles.navText, 
-          { color: colors.textLight },
-          currentRoute === "roast" && [styles.activeNavText, { color: colors.primary }]
+          currentRoute === "roast" && styles.activeNavText
         ]}>
           Roasted!
         </Text>
       </TouchableOpacity>
       
       <TouchableOpacity 
-        style={[styles.navItem, (currentRoute === "results" || currentRoute === "history") && [styles.activeNavItem, { backgroundColor: colors.primary + "15" }]]}
+        style={[styles.navItem, (currentRoute === "results" || currentRoute === "history") && styles.activeNavItem]}
         onPress={() => handleNavigation("results", "/results")}
         disabled={currentRoute === "results" || currentRoute === "history"}
       >
@@ -88,8 +84,7 @@ export default function BottomNavigation({ currentRoute }: BottomNavigationProps
         />
         <Text style={[
           styles.navText, 
-          { color: colors.textLight },
-          (currentRoute === "results" || currentRoute === "history") && [styles.activeNavText, { color: colors.primary }]
+          (currentRoute === "results" || currentRoute === "history") && styles.activeNavText
         ]}>
           Results
         </Text>
@@ -105,10 +100,12 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     flexDirection: "row",
+    backgroundColor: colors.card,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderTopWidth: 1,
-    shadowColor: "rgba(0, 0, 0, 0.3)",
+    borderTopColor: colors.border,
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -121,14 +118,16 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   activeNavItem: {
-    // Background color applied dynamically
+    backgroundColor: colors.primary + "15",
   },
   navText: {
     fontSize: 12,
+    color: colors.textLight,
     marginTop: 4,
     fontWeight: "500",
   },
   activeNavText: {
+    color: colors.primary,
     fontWeight: "900",
   },
 });

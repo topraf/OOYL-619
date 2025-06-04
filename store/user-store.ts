@@ -1,11 +1,10 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { User, Target, ComparisonResult, LeagueStatus, Celebrity } from "@/types";
-import { darkColors } from "@/constants/colors";
-import { celebrities } from "@/mocks/celebrities";
+import { User, Target, ComparisonResult, LeagueStatus } from "@/types";
+import { lightColors, darkColors } from "@/constants/colors";
 
-type Theme = "dark"; // Only dark theme now
+type Theme = "light" | "dark" | "system";
 
 interface UserState {
   user: User & { gender?: "male" | "female" };
@@ -28,7 +27,7 @@ interface UserState {
   
   setPremiumStatus: (status: boolean) => void;
   setTheme: (theme: Theme) => void;
-  getColors: () => typeof darkColors;
+  getColors: () => typeof lightColors;
   
   clearHistory: () => void;
   setOfflineStatus: (isOffline: boolean) => void;
@@ -53,7 +52,7 @@ export const useUserStore = create<UserState>()(
       freeComparisonUsed: false,
       isPremium: false,
       isLoading: false,
-      theme: "dark", // Only dark theme
+      theme: "dark", // Default to dark theme
       isOffline: false,
       cachedComparisons: [],
       
@@ -144,24 +143,9 @@ export const useUserStore = create<UserState>()(
           leagueStatus = "you_can_do_better";
         }
         
-        // Generate a score between 70-95
-        const score = Math.floor(Math.random() * 26) + 70;
-        
-        // Find a random celebrity for the comparison
-        const randomCelebrity = celebrities[Math.floor(Math.random() * celebrities.length)];
-        
         const result: ComparisonResult = {
           id: Date.now().toString(),
           date: new Date().toISOString(),
-          userImage: user.frontImage || "",
-          celebrity: currentTarget.isCelebrity ? {
-            id: currentTarget.id,
-            name: currentTarget.name || "Unknown",
-            image: currentTarget.image,
-            beautyScore: currentTarget.beautyScore,
-            category: "Celebrity"
-          } : randomCelebrity,
-          score: score,
           user: { ...user },
           target: { ...currentTarget },
           leagueStatus,
@@ -189,7 +173,8 @@ export const useUserStore = create<UserState>()(
       },
       
       getColors: () => {
-        // Always return dark colors
+        const { theme } = get();
+        // Always return dark colors as requested
         return darkColors;
       },
       

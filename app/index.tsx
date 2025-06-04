@@ -1,28 +1,37 @@
-import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Dimensions, Platform, Alert } from "react-native";
+import React, { useEffect } from "react";
+import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Dimensions, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { Camera, Sparkles, MessageCircle, Star, Plus } from "lucide-react-native";
-import * as Haptics from "expo-haptics";
+import { Settings, Camera, Star, MessageCircle, Plus } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
+import * as Haptics from "expo-haptics";
 import { useUserStore } from "@/store/user-store";
+import { useOnboardingStore } from "@/store/onboarding-store";
 import BottomNavigation from "@/components/BottomNavigation";
-import PaywallModal from "@/components/PaywallModal";
-import Animated, { useSharedValue, useAnimatedStyle, withSpring, withSequence, withTiming } from "react-native-reanimated";
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withSpring, 
+  withSequence, 
+  withTiming,
+  withRepeat,
+  interpolate
+} from "react-native-reanimated";
 
 const { width } = Dimensions.get("window");
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { user, isPremium, freeComparisonUsed, getColors } = useUserStore();
+  const { resetUserImages, freeComparisonUsed, isPremium, getColors } = useUserStore();
+  const { hasCompletedOnboarding, setHasCompletedOnboarding } = useOnboardingStore();
   const colors = getColors();
-  const [showPaywall, setShowPaywall] = useState(false);
   
   const buttonScale = useSharedValue(1);
-  const cardScale = useSharedValue(1);
+  const heroScale = useSharedValue(0.95);
   const fadeIn = useSharedValue(0);
-  const slideUp = useSharedValue(50);
+  const slideUp = useSharedValue(30);
+  const pulseScale = useSharedValue(1);
   
   const animatedButtonStyle = useAnimatedStyle(() => {
     return {
@@ -30,9 +39,9 @@ export default function HomeScreen() {
     };
   });
   
-  const animatedCardStyle = useAnimatedStyle(() => {
+  const animatedHeroStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ scale: cardScale.value }],
+      transform: [{ scale: heroScale.value }],
       opacity: fadeIn.value,
     };
   });
@@ -43,44 +52,67 @@ export default function HomeScreen() {
       opacity: fadeIn.value,
     };
   });
-
+  
+  const animatedPulseStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: pulseScale.value }]
+    };
+  });
+  
+  // Check if onboarding is completed
   useEffect(() => {
-    // Entrance animation
+    const timer = setTimeout(() => {
+      if (!hasCompletedOnboarding) {
+        router.push("/onboarding");
+        // Force set onboarding as completed to prevent loops
+        setHasCompletedOnboarding(true);
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [hasCompletedOnboarding, router]);
+  
+  // Entrance animations
+  useEffect(() => {
     fadeIn.value = withTiming(1, { duration: 800 });
     slideUp.value = withTiming(0, { duration: 800 });
+    heroScale.value = withSpring(1, { damping: 15 });
+    
+    // Subtle pulse animation for the main button
+    pulseScale.value = withRepeat(
+      withSequence(
+        withTiming(1.02, { duration: 2000 }),
+        withTiming(1, { duration: 2000 })
+      ),
+      -1,
+      false
+    );
   }, []);
-
+  
   const handleStartComparison = () => {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
     
-    // Animate button press
     buttonScale.value = withSequence(
       withTiming(0.95, { duration: 100 }),
       withTiming(1, { duration: 100 })
     );
     
-    // Check if user has used free comparison and is not premium
-    if (freeComparisonUsed && !isPremium) {
-      setShowPaywall(true);
-      return;
-    }
-    
-    router.push("/user-photo");
+    resetUserImages();
+    router.push("/gender-selection");
   };
 
-  const handleCelebrityComparison = () => {
+  const handleCelebrities = () => {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     
-    if (!isPremium) {
-      setShowPaywall(true);
-      return;
+    if (isPremium || !freeComparisonUsed) {
+      router.push("/celebrities");
+    } else {
+      router.push("/subscription");
     }
-    
-    router.push("/celebrities");
   };
 
   const handleAIRoast = () => {
@@ -88,12 +120,11 @@ export default function HomeScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     
-    if (!isPremium) {
-      setShowPaywall(true);
-      return;
+    if (isPremium || !freeComparisonUsed) {
+      router.push("/roastmaster");
+    } else {
+      router.push("/subscription");
     }
-    
-    router.push("/roastmaster");
   };
 
   const onPressIn = () => {
@@ -103,147 +134,190 @@ export default function HomeScreen() {
   const onPressOut = () => {
     buttonScale.value = withSpring(1);
   };
-
+  
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top"]}>
-      <Animated.View style={[styles.content, animatedSlideStyle]}>
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>
-            League{" "}
-            <Text style={[styles.titleAccent, { color: colors.primary }]}>Checker</Text>
-          </Text>
-          <Text style={[styles.subtitle, { color: colors.textLight }]}>
-            Find out if someone is in your league
-          </Text>
-        </View>
-
-        <Animated.View style={[styles.mainCard, animatedCardStyle]}>
+      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
+        <Animated.View style={[styles.heroContainer, animatedHeroStyle]}>
+          <Image
+            source={{ uri: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" }}
+            style={styles.heroImage}
+          />
           <LinearGradient
-            colors={[colors.primary, colors.secondary]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.gradientCard}
-          >
-            <View style={styles.cardContent}>
-              <View style={styles.cardHeader}>
-                <Text style={[styles.cardTitle, { color: "#FFFFFF" }]}>Start Your Analysis</Text>
-                <Text style={[styles.cardSubtitle, { color: "#FFFFFF" }]}>
-                  Upload your photo and compare with anyone
-                </Text>
-              </View>
-              
-              <Animated.View style={animatedButtonStyle}>
-                <TouchableOpacity 
-                  style={[styles.startButton, { backgroundColor: colors.background }]} 
-                  onPress={handleStartComparison}
-                  onPressIn={onPressIn}
-                  onPressOut={onPressOut}
-                >
-                  <Camera size={24} color={colors.primary} />
-                  <Text style={[styles.startButtonText, { color: colors.primary }]}>
-                    {freeComparisonUsed && !isPremium ? "Upgrade to Continue" : "Start Comparison"}
-                  </Text>
-                </TouchableOpacity>
-              </Animated.View>
-            </View>
-          </LinearGradient>
+            colors={["transparent", colors.overlay]}
+            style={styles.heroGradient}
+          />
+          <View style={styles.headerButtons}>
+            <TouchableOpacity
+              style={[styles.headerButton, { backgroundColor: colors.overlay }]}
+              onPress={() => router.push("/settings")}
+            >
+              <Settings size={20} color={colors.background} />
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+        
+        <Animated.View style={[styles.actionsContainer, animatedSlideStyle]}>
+          <Animated.View style={animatedPulseStyle}>
+            <TouchableOpacity 
+              style={styles.mainButton}
+              onPress={handleStartComparison}
+              onPressIn={onPressIn}
+              onPressOut={onPressOut}
+            >
+              <LinearGradient
+                colors={[colors.secondary, colors.primary]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.buttonGradient}
+              >
+                <Camera size={20} color={colors.background} />
+                <Text style={[styles.buttonText, { color: colors.background }]}>Find out if (s)he is out of your league!</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </Animated.View>
+          
+          {!freeComparisonUsed && (
+            <Animated.View style={[styles.freeTagContainer, { backgroundColor: colors.success }]}>
+              <Text style={[styles.freeTag, { color: colors.background }]}>First comparison is FREE!</Text>
+            </Animated.View>
+          )}
         </Animated.View>
 
-        <View style={styles.featuresGrid}>
-          <Animated.View style={[styles.featureCard, animatedCardStyle]}>
-            <TouchableOpacity 
-              style={[styles.featureButton, { backgroundColor: colors.card }]}
-              onPress={handleCelebrityComparison}
-            >
-              <LinearGradient
-                colors={[colors.primary, colors.secondary, colors.accent]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.gradientBorder}
-              >
-                <View style={[styles.featureContent, { backgroundColor: colors.card }]}>
-                  <View style={styles.featureImageContainer}>
-                    <Image
-                      source={{ uri: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face" }}
-                      style={styles.featureImage}
-                    />
-                    <View style={[styles.plusIcon, { backgroundColor: colors.primary }]}>
-                      <Plus size={16} color="#FFFFFF" />
-                    </View>
-                  </View>
-                  <Text style={[styles.featureTitle, { color: colors.text }]}>Celebrity Match</Text>
-                  <Text style={[styles.featureSubtitle, { color: colors.textLight }]}>
-                    Compare with famous people
-                  </Text>
-                  {!isPremium && <Text style={[styles.premiumBadge, { color: colors.primary }]}>Premium</Text>}
-                </View>
-              </LinearGradient>
-            </TouchableOpacity>
+        <Animated.View style={[styles.quickActionsContainer, animatedSlideStyle]}>
+          <TouchableOpacity 
+            style={[styles.quickActionCard, { backgroundColor: colors.card }]}
+            onPress={handleCelebrities}
+          >
+            <View style={[styles.plusIconContainer, { backgroundColor: colors.primary }]}>
+              <Plus size={20} color={colors.background} />
+            </View>
+            <LinearGradient
+              colors={[colors.secondary, colors.primary]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.cardGradientBorder}
+            />
+            <View style={styles.cardContent}>
+              <Star size={24} color={colors.primary} />
+              <Text style={[styles.cardTitle, { color: colors.text }]}>Celebrities</Text>
+              <Text style={[styles.cardDescription, { color: colors.textLight }]}>
+                Compare with famous people
+              </Text>
+            </View>
+            {(!isPremium && freeComparisonUsed) && (
+              <View style={[styles.premiumBadge, { backgroundColor: colors.primary }]}>
+                <Star size={10} color={colors.background} />
+              </View>
+            )}
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[styles.quickActionCard, { backgroundColor: colors.card }]}
+            onPress={handleAIRoast}
+          >
+            <View style={[styles.plusIconContainer, { backgroundColor: colors.primary }]}>
+              <Plus size={20} color={colors.background} />
+            </View>
+            <LinearGradient
+              colors={[colors.secondary, colors.primary]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.cardGradientBorder}
+            />
+            <View style={styles.cardContent}>
+              <MessageCircle size={24} color={colors.primary} />
+              <Text style={[styles.cardTitle, { color: colors.text }]}>AI Roast</Text>
+              <Text style={[styles.cardDescription, { color: colors.textLight }]}>
+                Get roasted by our AI
+              </Text>
+            </View>
+            {(!isPremium && freeComparisonUsed) && (
+              <View style={[styles.premiumBadge, { backgroundColor: colors.primary }]}>
+                <Star size={10} color={colors.background} />
+              </View>
+            )}
+          </TouchableOpacity>
+        </Animated.View>
+        
+        <Animated.View style={[styles.featuresContainer, animatedSlideStyle]}>
+          <Text style={[styles.featuresTitle, { color: colors.text }]}>
+            How It{" "}
+            <Text style={[styles.featuresTitleAccent, { color: colors.primary }]}>Works</Text>
+          </Text>
+          
+          <Animated.View style={[styles.featureItem, { backgroundColor: colors.card }]}>
+            <View style={[styles.featureIconContainer, { backgroundColor: colors.primary + "20" }]}>
+              <Camera size={24} color={colors.primary} />
+            </View>
+            <View style={styles.featureContent}>
+              <Text style={[styles.featureTitle, { color: colors.text }]}>📸 Take Your Selfie</Text>
+              <Text style={[styles.featureDescription, { color: colors.textLight }]}>
+                Capture a clear selfie for accurate beauty analysis
+              </Text>
+            </View>
           </Animated.View>
-
-          <Animated.View style={[styles.featureCard, animatedCardStyle]}>
-            <TouchableOpacity 
-              style={[styles.featureButton, { backgroundColor: colors.card }]}
-              onPress={handleAIRoast}
-            >
-              <LinearGradient
-                colors={[colors.primary, colors.secondary, colors.accent]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.gradientBorder}
-              >
-                <View style={[styles.featureContent, { backgroundColor: colors.card }]}>
-                  <View style={styles.featureImageContainer}>
-                    <Image
-                      source={{ uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" }}
-                      style={styles.featureImage}
-                    />
-                    <View style={[styles.plusIcon, { backgroundColor: colors.primary }]}>
-                      <Plus size={16} color="#FFFFFF" />
-                    </View>
-                  </View>
-                  <Text style={[styles.featureTitle, { color: colors.text }]}>AI Roast</Text>
-                  <Text style={[styles.featureSubtitle, { color: colors.textLight }]}>
-                    Get roasted by our AI
-                  </Text>
-                  {!isPremium && <Text style={[styles.premiumBadge, { color: colors.primary }]}>Premium</Text>}
-                </View>
-              </LinearGradient>
-            </TouchableOpacity>
+          
+          <Animated.View style={[styles.featureItem, { backgroundColor: colors.card }]}>
+            <View style={[styles.featureIconContainer, { backgroundColor: colors.primary + "20" }]}>
+              <Star size={24} color={colors.primary} />
+            </View>
+            <View style={styles.featureContent}>
+              <Text style={[styles.featureTitle, { color: colors.text }]}>🎯 Compare With Someone</Text>
+              <Text style={[styles.featureDescription, { color: colors.textLight }]}>
+                Upload their photo or choose from our celebrity database
+              </Text>
+            </View>
           </Animated.View>
+          
+          <Animated.View style={[styles.featureItem, { backgroundColor: colors.card }]}>
+            <View style={[styles.featureIconContainer, { backgroundColor: colors.primary + "20" }]}>
+              <Text style={[styles.gaugeIcon, { color: colors.primary }]}>%</Text>
+            </View>
+            <View style={styles.featureContent}>
+              <Text style={[styles.featureTitle, { color: colors.text }]}>✨ Get Honest Results</Text>
+              <Text style={[styles.featureDescription, { color: colors.textLight }]}>
+                Find out if they're in your league with our advanced algorithm
+              </Text>
+            </View>
+          </Animated.View>
+        </Animated.View>
+        
+        {!isPremium && (
+          <Animated.View style={[styles.premiumContainer, animatedSlideStyle]}>
+            <LinearGradient
+              colors={[colors.secondary, colors.primary]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.premiumBanner}
+            >
+              <Text style={[styles.premiumTitle, { color: colors.background }]}>
+                Upgrade to{" "}
+                <Text style={styles.premiumTitleAccent}>Premium</Text>
+              </Text>
+              <Text style={[styles.premiumDescription, { color: colors.background }]}>
+                Unlimited comparisons, celebrity matches, and AI beauty analysis
+              </Text>
+              <TouchableOpacity 
+                style={[styles.premiumButton, { backgroundColor: colors.background }]}
+                onPress={() => router.push("/subscription")}
+              >
+                <Text style={[styles.premiumButtonText, { color: colors.primary }]}>Get Premium</Text>
+              </TouchableOpacity>
+            </LinearGradient>
+          </Animated.View>
+        )}
+        
+        <View style={styles.disclaimerContainer}>
+          <Text style={[styles.disclaimer, { color: colors.textLight }]}>
+            This app is for entertainment purposes only. Beauty is subjective and our algorithm
+            provides an approximation based on photographic evidence. Not everyone is photogenic,
+            so don't take the results too seriously!
+          </Text>
         </View>
-
-        <View style={styles.infoSection}>
-          <Text style={[styles.infoTitle, { color: colors.text }]}>How it works</Text>
-          <View style={styles.stepsList}>
-            <View style={styles.step}>
-              <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
-                <Text style={[styles.stepNumberText, { color: "#FFFFFF" }]}>1</Text>
-              </View>
-              <Text style={[styles.stepText, { color: colors.textLight }]}>Upload your photo</Text>
-            </View>
-            <View style={styles.step}>
-              <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
-                <Text style={[styles.stepNumberText, { color: "#FFFFFF" }]}>2</Text>
-              </View>
-              <Text style={[styles.stepText, { color: colors.textLight }]}>Choose who to compare with</Text>
-            </View>
-            <View style={styles.step}>
-              <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
-                <Text style={[styles.stepNumberText, { color: "#FFFFFF" }]}>3</Text>
-              </View>
-              <Text style={[styles.stepText, { color: colors.textLight }]}>Get your league status</Text>
-            </View>
-          </View>
-        </View>
-      </Animated.View>
-
-      <BottomNavigation currentRoute="home" />
+      </ScrollView>
       
-      <PaywallModal
-        visible={showPaywall}
-        onClose={() => setShowPaywall(false)}
-      />
+      <BottomNavigation currentRoute="scan" />
     </SafeAreaView>
   );
 }
@@ -254,161 +328,240 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 16,
+  },
+  contentContainer: {
     paddingBottom: 120,
   },
-  header: {
-    alignItems: "center",
-    marginBottom: 32,
-    marginTop: 20,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "900",
-    marginBottom: 8,
-  },
-  titleAccent: {
-    // Color applied dynamically
-  },
-  subtitle: {
-    fontSize: 16,
-    textAlign: "center",
-  },
-  mainCard: {
-    marginBottom: 24,
-    borderRadius: 20,
-    shadowColor: "rgba(0, 0, 0, 0.1)",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  gradientCard: {
-    borderRadius: 20,
-    padding: 24,
-  },
-  cardContent: {
-    alignItems: "center",
-  },
-  cardHeader: {
-    alignItems: "center",
-    marginBottom: 24,
-  },
-  cardTitle: {
-    fontSize: 24,
-    fontWeight: "800",
-    marginBottom: 8,
-  },
-  cardSubtitle: {
-    fontSize: 16,
-    textAlign: "center",
-    opacity: 0.9,
-  },
-  startButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 12,
+  heroContainer: {
+    height: 240,
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 16,
+    overflow: "hidden",
+    position: "relative",
     shadowColor: "rgba(0, 0, 0, 0.1)",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 4,
   },
-  startButtonText: {
-    fontSize: 18,
-    fontWeight: "700",
-    marginLeft: 8,
+  heroImage: {
+    width: "100%",
+    height: "100%",
   },
-  featuresGrid: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 32,
-    gap: 12,
-  },
-  featureCard: {
-    flex: 1,
-  },
-  featureButton: {
-    borderRadius: 16,
-  },
-  gradientBorder: {
-    borderRadius: 16,
-    padding: 2,
-  },
-  featureContent: {
-    borderRadius: 14,
-    padding: 16,
-    alignItems: "center",
-    position: "relative",
-  },
-  featureImageContainer: {
-    position: "relative",
-    marginBottom: 12,
-  },
-  featureImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-  },
-  plusIcon: {
+  heroGradient: {
     position: "absolute",
-    bottom: -4,
-    right: -4,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
+  },
+  headerButtons: {
+    position: "absolute",
+    top: 12,
+    right: 12,
+    flexDirection: "row",
+    gap: 8,
+  },
+  headerButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     justifyContent: "center",
     alignItems: "center",
+  },
+  actionsContainer: {
+    marginTop: 24,
+    paddingHorizontal: 16,
+    position: "relative",
+  },
+  mainButton: {
+    borderRadius: 12,
+    overflow: "hidden",
+    shadowColor: "rgba(0, 0, 0, 0.1)",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  buttonGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 16,
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: "900",
+    marginLeft: 8,
+  },
+  freeTagContainer: {
+    position: "absolute",
+    top: -10,
+    right: 24,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  freeTag: {
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  quickActionsContainer: {
+    flexDirection: "row",
+    marginTop: 24,
+    paddingHorizontal: 16,
+    gap: 12,
+  },
+  quickActionCard: {
+    flex: 1,
+    height: 160,
+    borderRadius: 16,
+    overflow: "hidden",
+    position: "relative",
+    shadowColor: "rgba(0, 0, 0, 0.1)",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  cardGradientBorder: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 4,
+  },
+  cardContent: {
+    padding: 16,
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginTop: 12,
+    marginBottom: 4,
+  },
+  cardDescription: {
+    fontSize: 12,
+    textAlign: "center",
+  },
+  plusIconContainer: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
+  },
+  premiumBadge: {
+    position: "absolute",
+    top: 8,
+    left: 8,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 2,
+  },
+  featuresContainer: {
+    marginTop: 32,
+    paddingHorizontal: 16,
+  },
+  featuresTitle: {
+    fontSize: 24,
+    fontWeight: "900",
+    marginBottom: 16,
+  },
+  featuresTitleAccent: {
+    // Color applied dynamically
+  },
+  featureItem: {
+    flexDirection: "row",
+    marginBottom: 16,
+    padding: 16,
+    borderRadius: 12,
+    shadowColor: "rgba(0, 0, 0, 0.1)",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  featureIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 16,
+  },
+  gaugeIcon: {
+    fontSize: 20,
+    fontWeight: "800",
+  },
+  featureContent: {
+    flex: 1,
   },
   featureTitle: {
     fontSize: 16,
     fontWeight: "700",
     marginBottom: 4,
-    textAlign: "center",
   },
-  featureSubtitle: {
-    fontSize: 12,
-    textAlign: "center",
-    lineHeight: 16,
+  featureDescription: {
+    fontSize: 14,
+    lineHeight: 20,
   },
-  premiumBadge: {
-    position: "absolute",
-    top: 8,
-    right: 8,
-    fontSize: 10,
-    fontWeight: "700",
+  premiumContainer: {
+    marginTop: 24,
+    paddingHorizontal: 16,
   },
-  infoSection: {
-    marginTop: 16,
+  premiumBanner: {
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: "rgba(0, 0, 0, 0.1)",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  infoTitle: {
-    fontSize: 20,
-    fontWeight: "800",
+  premiumTitle: {
+    fontSize: 24,
+    fontWeight: "900",
+    marginBottom: 8,
+  },
+  premiumTitleAccent: {
+    textShadowColor: "rgba(255,255,255,0.3)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  premiumDescription: {
+    fontSize: 14,
+    opacity: 0.9,
     marginBottom: 16,
   },
-  stepsList: {
-    gap: 12,
+  premiumButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignSelf: "flex-start",
   },
-  step: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  stepNumber: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 12,
-  },
-  stepNumberText: {
-    fontSize: 14,
+  premiumButtonText: {
     fontWeight: "700",
   },
-  stepText: {
-    fontSize: 16,
-    flex: 1,
+  disclaimerContainer: {
+    marginTop: 32,
+    paddingHorizontal: 16,
+    marginBottom: 16,
+  },
+  disclaimer: {
+    fontSize: 12,
+    textAlign: "center",
+    lineHeight: 18,
   },
 });

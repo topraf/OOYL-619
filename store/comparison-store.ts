@@ -54,9 +54,6 @@ export const useComparisonStore = create<ComparisonState>()(
         const result: ComparisonResult = {
           id: Date.now().toString(),
           date: new Date().toISOString(),
-          userImage: userImage,
-          celebrity: randomCelebrity,
-          score: score,
           user: {
             id: "user-1",
             frontImage: userImage,
@@ -110,8 +107,8 @@ export const useComparisonStore = create<ComparisonState>()(
         // For now, we'll just simulate the process
         try {
           const imageUrls = results.flatMap(result => [
-            result.userImage || "",
-            result.celebrity.image
+            result.user.frontImage || "",
+            result.target.image
           ]);
           
           // Simulate image preloading
