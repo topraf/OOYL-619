@@ -74,7 +74,7 @@ export default function PaywallModal({ visible, onClose, onSuccess }: PaywallMod
                   
                   {plan.popular && (
                     <View style={styles.popularBadge}>
-                      <Star size={12} color={colors.background} />
+                      <Star size={12} color={colors.text} />
                       <Text style={styles.popularText}>POPULAR</Text>
                     </View>
                   )}
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   bannerText: {
-    color: colors.background,
+    color: colors.text,
     fontSize: 16,
     fontWeight: "500",
     textAlign: "center",
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   popularText: {
-    color: colors.background,
+    color: colors.text,
     fontSize: 8,
     fontWeight: "700",
     marginLeft: 2,
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   subscribeText: {
-    color: colors.background,
+    color: colors.text,
     fontSize: 16,
     fontWeight: "600",
   },

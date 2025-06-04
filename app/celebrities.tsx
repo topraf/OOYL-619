@@ -123,7 +123,7 @@ export default function CelebritiesScreen() {
                 style={[
                   styles.categoryText,
                   {
-                    color: selectedCategory === category.id ? colors.background : colors.text,
+                    color: selectedCategory === category.id ? colors.text : colors.text,
                     fontWeight: selectedCategory === category.id ? "700" : "500",
                   }
                 ]}
@@ -154,7 +154,7 @@ export default function CelebritiesScreen() {
               onPressOut={onPressOut}
             >
               <View style={styles.plusIconContainer}>
-                <Plus size={16} color={colors.background} />
+                <Plus size={16} color={colors.text} />
               </View>
               <Image
                 source={{ uri: item.image }}

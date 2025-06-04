@@ -1,11 +1,3 @@
-export type LeagueStatus = 
-  | "way_beyond" 
-  | "out_of_league" 
-  | "slightly_above" 
-  | "in_your_league" 
-  | "slightly_below" 
-  | "you_can_do_better";
-
 export interface User {
   id: string;
   frontImage: string | null;
@@ -21,6 +13,14 @@ export interface Target {
   isCelebrity?: boolean;
 }
 
+export type LeagueStatus = 
+  | "way_beyond"
+  | "out_of_league" 
+  | "slightly_above"
+  | "in_your_league"
+  | "slightly_below"
+  | "you_can_do_better";
+
 export interface ComparisonResult {
   id: string;
   date: string;
@@ -28,9 +28,6 @@ export interface ComparisonResult {
   target: Target;
   leagueStatus: LeagueStatus;
   feedback: string;
-  userImage: string; // Added for compatibility with comparison-store
-  celebrity: Celebrity; // Added for compatibility with comparison-store
-  score: number; // Added for compatibility with comparison-store
 }
 
 export interface Celebrity {
@@ -45,14 +42,4 @@ export interface CelebrityCategory {
   id: string;
   name: string;
   emoji: string;
-}
-
-export interface Subscription {
-  id: string;
-  title: string;
-  price: string;
-  period: string;
-  features: string[];
-  isPopular?: boolean;
-  savePercent?: string;
 }

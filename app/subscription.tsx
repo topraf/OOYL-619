@@ -86,7 +86,7 @@ export default function SubscriptionScreen() {
               >
                 {plan.popular && (
                   <View style={styles.popularBadge}>
-                    <Star size={10} color={colors.background} />
+                    <Star size={10} color={colors.text} />
                     <Text style={styles.popularText}>POPULAR</Text>
                   </View>
                 )}
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   popularText: {
-    color: colors.background,
+    color: colors.text,
     fontSize: 8,
     fontWeight: "700",
     marginLeft: 2,
@@ -331,12 +331,12 @@ const styles = StyleSheet.create({
   trialTitle: {
     fontSize: 20,
     fontWeight: "800",
-    color: colors.background,
+    color: colors.text,
     marginBottom: 8,
   },
   trialDescription: {
     fontSize: 14,
-    color: colors.background,
+    color: colors.text,
     opacity: 0.9,
   },
   footer: {
@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   subscribeText: {
-    color: colors.background,
+    color: colors.text,
     fontSize: 16,
     fontWeight: "600",
   },

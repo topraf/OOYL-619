@@ -152,7 +152,7 @@ export default function HomeScreen() {
               style={[styles.headerButton, { backgroundColor: colors.overlay }]}
               onPress={() => router.push("/settings")}
             >
-              <Settings size={20} color={colors.background} />
+              <Settings size={20} color={colors.text} />
             </TouchableOpacity>
           </View>
         </Animated.View>
@@ -171,15 +171,15 @@ export default function HomeScreen() {
                 end={{ x: 1, y: 0 }}
                 style={styles.buttonGradient}
               >
-                <Camera size={20} color={colors.background} />
-                <Text style={[styles.buttonText, { color: colors.background }]}>Find out if (s)he is out of your league!</Text>
+                <Camera size={20} color={colors.text} />
+                <Text style={[styles.buttonText, { color: colors.text }]}>Find out if (s)he is out of your league!</Text>
               </LinearGradient>
             </TouchableOpacity>
           </Animated.View>
           
           {!freeComparisonUsed && (
             <Animated.View style={[styles.freeTagContainer, { backgroundColor: colors.success }]}>
-              <Text style={[styles.freeTag, { color: colors.background }]}>First comparison is FREE!</Text>
+              <Text style={[styles.freeTag, { color: colors.text }]}>First comparison is FREE!</Text>
             </Animated.View>
           )}
         </Animated.View>
@@ -190,7 +190,7 @@ export default function HomeScreen() {
             onPress={handleCelebrities}
           >
             <View style={[styles.plusIconContainer, { backgroundColor: colors.primary }]}>
-              <Plus size={20} color={colors.background} />
+              <Plus size={20} color={colors.text} />
             </View>
             <LinearGradient
               colors={[colors.secondary, colors.primary]}
@@ -207,7 +207,7 @@ export default function HomeScreen() {
             </View>
             {(!isPremium && freeComparisonUsed) && (
               <View style={[styles.premiumBadge, { backgroundColor: colors.primary }]}>
-                <Star size={10} color={colors.background} />
+                <Star size={10} color={colors.text} />
               </View>
             )}
           </TouchableOpacity>
@@ -217,7 +217,7 @@ export default function HomeScreen() {
             onPress={handleAIRoast}
           >
             <View style={[styles.plusIconContainer, { backgroundColor: colors.primary }]}>
-              <Plus size={20} color={colors.background} />
+              <Plus size={20} color={colors.text} />
             </View>
             <LinearGradient
               colors={[colors.secondary, colors.primary]}
@@ -234,7 +234,7 @@ export default function HomeScreen() {
             </View>
             {(!isPremium && freeComparisonUsed) && (
               <View style={[styles.premiumBadge, { backgroundColor: colors.primary }]}>
-                <Star size={10} color={colors.background} />
+                <Star size={10} color={colors.text} />
               </View>
             )}
           </TouchableOpacity>
@@ -291,11 +291,11 @@ export default function HomeScreen() {
               end={{ x: 1, y: 0 }}
               style={styles.premiumBanner}
             >
-              <Text style={[styles.premiumTitle, { color: colors.background }]}>
+              <Text style={[styles.premiumTitle, { color: colors.text }]}>
                 Upgrade to{" "}
                 <Text style={styles.premiumTitleAccent}>Premium</Text>
               </Text>
-              <Text style={[styles.premiumDescription, { color: colors.background }]}>
+              <Text style={[styles.premiumDescription, { color: colors.text }]}>
                 Unlimited comparisons, celebrity matches, and AI beauty analysis
               </Text>
               <TouchableOpacity 

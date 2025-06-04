@@ -324,7 +324,7 @@ export default function ResultsScreen() {
           </Text>
           {isOffline && (
             <View style={[styles.offlineIndicator, { backgroundColor: colors.warning }]}>
-              <WifiOff size={16} color={colors.background} />
+              <WifiOff size={16} color={colors.text} />
             </View>
           )}
           <View style={styles.placeholder} />
@@ -392,7 +392,7 @@ export default function ResultsScreen() {
               onPressIn={onPressIn}
               onPressOut={onPressOut}
             >
-              <Text style={[styles.buttonText, { color: colors.background }]}>Start Comparison</Text>
+              <Text style={[styles.buttonText, { color: colors.text }]}>Start Comparison</Text>
             </TouchableOpacity>
           </Animated.View>
         </View>
@@ -437,7 +437,7 @@ export default function ResultsScreen() {
                 end={{ x: 1, y: 1 }}
                 style={styles.resultCard}
               >
-                <Text style={[styles.resultTitle, { color: colors.background }]}>
+                <Text style={[styles.resultTitle, { color: colors.text }]}>
                   {getLeagueText()}
                 </Text>
                 
@@ -445,25 +445,25 @@ export default function ResultsScreen() {
                   <View style={styles.imageColumn}>
                     <ImagePreview
                       uri={latestResult.user.frontImage || ""}
-                      style={[styles.circleImage, { borderColor: colors.background }]}
+                      style={[styles.circleImage, { borderColor: colors.text }]}
                     />
-                    <Text style={[styles.imageLabel, { color: colors.background }]}>You</Text>
-                    <Text style={[styles.scoreText, { color: colors.background }]}>{getOverallScore()}/10</Text>
+                    <Text style={[styles.imageLabel, { color: colors.text }]}>You</Text>
+                    <Text style={[styles.scoreText, { color: colors.text }]}>{getOverallScore()}/10</Text>
                   </View>
                   
                   <View style={styles.vsContainer}>
-                    <Text style={[styles.vsText, { color: colors.background }]}>VS</Text>
+                    <Text style={[styles.vsText, { color: colors.text }]}>VS</Text>
                   </View>
                   
                   <View style={styles.imageColumn}>
                     <ImagePreview
                       uri={latestResult.target.image}
-                      style={[styles.circleImage, { borderColor: colors.background }]}
+                      style={[styles.circleImage, { borderColor: colors.text }]}
                     />
-                    <Text style={[styles.imageLabel, { color: colors.background }]}>
+                    <Text style={[styles.imageLabel, { color: colors.text }]}>
                       {latestResult.target.name || "Them"}
                     </Text>
-                    <Text style={[styles.scoreText, { color: colors.background }]}>
+                    <Text style={[styles.scoreText, { color: colors.text }]}>
                       {Math.round((latestResult.target.beautyScore || 0) * 10)}/10
                     </Text>
                   </View>
@@ -517,7 +517,7 @@ export default function ResultsScreen() {
                       style={styles.socialIcon} 
                     />
                   </View>
-                  <Text style={styles.socialButtonText}>Instagram</Text>
+                  <Text style={[styles.socialButtonText, { color: "#FFFFFF" }]}>Instagram</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
@@ -543,7 +543,7 @@ export default function ResultsScreen() {
                       style={styles.socialIcon} 
                     />
                   </View>
-                  <Text style={styles.socialButtonText}>X</Text>
+                  <Text style={[styles.socialButtonText, { color: "#FFFFFF" }]}>X</Text>
                 </TouchableOpacity>
               </View>
             </Animated.View>
@@ -809,7 +809,6 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   socialButtonText: {
-    color: "#FFFFFF",
     fontSize: 14,
     fontWeight: "700",
   },
