@@ -11,12 +11,13 @@ import BottomNavigation from "@/components/BottomNavigation";
 export default function SettingsScreen() {
   const router = useRouter();
   const { isPremium, setPremiumStatus } = useUserStore();
-  const { resetOnboarding, setCurrentStep } = useOnboardingStore();
+  const { resetOnboarding, setCurrentStep, setHasCompletedOnboarding } = useOnboardingStore();
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
   const [saveHistory, setSaveHistory] = React.useState(true);
   
   const handleResetOnboarding = () => {
     resetOnboarding();
+    setHasCompletedOnboarding(false);
     router.push("/onboarding");
   };
 
@@ -148,22 +149,6 @@ export default function SettingsScreen() {
           >
             <Play size={20} color={colors.primary} />
             <Text style={styles.debugLabel}>More Features Screen</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={styles.debugItem}
-            onPress={() => handleGoToOnboardingStep(3, "/onboarding-notifications")}
-          >
-            <Play size={20} color={colors.primary} />
-            <Text style={styles.debugLabel}>Notifications Screen</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={styles.debugItem}
-            onPress={() => handleGoToOnboardingStep(4, "/onboarding-subscription")}
-          >
-            <Play size={20} color={colors.primary} />
-            <Text style={styles.debugLabel}>Subscription Screen</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 

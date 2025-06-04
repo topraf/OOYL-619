@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Platform, Dimensions, Share, FlatList, Linking } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Platform, Dimensions, Share, FlatList, Linking, Image as RNImage } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Home, Camera, MessageCircle, Star, History, Wifi, WifiOff } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { Platform as RNPlatform } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { Image } from "expo-image";
 import { useUserStore } from "@/store/user-store";
 import LeagueGauge from "@/components/LeagueGauge";
 import ImagePreview from "@/components/ImagePreview";
@@ -507,20 +508,38 @@ export default function ResultsScreen() {
                   style={[styles.socialButton, { backgroundColor: "#E4405F" }]}
                   onPress={handleShareInstagram}
                 >
-                  <Text style={styles.socialButtonText}>IG</Text>
+                  <View style={styles.socialIconContainer}>
+                    <RNImage 
+                      source={{ uri: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Instagram_logo_2016.svg/132px-Instagram_logo_2016.svg.png" }} 
+                      style={styles.socialIcon} 
+                    />
+                  </View>
+                  <Text style={styles.socialButtonText}>Instagram</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
                   style={[styles.socialButton, { backgroundColor: "#FFFC00" }]}
                   onPress={handleShareSnapchat}
                 >
-                  <Text style={[styles.socialButtonText, { color: "#000" }]}>SC</Text>
+                  <View style={styles.socialIconContainer}>
+                    <RNImage 
+                      source={{ uri: "https://upload.wikimedia.org/wikipedia/en/thumb/c/c4/Snapchat_logo.svg/320px-Snapchat_logo.svg.png" }} 
+                      style={styles.socialIcon} 
+                    />
+                  </View>
+                  <Text style={[styles.socialButtonText, { color: "#000" }]}>Snapchat</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
                   style={[styles.socialButton, { backgroundColor: "#000" }]}
                   onPress={handleShareX}
                 >
+                  <View style={styles.socialIconContainer}>
+                    <RNImage 
+                      source={{ uri: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/X_logo_2023_%28white%29.png/320px-X_logo_2023_%28white%29.png" }} 
+                      style={styles.socialIcon} 
+                    />
+                  </View>
                   <Text style={styles.socialButtonText}>X</Text>
                 </TouchableOpacity>
               </View>
@@ -762,21 +781,34 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   socialButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: "center",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     shadowColor: "rgba(0, 0, 0, 0.1)",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,
   },
+  socialIconContainer: {
+    width: 24,
+    height: 24,
+    marginRight: 6,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  socialIcon: {
+    width: 20,
+    height: 20,
+    resizeMode: "contain",
+  },
   socialButtonText: {
     color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "900",
+    fontSize: 14,
+    fontWeight: "700",
   },
   actionsContainer: {
     borderRadius: 16,

@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Dimensions, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { Settings, Camera, Image as ImageIcon, Star, MessageCircle } from "lucide-react-native";
+import { Settings, Camera, Star, MessageCircle, Plus } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
@@ -24,7 +24,7 @@ const { width } = Dimensions.get("window");
 export default function HomeScreen() {
   const router = useRouter();
   const { resetUserImages, freeComparisonUsed, isPremium, getColors } = useUserStore();
-  const { hasCompletedOnboarding } = useOnboardingStore();
+  const { hasCompletedOnboarding, setHasCompletedOnboarding } = useOnboardingStore();
   const colors = getColors();
   
   const buttonScale = useSharedValue(1);
@@ -64,6 +64,8 @@ export default function HomeScreen() {
     const timer = setTimeout(() => {
       if (!hasCompletedOnboarding) {
         router.push("/onboarding");
+        // Force set onboarding as completed to prevent loops
+        setHasCompletedOnboarding(true);
       }
     }, 100);
     
@@ -184,20 +186,24 @@ export default function HomeScreen() {
 
         <Animated.View style={[styles.quickActionsContainer, animatedSlideStyle]}>
           <TouchableOpacity 
-            style={[styles.quickActionButton, { backgroundColor: colors.card }]}
+            style={[styles.quickActionCard, { backgroundColor: colors.card }]}
             onPress={handleCelebrities}
           >
-            <View style={styles.gradientBorder}>
-              <LinearGradient
-                colors={[colors.secondary, colors.primary]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.gradientBorderInner}
-              />
+            <View style={styles.plusIconContainer}>
+              <Plus size={20} color={colors.background} />
             </View>
-            <View style={styles.quickActionContent}>
-              <Star size={20} color={colors.primary} />
-              <Text style={[styles.quickActionText, { color: colors.text }]}>Celebrities</Text>
+            <LinearGradient
+              colors={[colors.secondary, colors.primary]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.cardGradientBorder}
+            />
+            <View style={styles.cardContent}>
+              <Star size={24} color={colors.primary} />
+              <Text style={[styles.cardTitle, { color: colors.text }]}>Celebrities</Text>
+              <Text style={[styles.cardDescription, { color: colors.textLight }]}>
+                Compare with famous people
+              </Text>
             </View>
             {(!isPremium && freeComparisonUsed) && (
               <View style={[styles.premiumBadge, { backgroundColor: colors.primary }]}>
@@ -207,20 +213,24 @@ export default function HomeScreen() {
           </TouchableOpacity>
           
           <TouchableOpacity 
-            style={[styles.quickActionButton, { backgroundColor: colors.card }]}
+            style={[styles.quickActionCard, { backgroundColor: colors.card }]}
             onPress={handleAIRoast}
           >
-            <View style={styles.gradientBorder}>
-              <LinearGradient
-                colors={[colors.secondary, colors.primary]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.gradientBorderInner}
-              />
+            <View style={styles.plusIconContainer}>
+              <Plus size={20} color={colors.background} />
             </View>
-            <View style={styles.quickActionContent}>
-              <MessageCircle size={20} color={colors.primary} />
-              <Text style={[styles.quickActionText, { color: colors.text }]}>AI Roast</Text>
+            <LinearGradient
+              colors={[colors.secondary, colors.primary]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.cardGradientBorder}
+            />
+            <View style={styles.cardContent}>
+              <MessageCircle size={24} color={colors.primary} />
+              <Text style={[styles.cardTitle, { color: colors.text }]}>AI Roast</Text>
+              <Text style={[styles.cardDescription, { color: colors.textLight }]}>
+                Get roasted by our AI
+              </Text>
             </View>
             {(!isPremium && freeComparisonUsed) && (
               <View style={[styles.premiumBadge, { backgroundColor: colors.primary }]}>
@@ -250,7 +260,7 @@ export default function HomeScreen() {
           
           <Animated.View style={[styles.featureItem, { backgroundColor: colors.card }]}>
             <View style={[styles.featureIconContainer, { backgroundColor: colors.primary + "20" }]}>
-              <ImageIcon size={24} color={colors.primary} />
+              <Star size={24} color={colors.primary} />
             </View>
             <View style={styles.featureContent}>
               <Text style={[styles.featureTitle, { color: colors.text }]}>🎯 Compare With Someone</Text>
@@ -403,45 +413,57 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     gap: 12,
   },
-  quickActionButton: {
+  quickActionCard: {
     flex: 1,
-    borderRadius: 12,
-    padding: 16,
+    height: 160,
+    borderRadius: 16,
+    overflow: "hidden",
     position: "relative",
     shadowColor: "rgba(0, 0, 0, 0.1)",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
-    overflow: "hidden",
   },
-  gradientBorder: {
+  cardGradientBorder: {
     position: "absolute",
     top: 0,
     left: 0,
     right: 0,
-    bottom: 0,
-    padding: 2,
+    height: 4,
   },
-  gradientBorderInner: {
+  cardContent: {
+    padding: 16,
     flex: 1,
-    borderRadius: 10,
-  },
-  quickActionContent: {
-    flexDirection: "row",
-    alignItems: "center",
     justifyContent: "center",
-    zIndex: 1,
+    alignItems: "center",
   },
-  quickActionText: {
-    fontSize: 16,
+  cardTitle: {
+    fontSize: 18,
     fontWeight: "700",
-    marginLeft: 8,
+    marginTop: 12,
+    marginBottom: 4,
+  },
+  cardDescription: {
+    fontSize: 12,
+    textAlign: "center",
+  },
+  plusIconContainer: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: colors.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
   },
   premiumBadge: {
     position: "absolute",
-    top: -6,
-    right: -6,
+    top: 8,
+    left: 8,
     width: 20,
     height: 20,
     borderRadius: 10,

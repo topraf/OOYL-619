@@ -21,7 +21,7 @@ export default function HistoryScreen() {
   };
 
   const handleComparisonPress = (comparisonId: string) => {
-    // Navigate to results page - in a real app, you'd pass the comparison ID
+    // Navigate to results page
     router.push("/results");
   };
 

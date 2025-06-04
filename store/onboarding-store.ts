@@ -3,46 +3,45 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface OnboardingState {
-  hasCompletedOnboarding: boolean;
   currentStep: number;
-  hasShownNotifications: boolean;
-  hasShownPremium: boolean;
-  
-  // Actions
+  hasCompletedOnboarding: boolean;
   setCurrentStep: (step: number) => void;
+  nextStep: () => void;
+  prevStep: () => void;
   completeOnboarding: () => void;
   resetOnboarding: () => void;
-  skipNotifications: () => void;
-  skipPremium: () => void;
+  setHasCompletedOnboarding: (value: boolean) => void;
 }
 
 export const useOnboardingStore = create<OnboardingState>()(
   persist(
-    (set, get) => ({
-      hasCompletedOnboarding: false,
+    (set) => ({
       currentStep: 0,
-      hasShownNotifications: false,
-      hasShownPremium: false,
+      hasCompletedOnboarding: false,
       
       setCurrentStep: (step: number) => set({ currentStep: step }),
       
+      nextStep: () => set((state) => ({ 
+        currentStep: state.currentStep + 1 
+      })),
+      
+      prevStep: () => set((state) => ({ 
+        currentStep: Math.max(0, state.currentStep - 1) 
+      })),
+      
       completeOnboarding: () => set({ 
         hasCompletedOnboarding: true,
-        hasShownNotifications: true,
-        hasShownPremium: true,
         currentStep: 0
       }),
       
       resetOnboarding: () => set({ 
-        hasCompletedOnboarding: false,
         currentStep: 0,
-        hasShownNotifications: false,
-        hasShownPremium: false
+        hasCompletedOnboarding: false
       }),
       
-      skipNotifications: () => set({ hasShownNotifications: true }),
-      
-      skipPremium: () => set({ hasShownPremium: true }),
+      setHasCompletedOnboarding: (value: boolean) => set({
+        hasCompletedOnboarding: value
+      }),
     }),
     {
       name: "onboarding-storage",

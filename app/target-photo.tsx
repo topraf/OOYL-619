@@ -204,6 +204,7 @@ export default function TargetPhotoScreen() {
           <Text style={styles.tipText}>📸 Use a clear, front-facing photo</Text>
           <Text style={styles.tipText}>💡 Ensure good lighting</Text>
           <Text style={styles.tipText}>😐 Choose a photo with neutral expression</Text>
+          <Text style={styles.tipText}>🧑‍🤝‍🧑 One person per photo works best</Text>
         </View>
       </ScrollView>
       

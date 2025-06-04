@@ -54,9 +54,26 @@ export const useComparisonStore = create<ComparisonState>()(
         const result: ComparisonResult = {
           id: Date.now().toString(),
           date: new Date().toISOString(),
-          userImage,
-          celebrity: randomCelebrity,
-          score,
+          userImage, // This is now valid with updated type
+          celebrity: randomCelebrity, // This is now valid with updated type
+          score, // This is now valid with updated type
+          user: {
+            id: "user-1",
+            frontImage: userImage,
+            sideImage: null,
+            beautyScore: score / 100,
+          },
+          target: {
+            id: randomCelebrity.id,
+            name: randomCelebrity.name,
+            image: randomCelebrity.image,
+            beautyScore: randomCelebrity.beautyScore,
+            isCelebrity: true,
+          },
+          leagueStatus: score >= 90 ? "in_your_league" : 
+                        score >= 85 ? "slightly_above" : 
+                        score >= 80 ? "slightly_below" : 
+                        score >= 75 ? "out_of_league" : "way_beyond",
           feedback,
         };
         

@@ -1,49 +1,29 @@
-export const lightColors = {
-  primary: "#FF3A79", // Pink accent
-  secondary: "#FF9500", // Orange accent
-  tertiary: "#5E72E4", // Soft blue
-  background: "#FFFFFF", // Light background
-  card: "#F8F9FA", // Light card
-  text: "#333333", // Dark text
-  textLight: "#666666", // Medium text
-  border: "#EEEEEE", // Light border
-  success: "#48BB78",
-  warning: "#F6AD55",
-  error: "#F56565",
-  shadow: "rgba(0, 0, 0, 0.1)",
+export const colors = {
+  // Main colors
+  primary: "#4361EE",
+  secondary: "#3A0CA3",
+  
+  // UI colors
+  background: "#121212",
+  card: "#1E1E1E",
+  text: "#FFFFFF",
+  textLight: "#AAAAAA",
+  border: "#333333",
   overlay: "rgba(0, 0, 0, 0.5)",
+  shadow: "#000000",
+  
+  // Status colors
+  success: "#4CC9F0",
+  warning: "#F72585",
+  error: "#FF5252",
+  
+  // Gauge colors
   gauge: {
-    red: "#F56565",
-    orange: "#ED8936",
-    yellow: "#ECC94B",
-    green: "#48BB78",
-    blue: "#4299E1",
-    purple: "#9F7AEA",
+    purple: "#7209B7",
+    blue: "#4361EE",
+    green: "#4CC9F0",
+    yellow: "#4CC9F0",
+    orange: "#F72585",
+    red: "#F72585",
   }
 };
-
-export const darkColors = {
-  primary: "#FF3A79", // Pink accent
-  secondary: "#FF9500", // Orange accent
-  tertiary: "#5E72E4", // Soft blue
-  background: "#1A1A1A", // Dark background
-  card: "#2D2D2D", // Dark card
-  text: "#FFFFFF", // Light text
-  textLight: "#B0B0B0", // Medium text
-  border: "#404040", // Dark border
-  success: "#48BB78",
-  warning: "#F6AD55",
-  error: "#F56565",
-  shadow: "rgba(0, 0, 0, 0.3)",
-  overlay: "rgba(0, 0, 0, 0.7)",
-  gauge: {
-    red: "#F56565",
-    orange: "#ED8936",
-    yellow: "#ECC94B",
-    green: "#48BB78",
-    blue: "#4299E1",
-    purple: "#9F7AEA",
-  }
-};
-
-export const colors = lightColors; // Default export for backward compatibility

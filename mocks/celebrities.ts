@@ -1,124 +1,155 @@
-import { Celebrity } from "@/types";
+import { Celebrity, CelebrityCategory } from "@/types";
+
+export const celebrityCategories: CelebrityCategory[] = [
+  { id: "all", name: "All", emoji: "🌟" },
+  { id: "actors", name: "Actors", emoji: "🎬" },
+  { id: "music", name: "Music", emoji: "🎵" },
+  { id: "sports", name: "Sports", emoji: "⚽" },
+  { id: "models", name: "Models", emoji: "👗" },
+  { id: "influencers", name: "Influencers", emoji: "📱" },
+  { id: "politics", name: "Politics", emoji: "🏛️" },
+  { id: "business", name: "Business", emoji: "💼" },
+];
 
 export const celebrities: Celebrity[] = [
   {
     id: "1",
-    name: "Emma Stone",
-    image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    name: "Brad Pitt",
+    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     beautyScore: 0.92,
     category: "actors"
   },
   {
-    id: "2", 
-    name: "Ryan Gosling",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    beautyScore: 0.89,
+    id: "2",
+    name: "Angelina Jolie",
+    image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    beautyScore: 0.94,
     category: "actors"
   },
   {
     id: "3",
-    name: "Zendaya",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    beautyScore: 0.95,
-    category: "actors"
+    name: "Beyoncé",
+    image: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    beautyScore: 0.93,
+    category: "music"
   },
   {
     id: "4",
-    name: "Michael B. Jordan",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    name: "Chris Hemsworth",
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     beautyScore: 0.91,
     category: "actors"
   },
   {
     id: "5",
-    name: "Taylor Swift",
-    image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    beautyScore: 0.88,
-    category: "music"
+    name: "Zendaya",
+    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    beautyScore: 0.92,
+    category: "actors"
   },
   {
     id: "6",
-    name: "The Weeknd",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    beautyScore: 0.85,
-    category: "music"
+    name: "Michael B. Jordan",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    beautyScore: 0.90,
+    category: "actors"
   },
   {
     id: "7",
-    name: "Ariana Grande",
+    name: "Rihanna",
     image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    beautyScore: 0.90,
+    beautyScore: 0.93,
     category: "music"
   },
   {
     id: "8",
-    name: "Bruno Mars",
-    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    beautyScore: 0.83,
-    category: "music"
+    name: "Idris Elba",
+    image: "https://images.unsplash.com/photo-1504257432389-52343af06ae3?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    beautyScore: 0.89,
+    category: "actors"
   },
   {
     id: "9",
-    name: "Alexandria Ocasio-Cortez",
-    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    beautyScore: 0.86,
-    category: "politics"
+    name: "Gal Gadot",
+    image: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    beautyScore: 0.92,
+    category: "actors"
   },
   {
     id: "10",
-    name: "Justin Trudeau",
-    image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    beautyScore: 0.84,
-    category: "politics"
+    name: "Harry Styles",
+    image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    beautyScore: 0.88,
+    category: "music"
   },
   {
     id: "11",
-    name: "Jacinda Ardern",
-    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    beautyScore: 0.87,
-    category: "politics"
+    name: "Margot Robbie",
+    image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    beautyScore: 0.93,
+    category: "actors"
   },
   {
     id: "12",
-    name: "Emmanuel Macron",
-    image: "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    beautyScore: 0.79,
-    category: "politics"
-  },
-  {
-    id: "13",
-    name: "Serena Williams",
-    image: "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    name: "Cristiano Ronaldo",
+    image: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     beautyScore: 0.89,
     category: "sports"
   },
   {
+    id: "13",
+    name: "Kendall Jenner",
+    image: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    beautyScore: 0.91,
+    category: "models"
+  },
+  {
     id: "14",
-    name: "Cristiano Ronaldo",
-    image: "https://images.unsplash.com/photo-1566492031773-4f4e44671d66?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    beautyScore: 0.92,
-    category: "sports"
+    name: "Timothée Chalamet",
+    image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    beautyScore: 0.87,
+    category: "actors"
   },
   {
     id: "15",
-    name: "Simone Biles",
-    image: "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    name: "Dua Lipa",
+    image: "https://images.unsplash.com/photo-1534751516642-a1af1ef26a56?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    beautyScore: 0.90,
+    category: "music"
+  },
+  {
+    id: "16",
+    name: "Tom Holland",
+    image: "https://images.unsplash.com/photo-1463453091185-61582044d556?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    beautyScore: 0.86,
+    category: "actors"
+  },
+  {
+    id: "17",
+    name: "Serena Williams",
+    image: "https://images.unsplash.com/photo-1523824921871-d6f1a15151f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     beautyScore: 0.88,
     category: "sports"
   },
   {
-    id: "16",
-    name: "Lewis Hamilton",
-    image: "https://images.unsplash.com/photo-1552058544-f2b08422138a?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    id: "18",
+    name: "Elon Musk",
+    image: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    beautyScore: 0.82,
+    category: "business"
+  },
+  {
+    id: "19",
+    name: "Emma Watson",
+    image: "https://images.unsplash.com/photo-1557555187-23d685287bc3?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    beautyScore: 0.91,
+    category: "actors"
+  },
+  {
+    id: "20",
+    name: "Barack Obama",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     beautyScore: 0.85,
-    category: "sports"
-  }
-];
-
-export const celebrityCategories = [
-  { id: "all", name: "All", emoji: "🌟" },
-  { id: "actors", name: "Actors", emoji: "🎬" },
-  { id: "music", name: "Music", emoji: "🎵" },
-  { id: "politics", name: "Politics", emoji: "🏛️" },
-  { id: "sports", name: "Sports", emoji: "⚽" }
+    category: "politics"
+  },
 ];

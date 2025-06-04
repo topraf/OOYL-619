@@ -5,7 +5,7 @@ import { useRouter } from "expo-router";
 import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
 import { Platform } from "react-native";
-import { Search, X, ArrowLeft } from "lucide-react-native";
+import { Search, X, ArrowLeft, Plus } from "lucide-react-native";
 import { colors } from "@/constants/colors";
 import { celebrities, celebrityCategories } from "@/mocks/celebrities";
 import { useUserStore } from "@/store/user-store";
@@ -153,6 +153,9 @@ export default function CelebritiesScreen() {
               onPressIn={onPressIn}
               onPressOut={onPressOut}
             >
+              <View style={styles.plusIconContainer}>
+                <Plus size={16} color={colors.background} />
+              </View>
               <Image
                 source={{ uri: item.image }}
                 style={styles.celebrityImage}
@@ -161,7 +164,7 @@ export default function CelebritiesScreen() {
               <View style={styles.celebrityInfo}>
                 <Text style={styles.celebrityName}>{item.name}</Text>
                 <View style={styles.scoreContainer}>
-                  <Text style={styles.scoreText}>{Math.round(item.beautyScore * 100)}</Text>
+                  <Text style={styles.scoreText}>{Math.round(item.beautyScore * 10)}/10</Text>
                   <Text style={styles.scoreLabel}>Beauty Score</Text>
                 </View>
               </View>
@@ -275,6 +278,19 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+    position: "relative",
+  },
+  plusIconContainer: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: colors.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
   },
   celebrityImage: {
     width: "100%",
