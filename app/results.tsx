@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Platform, Dimensions, Share, FlatList, Linking } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { Home, Camera, MessageCircle, Star, History, Wifi, WifiOff, Share2 } from "lucide-react-native";
+import { Home, Camera, MessageCircle, Star, Share2 } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { Platform as RNPlatform } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -24,12 +24,11 @@ type FeatureStatus = "High" | "Mid" | "Low";
 
 export default function ResultsScreen() {
   const router = useRouter();
-  const { comparisons, isLoading, isPremium, clearHistory, getColors, isOffline, getCachedComparisons } = useUserStore();
+  const { comparisons, isLoading, isPremium, clearHistory, getColors } = useUserStore();
   const { history, clearHistory: clearComparisonHistory } = useComparisonStore();
   const colors = getColors();
   const [showResult, setShowResult] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
   
   const buttonScale = useSharedValue(1);
   const cardScale = useSharedValue(1);
@@ -58,8 +57,6 @@ export default function ResultsScreen() {
   
   // Use comparison store history instead of user store
   const latestResult = history[0] || comparisons[0];
-  const cachedResults = getCachedComparisons();
-  const displayResults = isOffline ? cachedResults : (history.length > 0 ? history : comparisons);
 
   useEffect(() => {
     if (!isLoading && latestResult) {
@@ -122,17 +119,6 @@ export default function ResultsScreen() {
       alert(`${feature} feature coming soon!`);
     } else {
       setShowPaywall(true);
-    }
-  };
-
-  const handleClearHistory = () => {
-    if (RNPlatform.OS !== "web") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    }
-    
-    if (displayResults.length > 0) {
-      clearHistory();
-      clearComparisonHistory();
     }
   };
 
@@ -226,13 +212,6 @@ export default function ResultsScreen() {
     buttonScale.value = withSpring(1);
   };
 
-  const toggleHistoryView = () => {
-    if (RNPlatform.OS !== "web") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-    setShowHistory(!showHistory);
-  };
-
   if (isLoading) {
     return (
       <SafeAreaView style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
@@ -244,71 +223,6 @@ export default function ResultsScreen() {
           <ActivityIndicator size="large" color={colors.primary} style={styles.loader} />
           <Text style={[styles.loadingSubtext, { color: colors.textLight }]}>Calculating league status</Text>
         </Animated.View>
-      </SafeAreaView>
-    );
-  }
-
-  if (showHistory) {
-    return (
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top"]}>
-        <View style={styles.header}>
-          <TouchableOpacity 
-            style={[styles.backButton, { backgroundColor: colors.card }]} 
-            onPress={toggleHistoryView}
-          >
-            <Home size={20} color={colors.text} />
-          </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>
-            Your{" "}
-            <Text style={[styles.headerTitleAccent, { color: colors.primary }]}>History</Text>
-          </Text>
-          {isOffline && (
-            <View style={[styles.offlineIndicator, { backgroundColor: colors.warning }]}>
-              <WifiOff size={16} color={colors.background} />
-            </View>
-          )}
-          <View style={styles.placeholder} />
-        </View>
-        
-        {displayResults.length === 0 ? (
-          <EmptyState
-            title="No History Yet"
-            message={isOffline ? "No cached comparisons available offline." : "Your comparisons will appear here after you complete them."}
-          />
-        ) : (
-          <FlatList
-            data={displayResults}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item, index }) => (
-              <Animated.View
-                style={[
-                  animatedCardStyle,
-                  { 
-                    transform: [{ 
-                      translateY: useSharedValue(index * 20).value 
-                    }] 
-                  }
-                ]}
-              >
-                <TouchableOpacity 
-                  style={styles.cardContainer}
-                  onPress={() => {
-                    if (RNPlatform.OS !== "web") {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    }
-                    setShowHistory(false);
-                  }}
-                >
-                  <ComparisonCard result={item} compact={true} />
-                </TouchableOpacity>
-              </Animated.View>
-            )}
-            contentContainerStyle={styles.listContent}
-            showsVerticalScrollIndicator={false}
-          />
-        )}
-        
-        <BottomNavigation currentRoute="results" />
       </SafeAreaView>
     );
   }
@@ -362,12 +276,7 @@ export default function ResultsScreen() {
                 Your{" "}
                 <Text style={[styles.headerTitleAccent, { color: colors.primary }]}>Results</Text>
               </Text>
-              <TouchableOpacity 
-                style={[styles.historyButton, { backgroundColor: colors.card }]} 
-                onPress={toggleHistoryView}
-              >
-                <History size={20} color={colors.text} />
-              </TouchableOpacity>
+              <View style={styles.placeholder} />
             </View>
             
             <Animated.View style={animatedCardStyle}>
@@ -588,26 +497,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  historyButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   headerTitle: {
     fontSize: 24,
     fontWeight: "900",
   },
   headerTitleAccent: {
     // Color applied dynamically
-  },
-  offlineIndicator: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: "center",
-    alignItems: "center",
   },
   placeholder: {
     width: 40,
@@ -822,13 +717,5 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: "700",
-  },
-  cardContainer: {
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  listContent: {
-    padding: 16,
-    paddingBottom: 120,
   },
 });

@@ -5,7 +5,7 @@ import { useRouter } from "expo-router";
 import { Star, MessageCircle, ArrowRight } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { Platform } from "react-native";
-import { colors } from "@/constants/colors";
+import { useUserStore } from "@/store/user-store";
 import { useOnboardingStore } from "@/store/onboarding-store";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withRepeat, withTiming } from "react-native-reanimated";
 
@@ -13,7 +13,9 @@ const { width } = Dimensions.get("window");
 
 export default function OnboardingMoreFeaturesScreen() {
   const router = useRouter();
+  const { getColors } = useUserStore();
   const { setCurrentStep } = useOnboardingStore();
+  const colors = getColors();
   
   const buttonScale = useSharedValue(1);
   const titleScale = useSharedValue(1);
@@ -55,7 +57,7 @@ export default function OnboardingMoreFeaturesScreen() {
   };
   
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView 
         style={styles.scrollView} 
         contentContainerStyle={styles.content}
@@ -64,52 +66,52 @@ export default function OnboardingMoreFeaturesScreen() {
         alwaysBounceVertical={true}
       >
         <Animated.View style={animatedTitleStyle}>
-          <Text style={styles.title}>
+          <Text style={[styles.title, { color: colors.text }]}>
             Try our{" "}
-            <Text style={styles.titleAccent}>special features</Text>
+            <Text style={[styles.titleAccent, { color: colors.primary }]}>special features</Text>
           </Text>
         </Animated.View>
         
         <View style={styles.featuresContainer}>
-          <View style={styles.featureCard}>
-            <View style={styles.featureIconContainer}>
+          <View style={[styles.featureCard, { backgroundColor: colors.card, shadowColor: colors.shadow }]}>
+            <View style={[styles.featureIconContainer, { backgroundColor: colors.primary + "20" }]}>
               <Star size={24} color={colors.primary} />
             </View>
             <View style={styles.featureContent}>
-              <Text style={styles.featureTitle}>Celebrity Comparison</Text>
-              <Text style={styles.featureDescription}>
+              <Text style={[styles.featureTitle, { color: colors.text }]}>Celebrity Comparison</Text>
+              <Text style={[styles.featureDescription, { color: colors.textLight }]}>
                 Compare your beauty score with famous celebrities and see if you're in their league
               </Text>
               <View style={styles.celebrityImages}>
                 <View style={styles.celebrityImageContainer}>
                   <Image
                     source={{ uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" }}
-                    style={styles.celebrityImage}
+                    style={[styles.celebrityImage, { backgroundColor: colors.border }]}
                   />
-                  <Text style={styles.celebrityName}>Ryan Gosling</Text>
+                  <Text style={[styles.celebrityName, { color: colors.text }]}>Ryan Gosling</Text>
                 </View>
                 <View style={styles.celebrityImageContainer}>
                   <Image
                     source={{ uri: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" }}
-                    style={styles.celebrityImage}
+                    style={[styles.celebrityImage, { backgroundColor: colors.border }]}
                   />
-                  <Text style={styles.celebrityName}>Emma Stone</Text>
+                  <Text style={[styles.celebrityName, { color: colors.text }]}>Emma Stone</Text>
                 </View>
               </View>
             </View>
           </View>
           
-          <View style={styles.featureCard}>
-            <View style={styles.featureIconContainer}>
+          <View style={[styles.featureCard, { backgroundColor: colors.card, shadowColor: colors.shadow }]}>
+            <View style={[styles.featureIconContainer, { backgroundColor: colors.primary + "20" }]}>
               <MessageCircle size={24} color={colors.primary} />
             </View>
             <View style={styles.featureContent}>
-              <Text style={styles.featureTitle}>AI Roastmaster</Text>
-              <Text style={styles.featureDescription}>
+              <Text style={[styles.featureTitle, { color: colors.text }]}>AI Roastmaster</Text>
+              <Text style={[styles.featureDescription, { color: colors.textLight }]}>
                 Get roasted by our AI based on your photos for some laughs and fun
               </Text>
-              <View style={styles.roastBubble}>
-                <Text style={styles.roastText}>
+              <View style={[styles.roastBubble, { backgroundColor: colors.primary + "20" }]}>
+                <Text style={[styles.roastText, { color: colors.text }]}>
                   "Your selfie game is so weak, even your phone's front camera is trying to auto-delete."
                 </Text>
               </View>
@@ -117,8 +119,8 @@ export default function OnboardingMoreFeaturesScreen() {
           </View>
         </View>
         
-        <View style={styles.infoContainer}>
-          <Text style={styles.infoText}>
+        <View style={[styles.infoContainer, { backgroundColor: colors.primary + "10" }]}>
+          <Text style={[styles.infoText, { color: colors.text }]}>
             With our AI-powered analysis, you'll get personalized results and insights about your appearance
           </Text>
         </View>
@@ -127,12 +129,12 @@ export default function OnboardingMoreFeaturesScreen() {
       <View style={styles.footer}>
         <Animated.View style={animatedButtonStyle}>
           <TouchableOpacity 
-            style={styles.button}
+            style={[styles.button, { backgroundColor: colors.primary, shadowColor: colors.shadow }]}
             onPress={handleContinue}
             onPressIn={onPressIn}
             onPressOut={onPressOut}
           >
-            <Text style={styles.buttonText}>Continue</Text>
+            <Text style={[styles.buttonText, { color: colors.background }]}>Continue</Text>
             <ArrowRight size={20} color={colors.background} />
           </TouchableOpacity>
         </Animated.View>
@@ -144,7 +146,6 @@ export default function OnboardingMoreFeaturesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   scrollView: {
     flex: 1,
@@ -156,24 +157,21 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "900",
-    color: colors.text,
     marginBottom: 32,
     textAlign: "center",
     lineHeight: 36,
   },
   titleAccent: {
-    color: colors.primary,
+    // Color applied dynamically
   },
   featuresContainer: {
     marginBottom: 24,
   },
   featureCard: {
     flexDirection: "row",
-    backgroundColor: colors.card,
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
-    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -183,7 +181,6 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: colors.primary + "20",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 16,
@@ -194,12 +191,10 @@ const styles = StyleSheet.create({
   featureTitle: {
     fontSize: 16,
     fontWeight: "700",
-    color: colors.text,
     marginBottom: 8,
   },
   featureDescription: {
     fontSize: 14,
-    color: colors.textLight,
     marginBottom: 12,
     lineHeight: 20,
   },
@@ -215,34 +210,28 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 8,
-    backgroundColor: colors.border,
     marginBottom: 4,
   },
   celebrityName: {
     fontSize: 12,
-    color: colors.text,
     fontWeight: "600",
     textAlign: "center",
   },
   roastBubble: {
-    backgroundColor: colors.primary + "20",
     borderRadius: 12,
     padding: 12,
     borderTopLeftRadius: 0,
   },
   roastText: {
     fontSize: 14,
-    color: colors.text,
     fontStyle: "italic",
   },
   infoContainer: {
-    backgroundColor: colors.primary + "10",
     borderRadius: 12,
     padding: 16,
   },
   infoText: {
     fontSize: 14,
-    color: colors.text,
     lineHeight: 20,
     textAlign: "center",
   },
@@ -250,20 +239,17 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   button: {
-    backgroundColor: colors.primary,
     borderRadius: 12,
     paddingVertical: 16,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,
   },
   buttonText: {
-    color: colors.background,
     fontSize: 16,
     fontWeight: "700",
     marginRight: 8,
