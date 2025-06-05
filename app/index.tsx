@@ -160,20 +160,15 @@ export default function HomeScreen() {
         <Animated.View style={[styles.actionsContainer, animatedSlideStyle]}>
           <Animated.View style={animatedPulseStyle}>
             <TouchableOpacity 
-              style={styles.mainButton}
+              style={[styles.mainButton, { backgroundColor: colors.primary }]}
               onPress={handleStartComparison}
               onPressIn={onPressIn}
               onPressOut={onPressOut}
             >
-              <LinearGradient
-                colors={[colors.secondary, colors.primary]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.buttonGradient}
-              >
-                <Camera size={20} color={colors.background} />
-                <Text style={[styles.buttonText, { color: colors.background }]}>Find out if (s)he is out of your league!</Text>
-              </LinearGradient>
+              <View style={styles.buttonContent}>
+                <Camera size={24} color="#FFFFFF" />
+                <Text style={styles.buttonText}>Find out if (s)he is out of your league!</Text>
+              </View>
             </TouchableOpacity>
           </Animated.View>
           
@@ -198,18 +193,11 @@ export default function HomeScreen() {
               end={{ x: 1, y: 1 }}
               style={styles.cardGradientBorder}
             />
-            <Image
-              source={{ uri: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" }}
-              style={styles.cardBackgroundImage}
-            />
-            <LinearGradient
-              colors={["transparent", "rgba(0,0,0,0.8)"]}
-              style={styles.cardOverlay}
-            />
+            <View style={[styles.cardFlatBackground, { backgroundColor: colors.primary + "15" }]} />
             <View style={styles.cardContent}>
-              <Star size={24} color={colors.background} />
-              <Text style={[styles.cardTitle, { color: colors.background }]}>Celebrities</Text>
-              <Text style={[styles.cardDescription, { color: colors.background }]}>
+              <Star size={24} color={colors.primary} />
+              <Text style={[styles.cardTitle, { color: colors.text }]}>Celebrities</Text>
+              <Text style={[styles.cardDescription, { color: colors.textLight }]}>
                 Compare with famous people
               </Text>
             </View>
@@ -233,18 +221,11 @@ export default function HomeScreen() {
               end={{ x: 1, y: 1 }}
               style={styles.cardGradientBorder}
             />
-            <Image
-              source={{ uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" }}
-              style={styles.cardBackgroundImage}
-            />
-            <LinearGradient
-              colors={["transparent", "rgba(0,0,0,0.8)"]}
-              style={styles.cardOverlay}
-            />
+            <View style={[styles.cardFlatBackground, { backgroundColor: colors.secondary + "15" }]} />
             <View style={styles.cardContent}>
-              <MessageCircle size={24} color={colors.background} />
-              <Text style={[styles.cardTitle, { color: colors.background }]}>AI Roast</Text>
-              <Text style={[styles.cardDescription, { color: colors.background }]}>
+              <MessageCircle size={24} color={colors.secondary} />
+              <Text style={[styles.cardTitle, { color: colors.text }]}>AI Roast</Text>
+              <Text style={[styles.cardDescription, { color: colors.textLight }]}>
                 Get roasted by our AI
               </Text>
             </View>
@@ -281,10 +262,10 @@ export default function HomeScreen() {
                   Unlimited comparisons, celebrity matches, and AI beauty analysis
                 </Text>
                 <TouchableOpacity 
-                  style={[styles.premiumButton, { backgroundColor: colors.background }]}
+                  style={[styles.premiumButton, { backgroundColor: "#FFD700" }]}
                   onPress={() => router.push("/subscription")}
                 >
-                  <Text style={[styles.premiumButtonText, { color: colors.primary }]}>Get Premium</Text>
+                  <Text style={[styles.premiumButtonText, { color: "#000000" }]}>Get Premium</Text>
                 </TouchableOpacity>
               </View>
             </LinearGradient>
@@ -402,24 +383,25 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   mainButton: {
-    borderRadius: 12,
-    overflow: "hidden",
+    borderRadius: 16,
+    paddingVertical: 20,
+    paddingHorizontal: 24,
     shadowColor: "rgba(0, 0, 0, 0.1)",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 4,
   },
-  buttonGradient: {
+  buttonContent: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 16,
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "900",
-    marginLeft: 8,
+    marginLeft: 12,
+    color: "#FFFFFF",
   },
   freeTagContainer: {
     position: "absolute",
@@ -459,15 +441,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     padding: 2,
   },
-  cardBackgroundImage: {
-    position: "absolute",
-    top: 2,
-    left: 2,
-    right: 2,
-    bottom: 2,
-    borderRadius: 14,
-  },
-  cardOverlay: {
+  cardFlatBackground: {
     position: "absolute",
     top: 2,
     left: 2,
@@ -565,13 +539,14 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   premiumButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 10,
     alignSelf: "flex-start",
   },
   premiumButtonText: {
     fontWeight: "700",
+    fontSize: 16,
   },
   featuresContainer: {
     marginTop: 32,
