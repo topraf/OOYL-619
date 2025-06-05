@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
     textTransform: "capitalize",
   },
   scoreContainer: {
-    backgroundColor: `${colors.primary}20`,
+    backgroundColor: colors.primary + "20",
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,

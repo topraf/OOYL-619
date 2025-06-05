@@ -211,7 +211,7 @@ export default function HomeScreen() {
           
           <View style={styles.featuresList}>
             <View style={styles.featureItem}>
-              <View style={[styles.featureIcon, { backgroundColor: `${colors.primary}20` }]}>
+              <View style={[styles.featureIcon, { backgroundColor: colors.primary + "20" }]}>
                 <Text style={styles.featureNumber}>1</Text>
               </View>
               <View style={styles.featureContent}>
@@ -221,7 +221,7 @@ export default function HomeScreen() {
             </View>
             
             <View style={styles.featureItem}>
-              <View style={[styles.featureIcon, { backgroundColor: `${colors.primary}20` }]}>
+              <View style={[styles.featureIcon, { backgroundColor: colors.primary + "20" }]}>
                 <Text style={styles.featureNumber}>2</Text>
               </View>
               <View style={styles.featureContent}>
@@ -231,7 +231,7 @@ export default function HomeScreen() {
             </View>
             
             <View style={styles.featureItem}>
-              <View style={[styles.featureIcon, { backgroundColor: `${colors.primary}20` }]}>
+              <View style={[styles.featureIcon, { backgroundColor: colors.primary + "20" }]}>
                 <Text style={styles.featureNumber}>3</Text>
               </View>
               <View style={styles.featureContent}>

@@ -70,14 +70,16 @@ export const useUserStore = create<UserState>()(
         set({ currentTarget: target }),
       
       addComparison: (result: ComparisonResult) => {
-        // Cache the comparison for offline access
-        get().cacheComparison(result);
-        
-        set((state) => ({
-          comparisons: [result, ...state.comparisons],
-          freeComparisonUsed: true,
-          isLoading: false,
-        }));
+        set((state) => {
+          // Cache the comparison for offline access
+          const updatedComparisons = [result, ...state.comparisons];
+          
+          return {
+            comparisons: updatedComparisons,
+            freeComparisonUsed: true,
+            isLoading: false,
+          };
+        });
       },
       
       setLoading: (loading: boolean) =>
@@ -101,8 +103,14 @@ export const useUserStore = create<UserState>()(
       },
       
       cacheComparison: (result: ComparisonResult) => {
-        // This would normally cache to local storage or similar
-        // For now, we just add to the comparisons array
+        // This function is now handled within addComparison
+        // Keeping it for backward compatibility
+        const state = get();
+        if (!state.comparisons.find(c => c.id === result.id)) {
+          set((prevState) => ({
+            comparisons: [result, ...prevState.comparisons.slice(0, 9)] // Keep only last 10
+          }));
+        }
       },
       
       getColors: () => {
