@@ -7,7 +7,6 @@ import * as Haptics from "expo-haptics";
 import { Platform as RNPlatform } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
-import { colors } from "@/constants/colors";
 import { useUserStore } from "@/store/user-store";
 import { useComparisonStore } from "@/store/comparison-store";
 import LeagueGauge from "@/components/LeagueGauge";
@@ -25,8 +24,9 @@ type FeatureStatus = "High" | "Mid" | "Low";
 
 export default function ResultsScreen() {
   const router = useRouter();
-  const { comparisons, isLoading, isPremium, clearHistory, isOffline, getCachedComparisons } = useUserStore();
+  const { comparisons, isLoading, isPremium, clearHistory, getColors, isOffline, getCachedComparisons } = useUserStore();
   const { history, clearHistory: clearComparisonHistory } = useComparisonStore();
+  const colors = getColors();
   const [showResult, setShowResult] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
@@ -433,12 +433,12 @@ export default function ResultsScreen() {
             
             <Animated.View style={animatedCardStyle}>
               <LinearGradient
-                colors={colors.gradientPrimary}
+                colors={[colors.secondary, colors.primary]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.resultCard}
               >
-                <Text style={[styles.resultTitle, { color: colors.text }]}>
+                <Text style={[styles.resultTitle, { color: colors.background }]}>
                   {getLeagueText()}
                 </Text>
                 
@@ -446,25 +446,25 @@ export default function ResultsScreen() {
                   <View style={styles.imageColumn}>
                     <ImagePreview
                       uri={latestResult.user.frontImage || ""}
-                      style={[styles.circleImage, { borderColor: colors.text }]}
+                      style={[styles.circleImage, { borderColor: colors.background }]}
                     />
-                    <Text style={[styles.imageLabel, { color: colors.text }]}>You</Text>
-                    <Text style={[styles.scoreText, { color: colors.text }]}>{getOverallScore()}/10</Text>
+                    <Text style={[styles.imageLabel, { color: colors.background }]}>You</Text>
+                    <Text style={[styles.scoreText, { color: colors.background }]}>{getOverallScore()}/10</Text>
                   </View>
                   
                   <View style={styles.vsContainer}>
-                    <Text style={[styles.vsText, { color: colors.text }]}>VS</Text>
+                    <Text style={[styles.vsText, { color: colors.background }]}>VS</Text>
                   </View>
                   
                   <View style={styles.imageColumn}>
                     <ImagePreview
                       uri={latestResult.target.image}
-                      style={[styles.circleImage, { borderColor: colors.text }]}
+                      style={[styles.circleImage, { borderColor: colors.background }]}
                     />
-                    <Text style={[styles.imageLabel, { color: colors.text }]}>
+                    <Text style={[styles.imageLabel, { color: colors.background }]}>
                       {latestResult.target.name || "Them"}
                     </Text>
-                    <Text style={[styles.scoreText, { color: colors.text }]}>
+                    <Text style={[styles.scoreText, { color: colors.background }]}>
                       {Math.round((latestResult.target.beautyScore || 0) * 10)}/10
                     </Text>
                   </View>
@@ -561,7 +561,7 @@ export default function ResultsScreen() {
                 contentContainerStyle={styles.actionButtonsRow}
               >
                 <TouchableOpacity 
-                  style={[styles.actionButtonCard, { backgroundColor: colors.primary + "20" }]}
+                  style={[styles.actionButtonCard, { backgroundColor: colors.primary + "10" }]}
                   onPress={handleNewComparison}
                 >
                   <View style={[styles.actionIconCircle, { backgroundColor: colors.background }]}>
@@ -571,7 +571,7 @@ export default function ResultsScreen() {
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
-                  style={[styles.actionButtonCard, { backgroundColor: colors.primary + "20" }]}
+                  style={[styles.actionButtonCard, { backgroundColor: colors.primary + "10" }]}
                   onPress={() => router.push("/celebrities")}
                 >
                   <View style={[styles.actionIconCircle, { backgroundColor: colors.background }]}>
@@ -582,7 +582,7 @@ export default function ResultsScreen() {
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
-                  style={[styles.actionButtonCard, { backgroundColor: colors.primary + "20" }]}
+                  style={[styles.actionButtonCard, { backgroundColor: colors.primary + "10" }]}
                   onPress={() => router.push("/roastmaster")}
                 >
                   <View style={[styles.actionIconCircle, { backgroundColor: colors.background }]}>

@@ -28,10 +28,9 @@ export interface ComparisonResult {
   target: Target;
   leagueStatus: LeagueStatus;
   feedback: string;
-  // Compatibility properties
-  userImage: string;
-  celebrity: Celebrity;
-  score: number;
+  userImage: string; // User's image for compatibility
+  celebrity: Celebrity; // Celebrity data for compatibility
+  score: number; // Overall score for compatibility
 }
 
 export interface Celebrity {

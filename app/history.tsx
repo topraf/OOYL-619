@@ -1,12 +1,10 @@
 import React from "react";
-import { StyleSheet, View, Text, TouchableOpacity, FlatList, Platform } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { Trash2, ArrowLeft } from "lucide-react-native";
-import * as Haptics from "expo-haptics";
+import { Trash2 } from "lucide-react-native";
 import { colors } from "@/constants/colors";
 import { useUserStore } from "@/store/user-store";
-import { useComparisonStore } from "@/store/comparison-store";
 import ComparisonCard from "@/components/ComparisonCard";
 import EmptyState from "@/components/EmptyState";
 import BottomNavigation from "@/components/BottomNavigation";
@@ -14,48 +12,22 @@ import BottomNavigation from "@/components/BottomNavigation";
 export default function HistoryScreen() {
   const router = useRouter();
   const { comparisons, clearHistory } = useUserStore();
-  const { history, clearHistory: clearComparisonHistory } = useComparisonStore();
-  
-  // Use comparison store history if available, otherwise fall back to user store
-  const displayComparisons = history.length > 0 ? history : comparisons;
 
   const handleClearHistory = () => {
-    if (Platform.OS !== "web") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    }
-    
-    // Clear both stores
-    if (displayComparisons.length > 0) {
+    // Simple confirmation
+    if (comparisons.length > 0) {
       clearHistory();
-      clearComparisonHistory();
     }
   };
 
   const handleComparisonPress = (comparisonId: string) => {
-    if (Platform.OS !== "web") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
     // Navigate to results page
     router.push("/results");
   };
 
-  if (displayComparisons.length === 0) {
+  if (comparisons.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton} 
-            onPress={() => router.back()}
-          >
-            <ArrowLeft size={24} color={colors.text} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>
-            Your{" "}
-            <Text style={styles.headerTitleAccent}>History</Text>
-          </Text>
-          <View style={styles.placeholder} />
-        </View>
-        
         <EmptyState
           title="No History Yet"
           message="Your comparisons will appear here after you complete them."
@@ -66,26 +38,20 @@ export default function HistoryScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
+    <SafeAreaView style={styles.container} edges={["bottom"]}>
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton} 
-          onPress={() => router.back()}
-        >
-          <ArrowLeft size={24} color={colors.text} />
-        </TouchableOpacity>
         <Text style={styles.headerTitle}>
           Your{" "}
-          <Text style={styles.headerTitleAccent}>History</Text>
+          <Text style={styles.headerTitleAccent}>Comparisons</Text>
         </Text>
         <TouchableOpacity style={styles.clearButton} onPress={handleClearHistory}>
           <Trash2 size={16} color={colors.error} />
-          <Text style={styles.clearButtonText}>Clear</Text>
+          <Text style={styles.clearButtonText}>Clear All</Text>
         </TouchableOpacity>
       </View>
       
       <FlatList
-        data={displayComparisons}
+        data={comparisons}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity 
@@ -118,14 +84,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.card,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   headerTitle: {
     fontSize: 20,
     fontWeight: "900",
@@ -134,22 +92,14 @@ const styles = StyleSheet.create({
   headerTitleAccent: {
     color: colors.primary,
   },
-  placeholder: {
-    width: 40,
-  },
   clearButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.card,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-    gap: 4,
   },
   clearButtonText: {
+    marginLeft: 4,
     fontSize: 14,
     color: colors.error,
-    fontWeight: "600",
   },
   listContent: {
     padding: 16,

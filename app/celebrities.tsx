@@ -1,36 +1,26 @@
-import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, ScrollView, FlatList, TextInput } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, View, Text, TouchableOpacity, FlatList, Dimensions, TextInput, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { Search, ArrowLeft } from "lucide-react-native";
+import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
 import { Platform } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { Image } from "expo-image";
-import { colors } from "@/constants/colors";
+import { Search, X, ArrowLeft, Plus } from "lucide-react-native";
 import { useUserStore } from "@/store/user-store";
-import { celebrities } from "@/mocks/celebrities";
-import { Celebrity } from "@/types";
-import PaywallModal from "@/components/PaywallModal";
+import { celebrities, celebrityCategories } from "@/mocks/celebrities";
 import BottomNavigation from "@/components/BottomNavigation";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 
-const categories = [
-  { id: "all", name: "All", emoji: "🌟" },
-  { id: "actors", name: "Actors", emoji: "🎬" },
-  { id: "music", name: "Music", emoji: "🎵" },
-  { id: "sports", name: "Sports", emoji: "⚽" },
-  { id: "politics", name: "Politics", emoji: "🏛️" },
-  { id: "models", name: "Models", emoji: "📸" },
-  { id: "influencers", name: "Influencers", emoji: "📱" },
-];
+const { width } = Dimensions.get("window");
+const numColumns = 2;
+const itemWidth = (width - 48) / numColumns;
 
 export default function CelebritiesScreen() {
   const router = useRouter();
-  const { setCurrentTarget, freeComparisonUsed, isPremium } = useUserStore();
+  const { setTargetImage, getColors } = useUserStore();
+  const colors = getColors();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [showPaywall, setShowPaywall] = useState(false);
   
   const buttonScale = useSharedValue(1);
   const animatedButtonStyle = useAnimatedStyle(() => {
@@ -45,34 +35,22 @@ export default function CelebritiesScreen() {
     return matchesSearch && matchesCategory;
   });
   
-  const handleCelebritySelect = (celebrity: Celebrity) => {
+  const handleSelectCelebrity = (id: string, image: string, name: string) => {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     
-    if (freeComparisonUsed && !isPremium) {
-      setShowPaywall(true);
-      return;
-    }
-    
-    setCurrentTarget({
-      id: celebrity.id,
-      name: celebrity.name,
-      image: celebrity.image,
-      beautyScore: celebrity.beautyScore,
-      isCelebrity: true,
-    });
-    
-    router.push("/comparison-loading");
+    setTargetImage(image, name, true);
+    router.push("/user-photo");
   };
-  
+
   const handleCategorySelect = (categoryId: string) => {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     setSelectedCategory(categoryId);
   };
-  
+
   const onPressIn = () => {
     buttonScale.value = withSpring(0.95);
   };
@@ -81,110 +59,121 @@ export default function CelebritiesScreen() {
     buttonScale.value = withSpring(1);
   };
   
-  const renderCelebrity = ({ item }: { item: Celebrity }) => (
-    <Animated.View style={animatedButtonStyle}>
-      <TouchableOpacity 
-        style={styles.celebrityCard}
-        onPress={() => handleCelebritySelect(item)}
-        onPressIn={onPressIn}
-        onPressOut={onPressOut}
-      >
-        <LinearGradient
-          colors={colors.gradientCard}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.celebrityGradient}
-        >
-          <Image
-            source={{ uri: item.image }}
-            style={styles.celebrityImage}
-          />
-          <View style={styles.celebrityInfo}>
-            <Text style={styles.celebrityName}>{item.name}</Text>
-            <Text style={styles.celebrityCategory}>{item.category}</Text>
-            <View style={styles.scoreContainer}>
-              <Text style={styles.scoreText}>{Math.round(item.beautyScore * 10)}/10</Text>
-            </View>
-          </View>
-        </LinearGradient>
-      </TouchableOpacity>
-    </Animated.View>
-  );
-  
-  const renderCategory = ({ item }: { item: typeof categories[0] }) => (
-    <TouchableOpacity 
-      style={[
-        styles.categoryButton,
-        selectedCategory === item.id && styles.categoryButtonActive
-      ]}
-      onPress={() => handleCategorySelect(item.id)}
-    >
-      <Text style={styles.categoryEmoji}>{item.emoji}</Text>
-      <Text style={[
-        styles.categoryText,
-        selectedCategory === item.id && styles.categoryTextActive
-      ]}>
-        {item.name}
-      </Text>
-    </TouchableOpacity>
-  );
+  const clearSearch = () => {
+    setSearchQuery("");
+  };
   
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top"]}>
       <View style={styles.header}>
         <TouchableOpacity 
-          style={styles.backButton} 
+          style={[styles.backButton, { backgroundColor: colors.card }]} 
           onPress={() => router.back()}
         >
-          <ArrowLeft size={24} color={colors.text} />
+          <ArrowLeft size={20} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.title}>
-          Choose{" "}
-          <Text style={styles.titleAccent}>Celebrity</Text>
-        </Text>
-        <View style={styles.placeholder} />
+        <View style={styles.headerContent}>
+          <Text style={[styles.title, { color: colors.text }]}>
+            Choose a{" "}
+            <Text style={[styles.titleAccent, { color: colors.primary }]}>Celebrity</Text>
+          </Text>
+          <Text style={[styles.subtitle, { color: colors.textLight }]}>
+            Compare yourself with these famous personalities
+          </Text>
+        </View>
       </View>
       
-      <View style={styles.searchContainer}>
-        <View style={styles.searchInputContainer}>
-          <Search size={20} color={colors.textLight} />
+      <View style={[styles.searchContainer, { borderBottomColor: colors.border }]}>
+        <View style={[styles.searchInputContainer, { backgroundColor: colors.card }]}>
+          <Search size={20} color={colors.textLight} style={styles.searchIcon} />
           <TextInput
-            style={styles.searchInput}
+            style={[styles.searchInput, { color: colors.text }]}
             placeholder="Search celebrities..."
             placeholderTextColor={colors.textLight}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={clearSearch}>
+              <X size={20} color={colors.textLight} />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
       
-      <View style={styles.categoriesContainer}>
-        <FlatList
-          data={categories}
-          renderItem={renderCategory}
-          keyExtractor={(item) => item.id}
-          horizontal
+      <View style={[styles.categoriesContainer, { borderBottomColor: colors.border }]}>
+        <ScrollView 
+          horizontal 
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoriesList}
-        />
+          contentContainerStyle={styles.categoriesContent}
+        >
+          {celebrityCategories.map((category) => (
+            <TouchableOpacity
+              key={category.id}
+              style={[
+                styles.categoryButton,
+                {
+                  backgroundColor: selectedCategory === category.id ? colors.primary : colors.card,
+                }
+              ]}
+              onPress={() => handleCategorySelect(category.id)}
+            >
+              <Text style={styles.categoryEmoji}>{category.emoji}</Text>
+              <Text
+                style={[
+                  styles.categoryText,
+                  {
+                    color: selectedCategory === category.id ? colors.background : colors.text,
+                    fontWeight: selectedCategory === category.id ? "700" : "500",
+                  }
+                ]}
+              >
+                {category.name}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
       </View>
       
       <FlatList
         data={filteredCelebrities}
-        renderItem={renderCelebrity}
         keyExtractor={(item) => item.id}
-        numColumns={2}
-        contentContainerStyle={styles.celebritiesList}
-        showsVerticalScrollIndicator={false}
-        columnWrapperStyle={styles.row}
+        numColumns={numColumns}
+        contentContainerStyle={styles.listContent}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={[styles.emptyText, { color: colors.textLight }]}>No celebrities found</Text>
+          </View>
+        }
+        renderItem={({ item }) => (
+          <Animated.View style={animatedButtonStyle}>
+            <TouchableOpacity
+              style={[styles.celebrityItem, { backgroundColor: colors.card, shadowColor: colors.shadow }]}
+              onPress={() => handleSelectCelebrity(item.id, item.image, item.name)}
+              onPressIn={onPressIn}
+              onPressOut={onPressOut}
+            >
+              <View style={[styles.plusIconContainer, { backgroundColor: colors.primary }]}>
+                <Plus size={16} color={colors.background} />
+              </View>
+              <Image
+                source={{ uri: item.image }}
+                style={[styles.celebrityImage, { backgroundColor: colors.border }]}
+                contentFit="cover"
+              />
+              <View style={styles.celebrityInfo}>
+                <Text style={[styles.celebrityName, { color: colors.text }]}>{item.name}</Text>
+                <View style={styles.scoreContainer}>
+                  <Text style={[styles.scoreText, { color: colors.primary }]}>{Math.round(item.beautyScore * 10)}/10</Text>
+                  <Text style={[styles.scoreLabel, { color: colors.textLight }]}>Beauty Score</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          </Animated.View>
+        )}
       />
       
       <BottomNavigation currentRoute="celebrities" />
-      
-      <PaywallModal
-        visible={showPaywall}
-        onClose={() => setShowPaywall(false)}
-      />
     </SafeAreaView>
   );
 }
@@ -192,136 +181,134 @@ export default function CelebritiesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    padding: 16,
+    borderBottomWidth: 1,
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.card,
     justifyContent: "center",
     alignItems: "center",
+    marginRight: 12,
+  },
+  headerContent: {
+    flex: 1,
   },
   title: {
     fontSize: 24,
-    fontWeight: "900",
-    color: colors.text,
+    fontWeight: "800",
+    marginBottom: 4,
   },
   titleAccent: {
-    color: colors.primary,
+    // Color applied dynamically
   },
-  placeholder: {
-    width: 40,
+  subtitle: {
+    fontSize: 14,
+    lineHeight: 20,
   },
   searchContainer: {
     paddingHorizontal: 16,
-    marginBottom: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
   },
   searchInputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.card,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 12,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+  },
+  searchIcon: {
+    marginRight: 8,
   },
   searchInput: {
     flex: 1,
+    height: 40,
     fontSize: 16,
-    color: colors.text,
   },
   categoriesContainer: {
-    marginBottom: 16,
+    borderBottomWidth: 1,
   },
-  categoriesList: {
+  categoriesContent: {
     paddingHorizontal: 16,
+    paddingVertical: 12,
     gap: 8,
   },
   categoryButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.card,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
     marginRight: 8,
-    gap: 6,
-  },
-  categoryButtonActive: {
-    backgroundColor: colors.primary,
   },
   categoryEmoji: {
     fontSize: 16,
+    marginRight: 6,
   },
   categoryText: {
     fontSize: 14,
-    fontWeight: "600",
-    color: colors.textLight,
   },
-  categoryTextActive: {
-    color: colors.background,
+  listContent: {
+    padding: 16,
+    paddingBottom: 80, // Space for bottom navigation
   },
-  celebritiesList: {
-    paddingHorizontal: 16,
-    paddingBottom: 120,
-  },
-  row: {
-    justifyContent: "space-between",
-  },
-  celebrityCard: {
-    width: "48%",
+  celebrityItem: {
+    width: itemWidth,
     marginBottom: 16,
-    borderRadius: 16,
+    marginHorizontal: 8,
+    borderRadius: 12,
     overflow: "hidden",
-    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 4,
+    elevation: 2,
+    position: "relative",
   },
-  celebrityGradient: {
-    padding: 12,
+  plusIconContainer: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
   },
   celebrityImage: {
     width: "100%",
-    height: 120,
-    borderRadius: 12,
-    marginBottom: 8,
+    height: itemWidth * 1.2,
   },
   celebrityInfo: {
-    alignItems: "center",
+    padding: 12,
   },
   celebrityName: {
     fontSize: 14,
-    fontWeight: "700",
-    color: colors.text,
-    textAlign: "center",
-    marginBottom: 4,
-  },
-  celebrityCategory: {
-    fontSize: 12,
-    color: colors.textLight,
-    textAlign: "center",
-    marginBottom: 6,
-    textTransform: "capitalize",
+    fontWeight: "600",
+    marginBottom: 8,
   },
   scoreContainer: {
-    backgroundColor: colors.primary + "20",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "baseline",
   },
   scoreText: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginRight: 4,
+  },
+  scoreLabel: {
     fontSize: 12,
-    fontWeight: "600",
-    color: colors.primary,
+  },
+  emptyContainer: {
+    padding: 24,
+    alignItems: "center",
+  },
+  emptyText: {
+    fontSize: 16,
   },
 });
