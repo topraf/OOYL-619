@@ -387,7 +387,7 @@ export default function RoastmasterScreen() {
               </TouchableOpacity>
             </View>
           ) : (
-            <View style={[styles.placeholderContainer, { backgroundColor: colors.card }]}>
+            <View style={[styles.placeholderContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <Text style={[styles.placeholderText, { color: colors.textLight }]}>
                 Select a photo to get roasted
               </Text>
@@ -553,7 +553,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: 2,
     borderStyle: "dashed",
-    borderColor: "rgba(0,0,0,0.1)",
   },
   placeholderText: {
     fontSize: 16,

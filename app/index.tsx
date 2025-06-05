@@ -189,8 +189,8 @@ export default function HomeScreen() {
             style={[styles.quickActionCard, { backgroundColor: colors.card }]}
             onPress={handleCelebrities}
           >
-            <View style={[styles.plusIconContainer, { backgroundColor: colors.primary }]}>
-              <Plus size={20} color={colors.background} />
+            <View style={[styles.plusIconContainer, { backgroundColor: colors.background }]}>
+              <Plus size={20} color={colors.primary} />
             </View>
             <LinearGradient
               colors={[colors.secondary, colors.primary, "#9C27B0"]}
@@ -198,10 +198,18 @@ export default function HomeScreen() {
               end={{ x: 1, y: 1 }}
               style={styles.cardGradientBorder}
             />
+            <Image
+              source={{ uri: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" }}
+              style={styles.cardBackgroundImage}
+            />
+            <LinearGradient
+              colors={["transparent", "rgba(0,0,0,0.8)"]}
+              style={styles.cardOverlay}
+            />
             <View style={styles.cardContent}>
-              <Star size={24} color={colors.primary} />
-              <Text style={[styles.cardTitle, { color: colors.text }]}>Celebrities</Text>
-              <Text style={[styles.cardDescription, { color: colors.textLight }]}>
+              <Star size={24} color={colors.background} />
+              <Text style={[styles.cardTitle, { color: colors.background }]}>Celebrities</Text>
+              <Text style={[styles.cardDescription, { color: colors.background }]}>
                 Compare with famous people
               </Text>
             </View>
@@ -216,8 +224,8 @@ export default function HomeScreen() {
             style={[styles.quickActionCard, { backgroundColor: colors.card }]}
             onPress={handleAIRoast}
           >
-            <View style={[styles.plusIconContainer, { backgroundColor: colors.primary }]}>
-              <Plus size={20} color={colors.background} />
+            <View style={[styles.plusIconContainer, { backgroundColor: colors.background }]}>
+              <Plus size={20} color={colors.primary} />
             </View>
             <LinearGradient
               colors={[colors.primary, "#9C27B0", colors.secondary]}
@@ -225,10 +233,18 @@ export default function HomeScreen() {
               end={{ x: 1, y: 1 }}
               style={styles.cardGradientBorder}
             />
+            <Image
+              source={{ uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" }}
+              style={styles.cardBackgroundImage}
+            />
+            <LinearGradient
+              colors={["transparent", "rgba(0,0,0,0.8)"]}
+              style={styles.cardOverlay}
+            />
             <View style={styles.cardContent}>
-              <MessageCircle size={24} color={colors.primary} />
-              <Text style={[styles.cardTitle, { color: colors.text }]}>AI Roast</Text>
-              <Text style={[styles.cardDescription, { color: colors.textLight }]}>
+              <MessageCircle size={24} color={colors.background} />
+              <Text style={[styles.cardTitle, { color: colors.background }]}>AI Roast</Text>
+              <Text style={[styles.cardDescription, { color: colors.background }]}>
                 Get roasted by our AI
               </Text>
             </View>
@@ -239,6 +255,41 @@ export default function HomeScreen() {
             )}
           </TouchableOpacity>
         </Animated.View>
+        
+        {!isPremium && (
+          <Animated.View style={[styles.premiumContainer, animatedSlideStyle]}>
+            <LinearGradient
+              colors={[colors.secondary, colors.primary]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.premiumBanner}
+            >
+              <Image
+                source={{ uri: "https://images.unsplash.com/photo-1494790108755-2616c9c0e8e3?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" }}
+                style={styles.premiumBackgroundImage}
+              />
+              <LinearGradient
+                colors={["rgba(0,0,0,0.3)", "rgba(0,0,0,0.7)"]}
+                style={styles.premiumOverlay}
+              />
+              <View style={styles.premiumContent}>
+                <Text style={[styles.premiumTitle, { color: colors.background }]}>
+                  Upgrade to{" "}
+                  <Text style={styles.premiumTitleAccent}>Premium</Text>
+                </Text>
+                <Text style={[styles.premiumDescription, { color: colors.background }]}>
+                  Unlimited comparisons, celebrity matches, and AI beauty analysis
+                </Text>
+                <TouchableOpacity 
+                  style={[styles.premiumButton, { backgroundColor: colors.background }]}
+                  onPress={() => router.push("/subscription")}
+                >
+                  <Text style={[styles.premiumButtonText, { color: colors.primary }]}>Get Premium</Text>
+                </TouchableOpacity>
+              </View>
+            </LinearGradient>
+          </Animated.View>
+        )}
         
         <Animated.View style={[styles.featuresContainer, animatedSlideStyle]}>
           <Text style={[styles.featuresTitle, { color: colors.text }]}>
@@ -282,31 +333,6 @@ export default function HomeScreen() {
             </View>
           </Animated.View>
         </Animated.View>
-        
-        {!isPremium && (
-          <Animated.View style={[styles.premiumContainer, animatedSlideStyle]}>
-            <LinearGradient
-              colors={[colors.secondary, colors.primary]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.premiumBanner}
-            >
-              <Text style={[styles.premiumTitle, { color: colors.background }]}>
-                Upgrade to{" "}
-                <Text style={styles.premiumTitleAccent}>Premium</Text>
-              </Text>
-              <Text style={[styles.premiumDescription, { color: colors.background }]}>
-                Unlimited comparisons, celebrity matches, and AI beauty analysis
-              </Text>
-              <TouchableOpacity 
-                style={[styles.premiumButton, { backgroundColor: colors.background }]}
-                onPress={() => router.push("/subscription")}
-              >
-                <Text style={[styles.premiumButtonText, { color: colors.primary }]}>Get Premium</Text>
-              </TouchableOpacity>
-            </LinearGradient>
-          </Animated.View>
-        )}
         
         <View style={styles.disclaimerContainer}>
           <Text style={[styles.disclaimer, { color: colors.textLight }]}>
@@ -430,13 +456,31 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: 4,
+    bottom: 0,
+    padding: 2,
+  },
+  cardBackgroundImage: {
+    position: "absolute",
+    top: 2,
+    left: 2,
+    right: 2,
+    bottom: 2,
+    borderRadius: 14,
+  },
+  cardOverlay: {
+    position: "absolute",
+    top: 2,
+    left: 2,
+    right: 2,
+    bottom: 2,
+    borderRadius: 14,
   },
   cardContent: {
     padding: 16,
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 1,
   },
   cardTitle: {
     fontSize: 18,
@@ -469,6 +513,65 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     zIndex: 2,
+  },
+  premiumContainer: {
+    marginTop: 24,
+    paddingHorizontal: 16,
+  },
+  premiumBanner: {
+    borderRadius: 16,
+    height: 120,
+    overflow: "hidden",
+    position: "relative",
+    shadowColor: "rgba(0, 0, 0, 0.1)",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  premiumBackgroundImage: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  premiumOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  premiumContent: {
+    padding: 20,
+    flex: 1,
+    justifyContent: "center",
+    zIndex: 1,
+  },
+  premiumTitle: {
+    fontSize: 20,
+    fontWeight: "900",
+    marginBottom: 8,
+  },
+  premiumTitleAccent: {
+    textShadowColor: "rgba(255,255,255,0.3)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  premiumDescription: {
+    fontSize: 14,
+    opacity: 0.9,
+    marginBottom: 16,
+  },
+  premiumButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignSelf: "flex-start",
+  },
+  premiumButtonText: {
+    fontWeight: "700",
   },
   featuresContainer: {
     marginTop: 32,
@@ -516,43 +619,6 @@ const styles = StyleSheet.create({
   featureDescription: {
     fontSize: 14,
     lineHeight: 20,
-  },
-  premiumContainer: {
-    marginTop: 24,
-    paddingHorizontal: 16,
-  },
-  premiumBanner: {
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: "rgba(0, 0, 0, 0.1)",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  premiumTitle: {
-    fontSize: 24,
-    fontWeight: "900",
-    marginBottom: 8,
-  },
-  premiumTitleAccent: {
-    textShadowColor: "rgba(255,255,255,0.3)",
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
-  premiumDescription: {
-    fontSize: 14,
-    opacity: 0.9,
-    marginBottom: 16,
-  },
-  premiumButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignSelf: "flex-start",
-  },
-  premiumButtonText: {
-    fontWeight: "700",
   },
   disclaimerContainer: {
     marginTop: 32,

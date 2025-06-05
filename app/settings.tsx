@@ -152,6 +152,22 @@ export default function SettingsScreen() {
           </TouchableOpacity>
           
           <TouchableOpacity 
+            style={[styles.debugItem, { borderBottomColor: colors.border }]}
+            onPress={() => handleGoToOnboardingStep(3, "/onboarding-notifications")}
+          >
+            <Play size={20} color={colors.primary} />
+            <Text style={[styles.debugLabel, { color: colors.text }]}>Notifications Screen</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[styles.debugItem, { borderBottomColor: colors.border }]}
+            onPress={() => handleGoToOnboardingStep(4, "/onboarding-subscription")}
+          >
+            <Play size={20} color={colors.primary} />
+            <Text style={[styles.debugLabel, { color: colors.text }]}>Subscription Screen</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
             style={[styles.demoButton, { backgroundColor: colors.primary + "20" }]}
             onPress={() => setPremiumStatus(!isPremium)}
           >

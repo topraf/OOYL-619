@@ -15,12 +15,24 @@ const { width } = Dimensions.get("window");
 const numColumns = 2;
 const itemWidth = (width - 48) / numColumns;
 
+// Additional tag filters
+const tagFilters = [
+  { id: "all", name: "All", emoji: "🌟" },
+  { id: "actors", name: "Actors", emoji: "🎬" },
+  { id: "music", name: "Music", emoji: "🎵" },
+  { id: "sports", name: "Sports", emoji: "⚽" },
+  { id: "models", name: "Models", emoji: "📸" },
+  { id: "politics", name: "Politics", emoji: "🏛️" },
+  { id: "influencers", name: "Influencers", emoji: "📱" },
+];
+
 export default function CelebritiesScreen() {
   const router = useRouter();
   const { setTargetImage, getColors } = useUserStore();
   const colors = getColors();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedTag, setSelectedTag] = useState("all");
   
   const buttonScale = useSharedValue(1);
   const animatedButtonStyle = useAnimatedStyle(() => {
@@ -32,7 +44,35 @@ export default function CelebritiesScreen() {
   const filteredCelebrities = celebrities.filter(celebrity => {
     const matchesSearch = celebrity.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === "all" || celebrity.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    
+    // Map celebrity categories to tag filters
+    let matchesTag = true;
+    if (selectedTag !== "all") {
+      switch (selectedTag) {
+        case "actors":
+          matchesTag = celebrity.category === "actors" || celebrity.category === "actresses";
+          break;
+        case "music":
+          matchesTag = celebrity.category === "musicians" || celebrity.category === "singers";
+          break;
+        case "sports":
+          matchesTag = celebrity.category === "athletes";
+          break;
+        case "models":
+          matchesTag = celebrity.category === "models";
+          break;
+        case "politics":
+          matchesTag = celebrity.category === "politicians";
+          break;
+        case "influencers":
+          matchesTag = celebrity.category === "influencers";
+          break;
+        default:
+          matchesTag = true;
+      }
+    }
+    
+    return matchesSearch && matchesCategory && matchesTag;
   });
   
   const handleSelectCelebrity = (id: string, image: string, name: string) => {
@@ -49,6 +89,13 @@ export default function CelebritiesScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     setSelectedCategory(categoryId);
+  };
+
+  const handleTagSelect = (tagId: string) => {
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    setSelectedTag(tagId);
   };
 
   const onPressIn = () => {
@@ -101,6 +148,40 @@ export default function CelebritiesScreen() {
         </View>
       </View>
       
+      <View style={[styles.filtersContainer, { borderBottomColor: colors.border }]}>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.filtersContent}
+        >
+          {tagFilters.map((tag) => (
+            <TouchableOpacity
+              key={tag.id}
+              style={[
+                styles.filterButton,
+                {
+                  backgroundColor: selectedTag === tag.id ? colors.primary : colors.card,
+                }
+              ]}
+              onPress={() => handleTagSelect(tag.id)}
+            >
+              <Text style={styles.filterEmoji}>{tag.emoji}</Text>
+              <Text
+                style={[
+                  styles.filterText,
+                  {
+                    color: selectedTag === tag.id ? colors.background : colors.text,
+                    fontWeight: selectedTag === tag.id ? "700" : "500",
+                  }
+                ]}
+              >
+                {tag.name}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+      
       <View style={[styles.categoriesContainer, { borderBottomColor: colors.border }]}>
         <ScrollView 
           horizontal 
@@ -113,7 +194,7 @@ export default function CelebritiesScreen() {
               style={[
                 styles.categoryButton,
                 {
-                  backgroundColor: selectedCategory === category.id ? colors.primary : colors.card,
+                  backgroundColor: selectedCategory === category.id ? colors.secondary : colors.card,
                 }
               ]}
               onPress={() => handleCategorySelect(category.id)}
@@ -229,6 +310,29 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 40,
     fontSize: 16,
+  },
+  filtersContainer: {
+    borderBottomWidth: 1,
+  },
+  filtersContent: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 8,
+  },
+  filterButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginRight: 8,
+  },
+  filterEmoji: {
+    fontSize: 16,
+    marginRight: 6,
+  },
+  filterText: {
+    fontSize: 14,
   },
   categoriesContainer: {
     borderBottomWidth: 1,

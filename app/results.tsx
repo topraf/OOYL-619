@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Platform, Dimensions, Share, FlatList, Linking, Image as RNImage } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { Home, Camera, MessageCircle, Star, History, Wifi, WifiOff } from "lucide-react-native";
+import { Home, Camera, MessageCircle, Star, History, Wifi, WifiOff, Share2 } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { Platform as RNPlatform } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -158,6 +158,22 @@ export default function ResultsScreen() {
       const message = `I just found out if someone is in my league using League Checker! My score: ${getOverallScore()}/10`;
       const webUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}`;
       window.open(webUrl, '_blank');
+    }
+  };
+
+  const handleShareGeneral = async () => {
+    if (RNPlatform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    
+    try {
+      const message = `I just found out if someone is in my league using League Checker! My score: ${getOverallScore()}/10`;
+      await Share.share({
+        message: message,
+        title: "League Checker Results"
+      });
+    } catch (error) {
+      console.error("Error sharing:", error);
     }
   };
 
@@ -512,39 +528,37 @@ export default function ResultsScreen() {
                   style={[styles.socialButton, { backgroundColor: "#E4405F" }]}
                   onPress={handleShareInstagram}
                 >
-                  <View style={styles.socialIconContainer}>
-                    <RNImage 
-                      source={{ uri: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Instagram_logo_2016.svg/132px-Instagram_logo_2016.svg.png" }} 
-                      style={styles.socialIcon} 
-                    />
-                  </View>
-                  <Text style={styles.socialButtonText}>Instagram</Text>
+                  <RNImage 
+                    source={{ uri: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Instagram_logo_2016.svg/132px-Instagram_logo_2016.svg.png" }} 
+                    style={styles.socialIcon} 
+                  />
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
                   style={[styles.socialButton, { backgroundColor: "#FFFC00" }]}
                   onPress={handleShareSnapchat}
                 >
-                  <View style={styles.socialIconContainer}>
-                    <RNImage 
-                      source={{ uri: "https://upload.wikimedia.org/wikipedia/en/thumb/c/c4/Snapchat_logo.svg/320px-Snapchat_logo.svg.png" }} 
-                      style={styles.socialIcon} 
-                    />
-                  </View>
-                  <Text style={[styles.socialButtonText, { color: "#000" }]}>Snapchat</Text>
+                  <RNImage 
+                    source={{ uri: "https://upload.wikimedia.org/wikipedia/en/thumb/c/c4/Snapchat_logo.svg/320px-Snapchat_logo.svg.png" }} 
+                    style={styles.socialIcon} 
+                  />
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
                   style={[styles.socialButton, { backgroundColor: "#000" }]}
                   onPress={handleShareX}
                 >
-                  <View style={styles.socialIconContainer}>
-                    <RNImage 
-                      source={{ uri: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/X_logo_2023_%28white%29.png/320px-X_logo_2023_%28white%29.png" }} 
-                      style={styles.socialIcon} 
-                    />
-                  </View>
-                  <Text style={styles.socialButtonText}>X</Text>
+                  <RNImage 
+                    source={{ uri: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/X_logo_2023_%28white%29.png/320px-X_logo_2023_%28white%29.png" }} 
+                    style={styles.socialIcon} 
+                  />
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={[styles.socialButton, { backgroundColor: colors.primary }]}
+                  onPress={handleShareGeneral}
+                >
+                  <Share2 size={20} color={colors.background} />
                 </TouchableOpacity>
               </View>
             </Animated.View>
@@ -785,34 +799,21 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   socialButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    flexDirection: "row",
-    alignItems: "center",
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: "center",
+    alignItems: "center",
     shadowColor: "rgba(0, 0, 0, 0.1)",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,
   },
-  socialIconContainer: {
+  socialIcon: {
     width: 24,
     height: 24,
-    marginRight: 6,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  socialIcon: {
-    width: 20,
-    height: 20,
     resizeMode: "contain",
-  },
-  socialButtonText: {
-    color: "#FFFFFF",
-    fontSize: 14,
-    fontWeight: "700",
   },
   actionsContainer: {
     borderRadius: 16,
