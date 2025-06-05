@@ -1,180 +1,209 @@
-import React from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Switch, ScrollView } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Switch, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Info, Heart, Shield, Bell, HelpCircle, CreditCard, RefreshCw, Play } from "lucide-react-native";
-import { useUserStore } from "@/store/user-store";
-import { useOnboardingStore } from "@/store/onboarding-store";
 import { useRouter } from "expo-router";
+import { ArrowLeft, Star, Trash2, Bell, Shield, HelpCircle, Mail, ExternalLink } from "lucide-react-native";
+import * as Haptics from "expo-haptics";
+import { Platform } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { colors } from "@/constants/colors";
+import { useUserStore } from "@/store/user-store";
+import { useComparisonStore } from "@/store/comparison-store";
+import PaywallModal from "@/components/PaywallModal";
 import BottomNavigation from "@/components/BottomNavigation";
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { isPremium, setPremiumStatus, getColors } = useUserStore();
-  const { resetOnboarding, setCurrentStep, setHasCompletedOnboarding } = useOnboardingStore();
-  const colors = getColors();
-  const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
-  const [saveHistory, setSaveHistory] = React.useState(true);
+  const { isPremium, clearHistory, notifications, setNotifications } = useUserStore();
+  const { clearHistory: clearComparisonHistory } = useComparisonStore();
+  const [showPaywall, setShowPaywall] = useState(false);
   
-  const handleResetOnboarding = () => {
-    resetOnboarding();
-    setHasCompletedOnboarding(false);
-    router.push("/onboarding");
+  const handleClearHistory = () => {
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    }
+    
+    Alert.alert(
+      "Clear History",
+      "Are you sure you want to delete all your comparison history? This action cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        { 
+          text: "Clear", 
+          style: "destructive",
+          onPress: () => {
+            clearHistory();
+            clearComparisonHistory();
+            Alert.alert("Success", "Your history has been cleared.");
+          }
+        }
+      ]
+    );
   };
-
-  const handleGoToOnboardingStep = (step: number, path: string) => {
-    setCurrentStep(step);
-    router.push(path);
+  
+  const handleUpgradeToPremium = () => {
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    setShowPaywall(true);
+  };
+  
+  const handleContactSupport = () => {
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    Alert.alert("Contact Support", "Email us at support@leaguechecker.com for help!");
+  };
+  
+  const handlePrivacyPolicy = () => {
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    Alert.alert("Privacy Policy", "Privacy policy would open here in a real app.");
+  };
+  
+  const handleTermsOfService = () => {
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    Alert.alert("Terms of Service", "Terms of service would open here in a real app.");
+  };
+  
+  const toggleNotifications = (value: boolean) => {
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    setNotifications(value);
   };
   
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["bottom"]}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {isPremium && (
-          <View style={[styles.premiumBanner, { backgroundColor: colors.primary }]}>
-            <Text style={[styles.premiumTitle, { color: colors.background }]}>
-              Premium{" "}
-              <Text style={styles.premiumTitleAccent}>Subscription</Text>
-            </Text>
-            <Text style={[styles.premiumStatus, { color: colors.background }]}>Active</Text>
-            <TouchableOpacity 
-              style={styles.managePremiumButton}
-              onPress={() => alert("Subscription management would open here")}
-            >
-              <Text style={[styles.managePremiumText, { color: colors.background }]}>Manage Subscription</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-        
+    <SafeAreaView style={styles.container} edges={["top"]}>
+      <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.backButton} 
+          onPress={() => router.back()}
+        >
+          <ArrowLeft size={24} color={colors.text} />
+        </TouchableOpacity>
+        <Text style={styles.title}>
+          Settings
+        </Text>
+        <View style={styles.placeholder} />
+      </View>
+      
+      <ScrollView 
+        style={styles.scrollView} 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         {!isPremium && (
           <TouchableOpacity 
-            style={[styles.getPremiumButton, { backgroundColor: colors.primary }]}
-            onPress={() => router.push("/subscription")}
+            style={styles.premiumCard}
+            onPress={handleUpgradeToPremium}
           >
-            <CreditCard size={20} color={colors.background} />
-            <Text style={[styles.getPremiumText, { color: colors.background }]}>
-              Get{" "}
-              <Text style={styles.getPremiumTextAccent}>Premium</Text>
-            </Text>
+            <LinearGradient
+              colors={colors.gradientPrimary}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.premiumGradient}
+            >
+              <View style={styles.premiumContent}>
+                <Text style={styles.premiumTitle}>Get Pro</Text>
+                <View style={styles.premiumFeatures}>
+                  <Text style={styles.premiumFeature}>✓ Unlimited comparisons</Text>
+                  <Text style={styles.premiumFeature}>✓ Celebrity database</Text>
+                  <Text style={styles.premiumFeature}>✓ AI roast feature</Text>
+                  <Text style={styles.premiumFeature}>✓ Detailed analysis</Text>
+                </View>
+                <View style={styles.premiumButton}>
+                  <Text style={styles.premiumButtonText}>Try now</Text>
+                </View>
+              </View>
+            </LinearGradient>
           </TouchableOpacity>
         )}
         
-        <View style={[styles.section, { backgroundColor: colors.card }]}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            App{" "}
-            <Text style={[styles.sectionTitleAccent, { color: colors.primary }]}>Settings</Text>
-          </Text>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Preferences</Text>
           
-          <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
-            <View style={styles.settingInfo}>
+          <View style={styles.settingItem}>
+            <View style={styles.settingLeft}>
               <Bell size={20} color={colors.text} />
-              <Text style={[styles.settingLabel, { color: colors.text }]}>Notifications</Text>
+              <Text style={styles.settingText}>Push Notifications</Text>
             </View>
             <Switch
-              value={notificationsEnabled}
-              onValueChange={setNotificationsEnabled}
+              value={notifications}
+              onValueChange={toggleNotifications}
               trackColor={{ false: colors.border, true: colors.primary }}
               thumbColor={colors.background}
             />
           </View>
+        </View>
+        
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Data</Text>
           
-          <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
-            <View style={styles.settingInfo}>
+          <TouchableOpacity 
+            style={styles.settingItem}
+            onPress={handleClearHistory}
+          >
+            <View style={styles.settingLeft}>
+              <Trash2 size={20} color={colors.error} />
+              <Text style={[styles.settingText, { color: colors.error }]}>Clear History</Text>
+            </View>
+            <ExternalLink size={16} color={colors.textLight} />
+          </TouchableOpacity>
+        </View>
+        
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Support</Text>
+          
+          <TouchableOpacity 
+            style={styles.settingItem}
+            onPress={handleContactSupport}
+          >
+            <View style={styles.settingLeft}>
+              <Mail size={20} color={colors.text} />
+              <Text style={styles.settingText}>Contact Support</Text>
+            </View>
+            <ExternalLink size={16} color={colors.textLight} />
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.settingItem}
+            onPress={handlePrivacyPolicy}
+          >
+            <View style={styles.settingLeft}>
               <Shield size={20} color={colors.text} />
-              <Text style={[styles.settingLabel, { color: colors.text }]}>Save History</Text>
+              <Text style={styles.settingText}>Privacy Policy</Text>
             </View>
-            <Switch
-              value={saveHistory}
-              onValueChange={setSaveHistory}
-              trackColor={{ false: colors.border, true: colors.primary }}
-              thumbColor={colors.background}
-            />
-          </View>
-        </View>
-        
-        <View style={[styles.section, { backgroundColor: colors.card }]}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            About{" "}
-            <Text style={[styles.sectionTitleAccent, { color: colors.primary }]}>& Support</Text>
-          </Text>
-          
-          <TouchableOpacity style={[styles.aboutItem, { borderBottomColor: colors.border }]}>
-            <Info size={20} color={colors.text} />
-            <Text style={[styles.aboutLabel, { color: colors.text }]}>How It Works</Text>
+            <ExternalLink size={16} color={colors.textLight} />
           </TouchableOpacity>
           
-          <TouchableOpacity style={[styles.aboutItem, { borderBottomColor: colors.border }]}>
-            <Heart size={20} color={colors.text} />
-            <Text style={[styles.aboutLabel, { color: colors.text }]}>Rate the App</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={[styles.aboutItem, { borderBottomColor: colors.border }]}>
-            <HelpCircle size={20} color={colors.text} />
-            <Text style={[styles.aboutLabel, { color: colors.text }]}>Help & Support</Text>
+          <TouchableOpacity 
+            style={styles.settingItem}
+            onPress={handleTermsOfService}
+          >
+            <View style={styles.settingLeft}>
+              <HelpCircle size={20} color={colors.text} />
+              <Text style={styles.settingText}>Terms of Service</Text>
+            </View>
+            <ExternalLink size={16} color={colors.textLight} />
           </TouchableOpacity>
         </View>
         
-        <View style={[styles.section, { backgroundColor: colors.card }]}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            Debug &{" "}
-            <Text style={[styles.sectionTitleAccent, { color: colors.primary }]}>Testing</Text>
-          </Text>
-          
-          <TouchableOpacity 
-            style={[styles.debugItem, { borderBottomColor: colors.border }]}
-            onPress={handleResetOnboarding}
-          >
-            <RefreshCw size={20} color={colors.primary} />
-            <Text style={[styles.debugLabel, { color: colors.text }]}>Reset & Show Onboarding</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.debugItem, { borderBottomColor: colors.border }]}
-            onPress={() => handleGoToOnboardingStep(0, "/onboarding")}
-          >
-            <Play size={20} color={colors.primary} />
-            <Text style={[styles.debugLabel, { color: colors.text }]}>Welcome Screen</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.debugItem, { borderBottomColor: colors.border }]}
-            onPress={() => handleGoToOnboardingStep(1, "/onboarding-features")}
-          >
-            <Play size={20} color={colors.primary} />
-            <Text style={[styles.debugLabel, { color: colors.text }]}>Features Screen</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.debugItem, { borderBottomColor: colors.border }]}
-            onPress={() => handleGoToOnboardingStep(2, "/onboarding-more-features")}
-          >
-            <Play size={20} color={colors.primary} />
-            <Text style={[styles.debugLabel, { color: colors.text }]}>More Features Screen</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.demoButton, { backgroundColor: colors.primary + "20" }]}
-            onPress={() => setPremiumStatus(!isPremium)}
-          >
-            <Text style={[styles.demoButtonText, { color: colors.primary }]}>
-              {isPremium ? "Demo: Disable Premium" : "Demo: Enable Premium"}
-            </Text>
-          </TouchableOpacity>
-        </View>
-        
-        <View style={styles.footer}>
-          <Text style={[styles.footerText, { color: colors.text }]}>
-            League{" "}
-            <Text style={[styles.footerTextAccent, { color: colors.primary }]}>Checker</Text>
-            {" "}v1.0.0
-          </Text>
-          <Text style={[styles.disclaimer, { color: colors.textLight }]}>
-            This app is for entertainment purposes only. Beauty is subjective and our algorithm
-            provides an approximation based on photographic evidence.
-          </Text>
+        <View style={styles.versionContainer}>
+          <Text style={styles.versionText}>League Checker v1.0.0</Text>
+          <Text style={styles.versionSubtext}>Made with ❤️ for fun</Text>
         </View>
       </ScrollView>
       
       <BottomNavigation currentRoute="settings" />
+      
+      <PaywallModal
+        visible={showPaywall}
+        onClose={() => setShowPaywall(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -182,133 +211,122 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.background,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.card,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "900",
+    color: colors.text,
+  },
+  placeholder: {
+    width: 40,
+  },
+  scrollView: {
+    flex: 1,
   },
   scrollContent: {
-    padding: 16,
-    paddingBottom: 120, // Space for bottom navigation
+    flexGrow: 1,
+    paddingBottom: 120,
   },
-  premiumBanner: {
+  premiumCard: {
+    margin: 16,
     borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-    alignItems: "center",
+    overflow: "hidden",
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  premiumGradient: {
+    padding: 20,
+  },
+  premiumContent: {
+    alignItems: "flex-start",
   },
   premiumTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "900",
+    color: colors.background,
+    marginBottom: 12,
+  },
+  premiumFeatures: {
+    marginBottom: 16,
+  },
+  premiumFeature: {
+    fontSize: 14,
+    color: colors.background,
     marginBottom: 4,
-  },
-  premiumTitleAccent: {
-    textShadowColor: "rgba(255,255,255,0.3)",
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
-  premiumStatus: {
-    fontSize: 14,
     opacity: 0.9,
-    marginBottom: 16,
   },
-  managePremiumButton: {
+  premiumButton: {
     backgroundColor: "rgba(255,255,255,0.2)",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
   },
-  managePremiumText: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  getPremiumButton: {
-    borderRadius: 12,
-    paddingVertical: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 16,
-  },
-  getPremiumText: {
-    fontSize: 18,
-    fontWeight: "900",
-    marginLeft: 8,
-  },
-  getPremiumTextAccent: {
-    textShadowColor: "rgba(255,255,255,0.3)",
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+  premiumButtonText: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: colors.background,
   },
   section: {
-    marginBottom: 24,
-    borderRadius: 16,
-    padding: 16,
+    marginTop: 24,
+    paddingHorizontal: 16,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: "900",
-    marginBottom: 16,
-  },
-  sectionTitleAccent: {
-    // Color applied dynamically
+    fontSize: 18,
+    fontWeight: "700",
+    color: colors.text,
+    marginBottom: 12,
   },
   settingItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-  },
-  settingInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  settingLabel: {
-    marginLeft: 12,
-    fontSize: 16,
-  },
-  aboutItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-  },
-  aboutLabel: {
-    marginLeft: 12,
-    fontSize: 16,
-  },
-  debugItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-  },
-  debugLabel: {
-    marginLeft: 12,
-    fontSize: 16,
-  },
-  demoButton: {
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 16,
-  },
-  demoButtonText: {
-    fontSize: 14,
-    fontWeight: "700",
-  },
-  footer: {
-    marginTop: 24,
-    alignItems: "center",
-  },
-  footerText: {
-    fontSize: 16,
-    fontWeight: "900",
+    backgroundColor: colors.card,
+    padding: 16,
+    borderRadius: 12,
     marginBottom: 8,
   },
-  footerTextAccent: {
-    // Color applied dynamically
+  settingLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
   },
-  disclaimer: {
+  settingText: {
+    fontSize: 16,
+    color: colors.text,
+    marginLeft: 12,
+    fontWeight: "500",
+  },
+  versionContainer: {
+    alignItems: "center",
+    marginTop: 32,
+    marginBottom: 16,
+  },
+  versionText: {
+    fontSize: 14,
+    color: colors.textLight,
+    marginBottom: 4,
+  },
+  versionSubtext: {
     fontSize: 12,
-    textAlign: "center",
-    lineHeight: 18,
+    color: colors.textMuted,
   },
 });

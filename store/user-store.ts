@@ -1,209 +1,171 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { User, Target, ComparisonResult, LeagueStatus } from "@/types";
-import { darkColors } from "@/constants/colors";
+import { ComparisonResult, Target, User } from "@/types";
+import { colors } from "@/constants/colors";
 
 interface UserState {
-  user: User & { gender?: "male" | "female" };
+  user: User;
   currentTarget: Target | null;
   comparisons: ComparisonResult[];
+  isLoading: boolean;
   freeComparisonUsed: boolean;
   isPremium: boolean;
-  isLoading: boolean;
+  notifications: boolean;
   isOffline: boolean;
-  cachedComparisons: ComparisonResult[];
   
-  setUserGender: (gender: "male" | "female") => void;
-  setUserFrontImage: (uri: string) => void;
-  setTargetImage: (uri: string, name?: string, isCelebrity?: boolean) => void;
-  clearCurrentTarget: () => void;
-  resetUserImages: () => void;
-  
+  setUserImage: (frontImage: string, sideImage?: string) => void;
+  setTargetImage: (image: string) => void;
+  setCurrentTarget: (target: Target) => void;
   compareWithTarget: () => Promise<ComparisonResult | null>;
-  
-  setPremiumStatus: (status: boolean) => void;
-  getColors: () => typeof darkColors;
-  
   clearHistory: () => void;
+  setPremium: (isPremium: boolean) => void;
+  setNotifications: (enabled: boolean) => void;
   setOfflineStatus: (isOffline: boolean) => void;
-  cacheComparison: (comparison: ComparisonResult) => void;
   getCachedComparisons: () => ComparisonResult[];
+  cacheComparison: (result: ComparisonResult) => void;
+  getColors: () => typeof colors;
 }
-
-const initialUser: User & { gender?: "male" | "female" } = {
-  id: "user_" + Date.now().toString(),
-  gender: "male",
-  frontImage: null,
-  sideImage: null,
-  beautyScore: 0,
-};
 
 export const useUserStore = create<UserState>()(
   persist(
     (set, get) => ({
-      user: initialUser,
+      user: {
+        id: "user-1",
+        frontImage: null,
+        sideImage: null,
+        beautyScore: 0,
+      },
       currentTarget: null,
       comparisons: [],
+      isLoading: false,
       freeComparisonUsed: false,
       isPremium: false,
-      isLoading: false,
+      notifications: true,
       isOffline: false,
-      cachedComparisons: [],
       
-      setUserGender: (gender: "male" | "female") => {
+      setUserImage: (frontImage: string, sideImage?: string) => {
         set(state => ({
           user: {
             ...state.user,
-            gender,
+            frontImage,
+            sideImage: sideImage || state.user.sideImage,
           }
         }));
       },
       
-      setUserFrontImage: (uri: string) => {
+      setTargetImage: (image: string) => {
         set(state => ({
-          user: {
-            ...state.user,
-            frontImage: uri,
-            // Simulate beauty score calculation when image is set
-            beautyScore: uri ? Math.random() * 0.5 + 0.3 : 0,
+          currentTarget: state.currentTarget ? {
+            ...state.currentTarget,
+            image,
+          } : {
+            id: "target-1",
+            image,
+            beautyScore: 0.8,
           }
         }));
       },
       
-      setTargetImage: (uri: string, name?: string, isCelebrity?: boolean) => {
-        set({
-          currentTarget: {
-            id: "target_" + Date.now().toString(),
-            image: uri,
-            name: name,
-            beautyScore: Math.random() * 0.5 + 0.4, // Simulate beauty score
-            isCelebrity: isCelebrity,
-          }
-        });
-      },
-      
-      clearCurrentTarget: () => {
-        set({ currentTarget: null });
-      },
-      
-      resetUserImages: () => {
-        set(state => ({
-          user: {
-            ...state.user,
-            frontImage: null,
-            sideImage: null,
-            beautyScore: 0,
-          },
-          currentTarget: null
-        }));
+      setCurrentTarget: (target: Target) => {
+        set({ currentTarget: target });
       },
       
       compareWithTarget: async () => {
-        const { user, currentTarget, freeComparisonUsed, isPremium, cacheComparison } = get();
+        const { user, currentTarget, freeComparisonUsed, isPremium } = get();
         
-        // Check if user has image and target has an image
-        if (!user.frontImage || !currentTarget?.image) {
+        if (!user.frontImage || !currentTarget) {
           return null;
         }
         
-        // Check if user has used free comparison and is not premium
         if (freeComparisonUsed && !isPremium) {
           return null;
         }
         
         set({ isLoading: true });
         
-        // Simulate API call delay with progress
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Calculate league status based on beauty scores
-        const userScore = user.beautyScore || 0.5;
-        const targetScore = currentTarget.beautyScore || 0.5;
-        const scoreDiff = targetScore - userScore;
-        
-        let leagueStatus: LeagueStatus;
-        
-        if (scoreDiff > 0.3) {
-          leagueStatus = "way_beyond";
-        } else if (scoreDiff > 0.15) {
-          leagueStatus = "out_of_league";
-        } else if (scoreDiff > 0.05) {
-          leagueStatus = "slightly_above";
-        } else if (scoreDiff >= -0.05) {
-          leagueStatus = "in_your_league";
-        } else if (scoreDiff >= -0.15) {
-          leagueStatus = "slightly_below";
-        } else {
-          leagueStatus = "you_can_do_better";
+        try {
+          // Simulate API call delay
+          await new Promise(resolve => setTimeout(resolve, 3000));
+          
+          // Generate a random score between 70 and 95
+          const score = Math.floor(Math.random() * 26) + 70;
+          
+          // Generate feedback based on score
+          let feedback = "";
+          if (score >= 90) {
+            feedback = `Wow! You have striking similarities with ${currentTarget.name || "this person"}! ✨`;
+          } else if (score >= 80) {
+            feedback = `Great match! You share many features with ${currentTarget.name || "this person"}. 🎯`;
+          } else {
+            feedback = `You have some nice similarities with ${currentTarget.name || "this person"}. 👍`;
+          }
+          
+          const result: ComparisonResult = {
+            id: Date.now().toString(),
+            date: new Date().toISOString(),
+            user: {
+              ...user,
+              beautyScore: score / 100,
+            },
+            target: currentTarget,
+            leagueStatus: score >= 90 ? "in_your_league" : 
+                          score >= 85 ? "slightly_above" : 
+                          score >= 80 ? "slightly_below" : 
+                          score >= 75 ? "out_of_league" : "way_beyond",
+            feedback,
+            userImage: user.frontImage || "",
+            celebrity: {
+              id: currentTarget.id,
+              name: currentTarget.name || "Unknown",
+              image: currentTarget.image,
+              beautyScore: currentTarget.beautyScore,
+              category: "unknown",
+            },
+            score: score,
+          };
+          
+          get().cacheComparison(result);
+          
+          set(state => ({
+            comparisons: [result, ...state.comparisons],
+            freeComparisonUsed: true,
+            isLoading: false,
+          }));
+          
+          return result;
+        } catch (error) {
+          set({ isLoading: false });
+          throw error;
         }
-        
-        const result: ComparisonResult = {
-          id: Date.now().toString(),
-          date: new Date().toISOString(),
-          user: { ...user },
-          target: { ...currentTarget },
-          leagueStatus,
-          feedback: `Comparison completed with ${currentTarget.name || "target"}`,
-          userImage: user.frontImage || "", // Add for compatibility
-          celebrity: {
-            id: currentTarget.id,
-            name: currentTarget.name || "Unknown",
-            image: currentTarget.image,
-            beautyScore: currentTarget.beautyScore || 0.5,
-            category: "unknown"
-          }, // Add for compatibility
-          score: Math.round((user.beautyScore || 0.5) * 100), // Add for compatibility
-        };
-        
-        // Cache the comparison for offline access
-        cacheComparison(result);
-        
-        set(state => ({
-          comparisons: [result, ...state.comparisons],
-          freeComparisonUsed: true,
-          isLoading: false,
-        }));
-        
-        return result;
       },
       
-      setPremiumStatus: (status: boolean) => {
-        set({ isPremium: status });
-      },
-      
-      getColors: () => {
-        // Always return dark colors with orange/pink theme
-        return darkColors;
-      },
-      
-      clearHistory: () => {
-        set({ comparisons: [], cachedComparisons: [] });
-      },
-      
-      setOfflineStatus: (isOffline: boolean) => {
-        set({ isOffline });
-      },
-      
-      cacheComparison: (comparison: ComparisonResult) => {
-        set(state => ({
-          cachedComparisons: [comparison, ...state.cachedComparisons.slice(0, 9)] // Keep last 10
-        }));
-      },
+      clearHistory: () => set({ comparisons: [] }),
+      setPremium: (isPremium: boolean) => set({ isPremium }),
+      setNotifications: (notifications: boolean) => set({ notifications }),
+      setOfflineStatus: (isOffline: boolean) => set({ isOffline }),
       
       getCachedComparisons: () => {
-        const { cachedComparisons, isOffline } = get();
-        return isOffline ? cachedComparisons : [];
+        const { comparisons, isOffline } = get();
+        return isOffline ? comparisons.slice(0, 10) : []; // Return last 10 when offline
       },
+      
+      cacheComparison: (result: ComparisonResult) => {
+        // This is handled by the main comparisons array in this store
+        // No additional caching needed since we persist the entire store
+      },
+      
+      getColors: () => colors,
     }),
     {
-      name: "league-checker-storage",
+      name: "user-storage",
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({
+        user: state.user,
         comparisons: state.comparisons,
         freeComparisonUsed: state.freeComparisonUsed,
         isPremium: state.isPremium,
-        cachedComparisons: state.cachedComparisons,
+        notifications: state.notifications,
       }),
     }
   )

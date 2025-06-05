@@ -32,61 +32,66 @@ export const useComparisonStore = create<ComparisonState>()(
       addComparison: async (userImage: string) => {
         set({ isLoading: true });
         
-        // Simulate API call delay with progress updates
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Randomly select a celebrity
-        const randomCelebrity = celebrities[Math.floor(Math.random() * celebrities.length)];
-        
-        // Generate a random score between 70 and 95
-        const score = Math.floor(Math.random() * 26) + 70;
-        
-        // Generate feedback based on score
-        let feedback = "";
-        if (score >= 90) {
-          feedback = `Wow! You have striking similarities with ${randomCelebrity.name}! ✨`;
-        } else if (score >= 80) {
-          feedback = `Great match! You share many features with ${randomCelebrity.name}. 🎯`;
-        } else {
-          feedback = `You have some nice similarities with ${randomCelebrity.name}. 👍`;
+        try {
+          // Simulate API call delay with progress updates
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          
+          // Randomly select a celebrity
+          const randomCelebrity = celebrities[Math.floor(Math.random() * celebrities.length)];
+          
+          // Generate a random score between 70 and 95
+          const score = Math.floor(Math.random() * 26) + 70;
+          
+          // Generate feedback based on score
+          let feedback = "";
+          if (score >= 90) {
+            feedback = `Wow! You have striking similarities with ${randomCelebrity.name}! ✨`;
+          } else if (score >= 80) {
+            feedback = `Great match! You share many features with ${randomCelebrity.name}. 🎯`;
+          } else {
+            feedback = `You have some nice similarities with ${randomCelebrity.name}. 👍`;
+          }
+          
+          const result: ComparisonResult = {
+            id: Date.now().toString(),
+            date: new Date().toISOString(),
+            user: {
+              id: "user-1",
+              frontImage: userImage,
+              sideImage: null,
+              beautyScore: score / 100,
+            },
+            target: {
+              id: randomCelebrity.id,
+              name: randomCelebrity.name,
+              image: randomCelebrity.image,
+              beautyScore: randomCelebrity.beautyScore,
+              isCelebrity: true,
+            },
+            leagueStatus: score >= 90 ? "in_your_league" : 
+                          score >= 85 ? "slightly_above" : 
+                          score >= 80 ? "slightly_below" : 
+                          score >= 75 ? "out_of_league" : "way_beyond",
+            feedback,
+            userImage: userImage,
+            celebrity: randomCelebrity,
+            score: score,
+          };
+          
+          // Cache the result for offline access
+          get().cacheResult(result);
+          
+          set(state => ({
+            history: [result, ...state.history],
+            currentImage: userImage,
+            isLoading: false,
+          }));
+          
+          return result;
+        } catch (error) {
+          set({ isLoading: false });
+          throw error;
         }
-        
-        const result: ComparisonResult = {
-          id: Date.now().toString(),
-          date: new Date().toISOString(),
-          user: {
-            id: "user-1",
-            frontImage: userImage,
-            sideImage: null,
-            beautyScore: score / 100,
-          },
-          target: {
-            id: randomCelebrity.id,
-            name: randomCelebrity.name,
-            image: randomCelebrity.image,
-            beautyScore: randomCelebrity.beautyScore,
-            isCelebrity: true,
-          },
-          leagueStatus: score >= 90 ? "in_your_league" : 
-                        score >= 85 ? "slightly_above" : 
-                        score >= 80 ? "slightly_below" : 
-                        score >= 75 ? "out_of_league" : "way_beyond",
-          feedback,
-          userImage: userImage, // Add for compatibility
-          celebrity: randomCelebrity, // Add for compatibility
-          score: score, // Add for compatibility
-        };
-        
-        // Cache the result for offline access
-        get().cacheResult(result);
-        
-        set(state => ({
-          history: [result, ...state.history],
-          currentImage: userImage,
-          isLoading: false,
-        }));
-        
-        return result;
       },
       
       clearHistory: () => set({ history: [], cachedResults: [] }),
@@ -110,7 +115,7 @@ export const useComparisonStore = create<ComparisonState>()(
         // For now, we'll just simulate the process
         try {
           const imageUrls = results.flatMap(result => [
-            result.user.frontImage || "",
+            result.userImage || "",
             result.target.image
           ]);
           

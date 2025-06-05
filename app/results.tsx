@@ -7,6 +7,7 @@ import * as Haptics from "expo-haptics";
 import { Platform as RNPlatform } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
+import { colors } from "@/constants/colors";
 import { useUserStore } from "@/store/user-store";
 import { useComparisonStore } from "@/store/comparison-store";
 import LeagueGauge from "@/components/LeagueGauge";
@@ -24,9 +25,8 @@ type FeatureStatus = "High" | "Mid" | "Low";
 
 export default function ResultsScreen() {
   const router = useRouter();
-  const { comparisons, isLoading, isPremium, clearHistory, getColors, isOffline, getCachedComparisons } = useUserStore();
+  const { comparisons, isLoading, isPremium, clearHistory, isOffline, getCachedComparisons } = useUserStore();
   const { history, clearHistory: clearComparisonHistory } = useComparisonStore();
-  const colors = getColors();
   const [showResult, setShowResult] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
@@ -433,7 +433,7 @@ export default function ResultsScreen() {
             
             <Animated.View style={animatedCardStyle}>
               <LinearGradient
-                colors={[colors.secondary, colors.primary]}
+                colors={colors.gradientPrimary}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.resultCard}
