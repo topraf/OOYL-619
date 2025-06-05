@@ -1,3 +1,5 @@
+import { ColorValue } from 'react-native';
+
 export const colors = {
   // Dark theme base
   background: "#0A0A0A",
@@ -23,8 +25,9 @@ export const colors = {
   // Shadow
   shadow: "rgba(0, 0, 0, 0.3)",
   
-  // Gradients
-  gradientPrimary: ["#FF6B35", "#FF8E53"],
-  gradientSecondary: ["#FF8E53", "#FF4081"],
-  gradientCard: ["#1A1A1A", "#2A2A2A"],
+  // Gradients - properly typed as readonly tuples
+  gradientPrimary: ["#FF6B35", "#FF8E53"] as readonly [ColorValue, ColorValue],
+  gradientSecondary: ["#FF8E53", "#FF4081"] as readonly [ColorValue, ColorValue],
+  gradientCard: ["#1A1A1A", "#2A2A2A"] as readonly [ColorValue, ColorValue],
+  gradientPink: ["#FF4081", "#E91E63"] as readonly [ColorValue, ColorValue],
 };

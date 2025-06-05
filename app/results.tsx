@@ -438,7 +438,7 @@ export default function ResultsScreen() {
                 end={{ x: 1, y: 1 }}
                 style={styles.resultCard}
               >
-                <Text style={[styles.resultTitle, { color: colors.background }]}>
+                <Text style={[styles.resultTitle, { color: colors.text }]}>
                   {getLeagueText()}
                 </Text>
                 
@@ -446,25 +446,25 @@ export default function ResultsScreen() {
                   <View style={styles.imageColumn}>
                     <ImagePreview
                       uri={latestResult.user.frontImage || ""}
-                      style={[styles.circleImage, { borderColor: colors.background }]}
+                      style={[styles.circleImage, { borderColor: colors.text }]}
                     />
-                    <Text style={[styles.imageLabel, { color: colors.background }]}>You</Text>
-                    <Text style={[styles.scoreText, { color: colors.background }]}>{getOverallScore()}/10</Text>
+                    <Text style={[styles.imageLabel, { color: colors.text }]}>You</Text>
+                    <Text style={[styles.scoreText, { color: colors.text }]}>{getOverallScore()}/10</Text>
                   </View>
                   
                   <View style={styles.vsContainer}>
-                    <Text style={[styles.vsText, { color: colors.background }]}>VS</Text>
+                    <Text style={[styles.vsText, { color: colors.text }]}>VS</Text>
                   </View>
                   
                   <View style={styles.imageColumn}>
                     <ImagePreview
                       uri={latestResult.target.image}
-                      style={[styles.circleImage, { borderColor: colors.background }]}
+                      style={[styles.circleImage, { borderColor: colors.text }]}
                     />
-                    <Text style={[styles.imageLabel, { color: colors.background }]}>
+                    <Text style={[styles.imageLabel, { color: colors.text }]}>
                       {latestResult.target.name || "Them"}
                     </Text>
-                    <Text style={[styles.scoreText, { color: colors.background }]}>
+                    <Text style={[styles.scoreText, { color: colors.text }]}>
                       {Math.round((latestResult.target.beautyScore || 0) * 10)}/10
                     </Text>
                   </View>

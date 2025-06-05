@@ -176,7 +176,7 @@ export default function HomeScreen() {
                 onPress={handleAIRoast}
               >
                 <LinearGradient
-                  colors={["#FF4081", "#E91E63"]}
+                  colors={colors.gradientPink}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                   style={styles.secondaryActionGradient}
@@ -316,13 +316,13 @@ const styles = StyleSheet.create({
   mainActionText: {
     fontSize: 20,
     fontWeight: "800",
-    color: colors.background,
+    color: colors.text,
     marginTop: 12,
     marginBottom: 4,
   },
   mainActionSubtext: {
     fontSize: 14,
-    color: colors.background,
+    color: colors.text,
     opacity: 0.9,
   },
   secondaryActions: {
@@ -371,12 +371,12 @@ const styles = StyleSheet.create({
   actionTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: colors.background,
+    color: colors.text,
     marginBottom: 4,
   },
   actionSubtitle: {
     fontSize: 14,
-    color: colors.background,
+    color: colors.text,
     opacity: 0.9,
   },
   premiumBadge: {

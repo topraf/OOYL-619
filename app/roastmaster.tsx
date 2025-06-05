@@ -153,12 +153,12 @@ export default function RoastMasterScreen() {
       >
         <View style={styles.warningContainer}>
           <LinearGradient
-            colors={["#FF4081", "#E91E63"]}
+            colors={colors.gradientPink}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.warningGradient}
           >
-            <Zap size={24} color={colors.background} />
+            <Zap size={24} color={colors.text} />
             <Text style={styles.warningTitle}>Warning: Brutal Honesty Ahead!</Text>
             <Text style={styles.warningText}>
               Our AI doesn't hold back. Prepare for some savage roasting! 🔥
@@ -213,7 +213,7 @@ export default function RoastMasterScreen() {
                   end={{ x: 1, y: 1 }}
                   style={styles.photoOptionGradient}
                 >
-                  <Camera size={32} color={colors.background} />
+                  <Camera size={32} color={colors.text} />
                   <Text style={styles.photoOptionText}>Take Photo</Text>
                 </LinearGradient>
               </TouchableOpacity>
@@ -228,7 +228,7 @@ export default function RoastMasterScreen() {
                   end={{ x: 1, y: 1 }}
                   style={styles.photoOptionGradient}
                 >
-                  <Upload size={32} color={colors.background} />
+                  <Upload size={32} color={colors.text} />
                   <Text style={styles.photoOptionText}>Upload Photo</Text>
                 </LinearGradient>
               </TouchableOpacity>
@@ -272,15 +272,15 @@ export default function RoastMasterScreen() {
             onPressOut={roastImage && !isLoading ? onPressOut : undefined}
           >
             <LinearGradient
-              colors={roastImage && !isLoading ? ["#FF4081", "#E91E63"] : [colors.card, colors.card]}
+              colors={roastImage && !isLoading ? colors.gradientPink : [colors.card, colors.card]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.roastButtonGradient}
             >
               {isLoading ? (
-                <ActivityIndicator size="small" color={colors.background} />
+                <ActivityIndicator size="small" color={colors.text} />
               ) : (
-                <Zap size={20} color={roastImage ? colors.background : colors.textLight} />
+                <Zap size={20} color={roastImage ? colors.text : colors.textLight} />
               )}
               <Text style={[
                 styles.roastButtonText, 
@@ -371,13 +371,13 @@ const styles = StyleSheet.create({
   warningTitle: {
     fontSize: 18,
     fontWeight: "800",
-    color: colors.background,
+    color: colors.text,
     marginTop: 8,
     marginBottom: 4,
   },
   warningText: {
     fontSize: 14,
-    color: colors.background,
+    color: colors.text,
     textAlign: "center",
     opacity: 0.9,
   },
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
   photoOptionText: {
     fontSize: 16,
     fontWeight: "700",
-    color: colors.background,
+    color: colors.text,
     marginTop: 8,
   },
   roastContainer: {
@@ -504,7 +504,7 @@ const styles = StyleSheet.create({
   roastButtonText: {
     fontSize: 16,
     fontWeight: "700",
-    color: colors.background,
+    color: colors.text,
   },
   disabledButton: {
     shadowOpacity: 0,

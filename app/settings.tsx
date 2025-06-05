@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   premiumTitle: {
     fontSize: 24,
     fontWeight: "900",
-    color: colors.background,
+    color: colors.text,
     marginBottom: 12,
   },
   premiumFeatures: {
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
   },
   premiumFeature: {
     fontSize: 14,
-    color: colors.background,
+    color: colors.text,
     marginBottom: 4,
     opacity: 0.9,
   },
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
   premiumButtonText: {
     fontSize: 16,
     fontWeight: "700",
-    color: colors.background,
+    color: colors.text,
   },
   section: {
     marginTop: 24,
