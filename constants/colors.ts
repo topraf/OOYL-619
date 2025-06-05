@@ -1,33 +1,27 @@
-import { ColorValue } from 'react-native';
-
 export const colors = {
-  // Dark theme base
-  background: "#0A0A0A" as ColorValue,
-  card: "#1A1A1A" as ColorValue,
-  border: "#2A2A2A" as ColorValue,
-  
-  // Orange/Pink gradient theme
-  primary: "#FF6B35" as ColorValue, // Orange
-  secondary: "#FF8E53" as ColorValue, // Light orange
-  accent: "#FF4081" as ColorValue, // Pink accent
+  // Background colors
+  background: "#000000",
+  card: "#1A1A1A",
   
   // Text colors
-  text: "#FFFFFF" as ColorValue,
-  textLight: "#B0B0B0" as ColorValue,
-  textMuted: "#808080" as ColorValue,
+  text: "#FFFFFF",
+  textLight: "#A0A0A0",
+  
+  // Primary colors (orange/pink theme)
+  primary: "#FF6B35",
+  secondary: "#FF8E53",
   
   // Status colors
-  success: "#4CAF50" as ColorValue,
-  warning: "#FF9800" as ColorValue,
-  error: "#F44336" as ColorValue,
-  info: "#2196F3" as ColorValue,
+  success: "#4CAF50",
+  warning: "#FF9800",
+  error: "#F44336",
   
   // Shadow
-  shadow: "rgba(0, 0, 0, 0.3)" as ColorValue,
+  shadow: "#000000",
   
-  // Gradients - properly typed as readonly tuples
+  // Gradients
   gradientPrimary: ["#FF6B35", "#FF8E53"] as const,
-  gradientSecondary: ["#FF8E53", "#FF4081"] as const,
+  gradientSecondary: ["#FF8E53", "#FFB366"] as const,
   gradientCard: ["#1A1A1A", "#2A2A2A"] as const,
-  gradientPink: ["#FF4081", "#E91E63"] as const,
-};
+  gradientPink: ["#FF6B35", "#FF4081"] as const,
+} as const;

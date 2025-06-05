@@ -561,7 +561,7 @@ export default function ResultsScreen() {
                 contentContainerStyle={styles.actionButtonsRow}
               >
                 <TouchableOpacity 
-                  style={[styles.actionButtonCard, { backgroundColor: colors.primary + "10" }]}
+                  style={[styles.actionButtonCard, { backgroundColor: `${colors.primary}10` }]}
                   onPress={handleNewComparison}
                 >
                   <View style={[styles.actionIconCircle, { backgroundColor: colors.background }]}>
@@ -571,7 +571,7 @@ export default function ResultsScreen() {
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
-                  style={[styles.actionButtonCard, { backgroundColor: colors.primary + "10" }]}
+                  style={[styles.actionButtonCard, { backgroundColor: `${colors.primary}10` }]}
                   onPress={() => router.push("/celebrities")}
                 >
                   <View style={[styles.actionIconCircle, { backgroundColor: colors.background }]}>
@@ -582,7 +582,7 @@ export default function ResultsScreen() {
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
-                  style={[styles.actionButtonCard, { backgroundColor: colors.primary + "10" }]}
+                  style={[styles.actionButtonCard, { backgroundColor: `${colors.primary}10` }]}
                   onPress={() => router.push("/roastmaster")}
                 >
                   <View style={[styles.actionIconCircle, { backgroundColor: colors.background }]}>
