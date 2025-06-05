@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Platform, Dimensions, Share, FlatList, Linking, Image as RNImage } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Platform, Dimensions, Share, FlatList, Linking } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Home, Camera, MessageCircle, Star, History, Wifi, WifiOff, Share2 } from "lucide-react-native";
@@ -83,83 +83,6 @@ export default function ResultsScreen() {
       return () => clearTimeout(timer);
     }
   }, [isLoading, latestResult]);
-
-  const handleShareInstagram = async () => {
-    if (RNPlatform.OS !== "web") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      
-      try {
-        const message = `I just found out if someone is in my league using League Checker! My score: ${getOverallScore()}/10`;
-        
-        const instagramUrl = `instagram://story-camera`;
-        const canOpen = await Linking.canOpenURL(instagramUrl);
-        
-        if (canOpen) {
-          await Linking.openURL(instagramUrl);
-        } else {
-          await Share.share({
-            message: message,
-            title: "League Checker Results"
-          });
-        }
-      } catch (error) {
-        console.error("Error sharing to Instagram:", error);
-      }
-    } else {
-      alert("Instagram sharing is not available on web");
-    }
-  };
-
-  const handleShareSnapchat = async () => {
-    if (RNPlatform.OS !== "web") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      
-      try {
-        const message = `I just found out if someone is in my league using League Checker! My score: ${getOverallScore()}/10`;
-        
-        const snapchatUrl = `snapchat://`;
-        const canOpen = await Linking.canOpenURL(snapchatUrl);
-        
-        if (canOpen) {
-          await Linking.openURL(snapchatUrl);
-        } else {
-          await Share.share({
-            message: message,
-            title: "League Checker Results"
-          });
-        }
-      } catch (error) {
-        console.error("Error sharing to Snapchat:", error);
-      }
-    } else {
-      alert("Snapchat sharing is not available on web");
-    }
-  };
-
-  const handleShareX = async () => {
-    if (RNPlatform.OS !== "web") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      
-      try {
-        const message = `I just found out if someone is in my league using League Checker! My score: ${getOverallScore()}/10`;
-        const twitterUrl = `twitter://post?message=${encodeURIComponent(message)}`;
-        const canOpen = await Linking.canOpenURL(twitterUrl);
-        
-        if (canOpen) {
-          await Linking.openURL(twitterUrl);
-        } else {
-          const webUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}`;
-          await Linking.openURL(webUrl);
-        }
-      } catch (error) {
-        console.error("Error sharing to X:", error);
-      }
-    } else {
-      const message = `I just found out if someone is in my league using League Checker! My score: ${getOverallScore()}/10`;
-      const webUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}`;
-      window.open(webUrl, '_blank');
-    }
-  };
 
   const handleShareGeneral = async () => {
     if (RNPlatform.OS !== "web") {
@@ -526,32 +449,23 @@ export default function ResultsScreen() {
               <View style={styles.socialButtonsContainer}>
                 <TouchableOpacity 
                   style={[styles.socialButton, { backgroundColor: "#E4405F" }]}
-                  onPress={handleShareInstagram}
+                  onPress={handleShareGeneral}
                 >
-                  <RNImage 
-                    source={{ uri: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Instagram_logo_2016.svg/132px-Instagram_logo_2016.svg.png" }} 
-                    style={styles.socialIcon} 
-                  />
+                  <Text style={styles.socialButtonText}>📷</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
                   style={[styles.socialButton, { backgroundColor: "#FFFC00" }]}
-                  onPress={handleShareSnapchat}
+                  onPress={handleShareGeneral}
                 >
-                  <RNImage 
-                    source={{ uri: "https://upload.wikimedia.org/wikipedia/en/thumb/c/c4/Snapchat_logo.svg/320px-Snapchat_logo.svg.png" }} 
-                    style={styles.socialIcon} 
-                  />
+                  <Text style={styles.socialButtonText}>👻</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
                   style={[styles.socialButton, { backgroundColor: "#000" }]}
-                  onPress={handleShareX}
+                  onPress={handleShareGeneral}
                 >
-                  <RNImage 
-                    source={{ uri: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/X_logo_2023_%28white%29.png/320px-X_logo_2023_%28white%29.png" }} 
-                    style={styles.socialIcon} 
-                  />
+                  <Text style={styles.socialButtonText}>𝕏</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
@@ -810,10 +724,8 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  socialIcon: {
-    width: 24,
-    height: 24,
-    resizeMode: "contain",
+  socialButtonText: {
+    fontSize: 20,
   },
   actionsContainer: {
     borderRadius: 16,

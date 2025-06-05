@@ -5,12 +5,18 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 interface OnboardingState {
   currentStep: number;
   hasCompletedOnboarding: boolean;
+  notificationsEnabled: boolean;
+  premiumOffered: boolean;
   setCurrentStep: (step: number) => void;
   nextStep: () => void;
   prevStep: () => void;
   completeOnboarding: () => void;
   resetOnboarding: () => void;
   setHasCompletedOnboarding: (value: boolean) => void;
+  enableNotifications: () => void;
+  skipNotifications: () => void;
+  acceptPremium: () => void;
+  skipPremium: () => void;
 }
 
 export const useOnboardingStore = create<OnboardingState>()(
@@ -18,6 +24,8 @@ export const useOnboardingStore = create<OnboardingState>()(
     (set) => ({
       currentStep: 0,
       hasCompletedOnboarding: false,
+      notificationsEnabled: false,
+      premiumOffered: false,
       
       setCurrentStep: (step: number) => set({ currentStep: step }),
       
@@ -36,11 +44,29 @@ export const useOnboardingStore = create<OnboardingState>()(
       
       resetOnboarding: () => set({ 
         currentStep: 0,
-        hasCompletedOnboarding: false
+        hasCompletedOnboarding: false,
+        notificationsEnabled: false,
+        premiumOffered: false
       }),
       
       setHasCompletedOnboarding: (value: boolean) => set({
         hasCompletedOnboarding: value
+      }),
+      
+      enableNotifications: () => set({
+        notificationsEnabled: true
+      }),
+      
+      skipNotifications: () => set({
+        notificationsEnabled: false
+      }),
+      
+      acceptPremium: () => set({
+        premiumOffered: true
+      }),
+      
+      skipPremium: () => set({
+        premiumOffered: false
       }),
     }),
     {
