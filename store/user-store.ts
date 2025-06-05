@@ -70,10 +70,8 @@ export const useUserStore = create<UserState>()(
         set({ currentTarget: target }),
       
       addComparison: (result: ComparisonResult) => {
-        const state = get();
-        
         // Cache the comparison for offline access
-        state.cacheComparison(result);
+        get().cacheComparison(result);
         
         set((state) => ({
           comparisons: [result, ...state.comparisons],
