@@ -1,3 +1,29 @@
+/**
+ * Results Screen - Display comparison analysis results
+ * 
+ * This screen shows the outcome of a beauty comparison between the user
+ * and their selected target (person or celebrity). Key features include:
+ * 
+ * - League status visualization with animated gauge
+ * - Side-by-side photo comparison with beauty scores
+ * - Detailed feature analysis (premium feature)
+ * - Social sharing capabilities
+ * - Action buttons for next steps (new comparison, celebrities, AI roast)
+ * - Premium upgrade prompts for non-premium users
+ * 
+ * The screen handles both loading states during analysis and empty states
+ * when no comparisons have been made. It integrates with both user store
+ * and comparison store for data management.
+ * 
+ * Premium Features:
+ * - Detailed feature scores (facial symmetry, jawline, eyes, skin)
+ * - Advanced sharing options
+ * - Unlimited comparisons
+ * 
+ * Navigation: Includes bottom navigation and back button to homepage
+ * Animations: Smooth entrance animations and celebration effects
+ */
+
 import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Platform, Dimensions, Share, FlatList, Linking } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";

@@ -1,3 +1,33 @@
+/**
+ * Root Layout - Main app structure and navigation configuration
+ * 
+ * This file sets up the core app architecture including:
+ * - Font loading and splash screen management
+ * - tRPC client configuration for type-safe API calls
+ * - React Query setup for data fetching and caching
+ * - Network status monitoring for offline support
+ * - Stack navigation configuration for all app screens
+ * - Global styling and theme application
+ * 
+ * Key Features:
+ * - Cross-platform font loading with error handling
+ * - Automatic splash screen hiding after assets load
+ * - Network connectivity monitoring (mobile only)
+ * - Centralized navigation configuration
+ * - Dynamic color theming from user store
+ * - Screen-specific options (headers, animations, etc.)
+ * 
+ * Navigation Structure:
+ * - Stack-based navigation using Expo Router
+ * - Custom header styling with theme colors
+ * - Screen-specific animations (slide, fade)
+ * - Conditional header visibility
+ * - Centralized screen titles and options
+ * 
+ * The layout wraps the entire app and provides the foundation
+ * for all other screens and components.
+ */
+
 import { useFonts } from "expo-font";
 import { Stack, Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";

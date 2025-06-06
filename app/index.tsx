@@ -1,3 +1,23 @@
+/**
+ * Homepage Screen - Main landing page of the League Checker app
+ * 
+ * This is the primary entry point for users after onboarding. It provides:
+ * - Hero section with app introduction
+ * - Main CTA to start photo comparison
+ * - Quick access to premium features (celebrities, AI roast)
+ * - Premium upgrade banner for free users
+ * - Feature explanation section
+ * - App disclaimer
+ * 
+ * The screen uses a dark theme with orange/pink gradients and includes
+ * smooth animations for user interactions. It integrates with the user
+ * store for premium status and comparison management.
+ * 
+ * Navigation: Includes bottom navigation and routes to various app sections
+ * Premium: Shows upgrade prompts for non-premium users
+ * Animations: React Native Reanimated for smooth interactions
+ */
+
 import React, { useEffect } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Dimensions, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";

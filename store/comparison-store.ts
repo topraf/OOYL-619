@@ -1,3 +1,30 @@
+/**
+ * Comparison Store - Manages comparison-specific state and operations
+ * 
+ * This store handles the comparison workflow and history management:
+ * - Stores comparison results and history
+ * - Manages current comparison state
+ * - Handles mock AI analysis for celebrity comparisons
+ * - Provides loading states during analysis
+ * 
+ * Key Features:
+ * - Celebrity comparison with random selection
+ * - Mock beauty score generation (70-95 range)
+ * - League status calculation based on scores
+ * - Feedback generation based on comparison results
+ * - History management with chronological ordering
+ * 
+ * This store works alongside the user store to provide a complete
+ * comparison experience. It's specifically designed for celebrity
+ * comparisons but can be extended for other comparison types.
+ * 
+ * Mock Data:
+ * - Randomly selects celebrities from the database
+ * - Generates realistic beauty scores
+ * - Creates contextual feedback messages
+ * - Simulates API delay for realistic UX
+ */
+
 import { create } from "zustand";
 import { ComparisonResult, Celebrity } from "@/types";
 import { celebrities } from "@/mocks/celebrities";

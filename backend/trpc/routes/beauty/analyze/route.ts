@@ -1,3 +1,35 @@
+/**
+ * Beauty Analysis API Route - Mock AI beauty analysis endpoint
+ * 
+ * This tRPC procedure simulates AI-powered beauty analysis for the app.
+ * In a production environment, this would integrate with real AI services
+ * like AWS Rekognition, Google Vision AI, or custom ML models.
+ * 
+ * Features:
+ * - Accepts user and target image URLs for comparison
+ * - Optional gender parameter for gender-specific analysis
+ * - Generates realistic beauty scores (0.3-0.8 for users, 0.4-0.9 for targets)
+ * - Calculates league status based on score differences
+ * - Provides detailed feature analysis (facial symmetry, jawline, eyes, skin)
+ * - Simulates realistic API delay for better UX
+ * 
+ * League Status Calculation:
+ * - way_beyond: Target score > User score + 0.3
+ * - out_of_league: Target score > User score + 0.15
+ * - slightly_above: Target score > User score + 0.05
+ * - in_your_league: Score difference within ±0.05
+ * - slightly_below: User score > Target score + 0.05
+ * - you_can_do_better: User score > Target score + 0.15
+ * 
+ * Feature Scores:
+ * - Generates random but realistic scores for facial features
+ * - Includes status indicators (High/Mid/Low)
+ * - Provides basis for premium feature analysis
+ * 
+ * This is a mock implementation for demonstration purposes.
+ * Real implementation would use computer vision and ML algorithms.
+ */
+
 import { z } from "zod";
 import { publicProcedure } from "../../../create-context";
 

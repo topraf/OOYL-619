@@ -1,3 +1,33 @@
+/**
+ * User Store - Main application state management using Zustand
+ * 
+ * This store manages the core application state including:
+ * - User profile data (gender, photos, beauty scores)
+ * - Comparison targets (people or celebrities to compare with)
+ * - Comparison history and results
+ * - Premium subscription status
+ * - App settings and preferences
+ * 
+ * Key Features:
+ * - Photo management for user selfies and target images
+ * - Mock AI beauty analysis with realistic scoring
+ * - League status calculation based on beauty score differences
+ * - Premium feature gating
+ * - Comparison history tracking
+ * - Color theme management (dark theme with orange/pink gradients)
+ * 
+ * The store uses mock data for demonstration purposes. In a production app,
+ * this would integrate with real AI services and backend APIs.
+ * 
+ * State Structure:
+ * - user: User profile with photos and scores
+ * - currentTarget: Selected comparison target
+ * - comparisons: Array of completed comparisons
+ * - freeComparisonUsed: Tracks if user has used their free comparison
+ * - isPremium: Premium subscription status
+ * - isLoading: Loading state for async operations
+ */
+
 import { create } from "zustand";
 import { User, Target, ComparisonResult, LeagueStatus } from "@/types";
 import { darkColors } from "@/constants/colors";

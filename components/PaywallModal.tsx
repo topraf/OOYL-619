@@ -1,3 +1,35 @@
+/**
+ * Paywall Modal - Premium subscription upgrade interface
+ * 
+ * This modal component handles the premium subscription flow:
+ * - Displays subscription plans with pricing
+ * - Shows premium features and benefits
+ * - Handles plan selection and subscription process
+ * - Integrates with user store for premium status updates
+ * 
+ * Key Features:
+ * - Multiple subscription plan options (monthly, yearly, lifetime)
+ * - Popular plan highlighting
+ * - Radio button selection interface
+ * - Free trial promotion
+ * - Terms and privacy policy links
+ * - Mock payment processing (sets premium status)
+ * 
+ * Design:
+ * - Bottom sheet modal presentation
+ * - Orange/pink gradient branding
+ * - Clear pricing display
+ * - Prominent call-to-action button
+ * 
+ * The modal is triggered from various parts of the app when users
+ * attempt to access premium features without a subscription.
+ * 
+ * Mock Implementation:
+ * - Simulates subscription purchase
+ * - Immediately grants premium status
+ * - No actual payment processing
+ */
+
 import React, { useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Modal, Dimensions } from "react-native";
 import { X, Star } from "lucide-react-native";
