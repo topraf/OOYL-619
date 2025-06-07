@@ -187,6 +187,30 @@ function RootLayoutNav() {
           }}
         />
         <Stack.Screen
+          name="celebrity-compare-self"
+          options={{
+            title: "Compare with Celebrity",
+            headerTitleAlign: "center",
+            animation: "slide_from_right",
+          }}
+        />
+        <Stack.Screen
+          name="celebrity-compare-between"
+          options={{
+            title: "Compare Celebrities",
+            headerTitleAlign: "center",
+            animation: "slide_from_right",
+          }}
+        />
+        <Stack.Screen
+          name="celebrity-lookalike"
+          options={{
+            title: "Find Your Lookalike",
+            headerTitleAlign: "center",
+            animation: "slide_from_right",
+          }}
+        />
+        <Stack.Screen
           name="subscription"
           options={{
             title: "Premium Subscription",
