@@ -1,19 +1,22 @@
-import React from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Switch, ScrollView } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, View, Text, TouchableOpacity, Switch, ScrollView, Modal, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Info, Heart, Shield, Bell, HelpCircle, CreditCard, RefreshCw, Play } from "lucide-react-native";
+import { Info, Heart, Shield, Bell, HelpCircle, CreditCard, RefreshCw, Play, Globe, Check } from "lucide-react-native";
 import { useUserStore } from "@/store/user-store";
 import { useOnboardingStore } from "@/store/onboarding-store";
 import { useRouter } from "expo-router";
+import { SUPPORTED_LANGUAGES, Language } from "@/constants/translations";
 import BottomNavigation from "@/components/BottomNavigation";
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { isPremium, setPremiumStatus, getColors } = useUserStore();
+  const { isPremium, setPremiumStatus, getColors, language, setLanguage, getTranslations } = useUserStore();
   const { resetOnboarding, setCurrentStep, setHasCompletedOnboarding } = useOnboardingStore();
   const colors = getColors();
-  const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
-  const [saveHistory, setSaveHistory] = React.useState(true);
+  const t = getTranslations();
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [saveHistory, setSaveHistory] = useState(true);
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
   
   const handleResetOnboarding = () => {
     resetOnboarding();
@@ -25,6 +28,13 @@ export default function SettingsScreen() {
     setCurrentStep(step);
     router.push(path);
   };
+
+  const handleLanguageSelect = (selectedLanguage: Language) => {
+    setLanguage(selectedLanguage);
+    setShowLanguageModal(false);
+  };
+
+  const currentLanguage = SUPPORTED_LANGUAGES.find(lang => lang.code === language);
   
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["bottom"]}>
@@ -32,7 +42,7 @@ export default function SettingsScreen() {
         {isPremium && (
           <View style={[styles.premiumBanner, { backgroundColor: colors.primary }]}>
             <Text style={[styles.premiumTitle, { color: colors.background }]}>
-              Premium{" "}
+              {t.common.premium}{" "}
               <Text style={styles.premiumTitleAccent}>Subscription</Text>
             </Text>
             <Text style={[styles.premiumStatus, { color: colors.background }]}>Active</Text>
@@ -53,21 +63,23 @@ export default function SettingsScreen() {
             <CreditCard size={20} color={colors.background} />
             <Text style={[styles.getPremiumText, { color: colors.background }]}>
               Get{" "}
-              <Text style={styles.getPremiumTextAccent}>Premium</Text>
+              <Text style={styles.getPremiumTextAccent}>{t.common.premium}</Text>
             </Text>
           </TouchableOpacity>
         )}
         
         <View style={[styles.section, { backgroundColor: colors.card }]}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            App{" "}
-            <Text style={[styles.sectionTitleAccent, { color: colors.primary }]}>Settings</Text>
+            {t.screens.settings.app_settings.split(' ')[0]}{" "}
+            <Text style={[styles.sectionTitleAccent, { color: colors.primary }]}>
+              {t.screens.settings.app_settings.split(' ')[1]}
+            </Text>
           </Text>
           
           <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
             <View style={styles.settingInfo}>
               <Bell size={20} color={colors.text} />
-              <Text style={[styles.settingLabel, { color: colors.text }]}>Notifications</Text>
+              <Text style={[styles.settingLabel, { color: colors.text }]}>{t.screens.settings.notifications}</Text>
             </View>
             <Switch
               value={notificationsEnabled}
@@ -80,7 +92,7 @@ export default function SettingsScreen() {
           <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
             <View style={styles.settingInfo}>
               <Shield size={20} color={colors.text} />
-              <Text style={[styles.settingLabel, { color: colors.text }]}>Save History</Text>
+              <Text style={[styles.settingLabel, { color: colors.text }]}>{t.screens.settings.save_history}</Text>
             </View>
             <Switch
               value={saveHistory}
@@ -89,34 +101,53 @@ export default function SettingsScreen() {
               thumbColor={colors.background}
             />
           </View>
+          
+          <TouchableOpacity 
+            style={[styles.settingItem, { borderBottomColor: colors.border }]}
+            onPress={() => setShowLanguageModal(true)}
+          >
+            <View style={styles.settingInfo}>
+              <Globe size={20} color={colors.text} />
+              <Text style={[styles.settingLabel, { color: colors.text }]}>{t.screens.settings.language}</Text>
+            </View>
+            <View style={styles.languageDisplay}>
+              <Text style={[styles.languageText, { color: colors.textLight }]}>
+                {currentLanguage?.flag} {currentLanguage?.name}
+              </Text>
+            </View>
+          </TouchableOpacity>
         </View>
         
         <View style={[styles.section, { backgroundColor: colors.card }]}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            About{" "}
-            <Text style={[styles.sectionTitleAccent, { color: colors.primary }]}>& Support</Text>
+            {t.screens.settings.about_support.split(' & ')[0]}{" "}
+            <Text style={[styles.sectionTitleAccent, { color: colors.primary }]}>
+              & {t.screens.settings.about_support.split(' & ')[1]}
+            </Text>
           </Text>
           
           <TouchableOpacity style={[styles.aboutItem, { borderBottomColor: colors.border }]}>
             <Info size={20} color={colors.text} />
-            <Text style={[styles.aboutLabel, { color: colors.text }]}>How It Works</Text>
+            <Text style={[styles.aboutLabel, { color: colors.text }]}>{t.screens.settings.how_it_works}</Text>
           </TouchableOpacity>
           
           <TouchableOpacity style={[styles.aboutItem, { borderBottomColor: colors.border }]}>
             <Heart size={20} color={colors.text} />
-            <Text style={[styles.aboutLabel, { color: colors.text }]}>Rate the App</Text>
+            <Text style={[styles.aboutLabel, { color: colors.text }]}>{t.screens.settings.rate_app}</Text>
           </TouchableOpacity>
           
           <TouchableOpacity style={[styles.aboutItem, { borderBottomColor: colors.border }]}>
             <HelpCircle size={20} color={colors.text} />
-            <Text style={[styles.aboutLabel, { color: colors.text }]}>Help & Support</Text>
+            <Text style={[styles.aboutLabel, { color: colors.text }]}>{t.screens.settings.help_support}</Text>
           </TouchableOpacity>
         </View>
         
         <View style={[styles.section, { backgroundColor: colors.card }]}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            Debug &{" "}
-            <Text style={[styles.sectionTitleAccent, { color: colors.primary }]}>Testing</Text>
+            {t.screens.settings.debug_testing.split(' & ')[0]} &{" "}
+            <Text style={[styles.sectionTitleAccent, { color: colors.primary }]}>
+              {t.screens.settings.debug_testing.split(' & ')[1]}
+            </Text>
           </Text>
           
           <TouchableOpacity 
@@ -124,7 +155,7 @@ export default function SettingsScreen() {
             onPress={handleResetOnboarding}
           >
             <RefreshCw size={20} color={colors.primary} />
-            <Text style={[styles.debugLabel, { color: colors.text }]}>Reset & Show Onboarding</Text>
+            <Text style={[styles.debugLabel, { color: colors.text }]}>{t.screens.settings.reset_onboarding}</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
@@ -172,7 +203,7 @@ export default function SettingsScreen() {
             onPress={() => setPremiumStatus(!isPremium)}
           >
             <Text style={[styles.demoButtonText, { color: colors.primary }]}>
-              {isPremium ? "Demo: Disable Premium" : "Demo: Enable Premium"}
+              {isPremium ? t.screens.settings.demo_disable_premium : t.screens.settings.demo_premium}
             </Text>
           </TouchableOpacity>
         </View>
@@ -181,14 +212,51 @@ export default function SettingsScreen() {
           <Text style={[styles.footerText, { color: colors.text }]}>
             League{" "}
             <Text style={[styles.footerTextAccent, { color: colors.primary }]}>Checker</Text>
-            {" "}v1.0.0
+            {" "}{t.screens.settings.version}
           </Text>
           <Text style={[styles.disclaimer, { color: colors.textLight }]}>
-            This app is for entertainment purposes only. Beauty is subjective and our algorithm
-            provides an approximation based on photographic evidence.
+            {t.screens.settings.disclaimer}
           </Text>
         </View>
       </ScrollView>
+      
+      {/* Language Selection Modal */}
+      <Modal
+        visible={showLanguageModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowLanguageModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>{t.screens.settings.language}</Text>
+              <TouchableOpacity onPress={() => setShowLanguageModal(false)}>
+                <Text style={[styles.modalClose, { color: colors.primary }]}>{t.common.close}</Text>
+              </TouchableOpacity>
+            </View>
+            
+            <FlatList
+              data={SUPPORTED_LANGUAGES}
+              keyExtractor={(item) => item.code}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[styles.languageItem, { borderBottomColor: colors.border }]}
+                  onPress={() => handleLanguageSelect(item.code)}
+                >
+                  <View style={styles.languageInfo}>
+                    <Text style={styles.languageFlag}>{item.flag}</Text>
+                    <Text style={[styles.languageName, { color: colors.text }]}>{item.name}</Text>
+                  </View>
+                  {language === item.code && (
+                    <Check size={20} color={colors.primary} />
+                  )}
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        </View>
+      </Modal>
       
       <BottomNavigation currentRoute="settings" />
     </SafeAreaView>
@@ -280,6 +348,13 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     fontSize: 16,
   },
+  languageDisplay: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  languageText: {
+    fontSize: 14,
+  },
   aboutItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -326,5 +401,50 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: "center",
     lineHeight: 18,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
+  },
+  modalContent: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: "70%",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#333",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  modalClose: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  languageItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+  },
+  languageInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  languageFlag: {
+    fontSize: 24,
+    marginRight: 12,
+  },
+  languageName: {
+    fontSize: 16,
   },
 });

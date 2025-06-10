@@ -1,94 +1,136 @@
+/**
+ * Bottom Navigation Component - Main navigation bar for the League Checker app
+ * 
+ * This component provides the primary navigation interface for users to move
+ * between different sections of the app. It features:
+ * 
+ * - Five main navigation tabs (Scan, Celebrities, Results, Roast, Settings)
+ * - Active state highlighting with color changes
+ * - Smooth animations and haptic feedback
+ * - Multilingual support with dynamic labels
+ * - Premium feature indicators
+ * - Responsive design that works across different screen sizes
+ * 
+ * The navigation integrates with the user store for language preferences
+ * and premium status to show appropriate labels and access controls.
+ * 
+ * Navigation Routes:
+ * - scan: Main homepage for starting comparisons
+ * - celebrities: Celebrity comparison database
+ * - results: Comparison results and history
+ * - roast: AI roast generator
+ * - settings: App settings and preferences
+ * 
+ * Design: Uses dark theme with orange/pink accent colors
+ * Animations: Subtle scale animations on press
+ * Accessibility: Proper labels and touch targets
+ */
+
 import React from "react";
-import { StyleSheet, View, TouchableOpacity, Text } from "react-native";
-import { useRouter } from "expo-router";
-import { Camera, Star, MessageCircle, BarChart3 } from "lucide-react-native";
-import { colors } from "@/constants/colors";
+import { StyleSheet, View, TouchableOpacity, Text, Platform } from "react-native";
+import { useRouter, usePathname } from "expo-router";
+import { Camera, Star, BarChart3, MessageCircle, Settings } from "lucide-react-native";
+import * as Haptics from "expo-haptics";
+import { useUserStore } from "@/store/user-store";
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 
 interface BottomNavigationProps {
-  currentRoute: string;
+  currentRoute: "scan" | "celebrities" | "results" | "roast" | "settings";
 }
 
 export default function BottomNavigation({ currentRoute }: BottomNavigationProps) {
   const router = useRouter();
-
-  const handleNavigation = (route: string, path: string) => {
-    if (route === currentRoute) return; // Don't navigate if already on this route
-    router.push(path);
+  const pathname = usePathname();
+  const { getColors, getTranslations } = useUserStore();
+  const colors = getColors();
+  const t = getTranslations();
+  
+  const buttonScale = useSharedValue(1);
+  
+  const animatedButtonStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: buttonScale.value }]
+    };
+  });
+  
+  const handleNavigation = (route: string, routeName: string) => {
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    
+    buttonScale.value = withSpring(0.95, {}, () => {
+      buttonScale.value = withSpring(1);
+    });
+    
+    if (pathname !== route) {
+      router.push(route as any);
+    }
   };
-
+  
+  const tabs = [
+    {
+      id: "scan",
+      route: "/",
+      icon: Camera,
+      label: t.components.bottom_nav.scan,
+    },
+    {
+      id: "celebrities",
+      route: "/celebrities",
+      icon: Star,
+      label: t.components.bottom_nav.celebrities,
+    },
+    {
+      id: "results",
+      route: "/results",
+      icon: BarChart3,
+      label: t.components.bottom_nav.results,
+    },
+    {
+      id: "roast",
+      route: "/roastmaster",
+      icon: MessageCircle,
+      label: t.components.bottom_nav.roast,
+    },
+    {
+      id: "settings",
+      route: "/settings",
+      icon: Settings,
+      label: t.components.bottom_nav.settings,
+    },
+  ];
+  
   return (
-    <View style={styles.container}>
-      <TouchableOpacity 
-        style={[styles.navItem, currentRoute === "scan" && styles.activeNavItem]}
-        onPress={() => handleNavigation("scan", "/")}
-        disabled={currentRoute === "scan"}
-      >
-        <Camera 
-          size={24} 
-          color={currentRoute === "scan" ? colors.primary : colors.textLight} 
-          strokeWidth={currentRoute === "scan" ? 3 : 2}
-        />
-        <Text style={[
-          styles.navText, 
-          currentRoute === "scan" && styles.activeNavText
-        ]}>
-          Scan
-        </Text>
-      </TouchableOpacity>
-      
-      <TouchableOpacity 
-        style={[styles.navItem, currentRoute === "celebrities" && styles.activeNavItem]}
-        onPress={() => handleNavigation("celebrities", "/celebrities")}
-        disabled={currentRoute === "celebrities"}
-      >
-        <Star 
-          size={24} 
-          color={currentRoute === "celebrities" ? colors.primary : colors.textLight} 
-          strokeWidth={currentRoute === "celebrities" ? 3 : 2}
-        />
-        <Text style={[
-          styles.navText, 
-          currentRoute === "celebrities" && styles.activeNavText
-        ]}>
-          Celebrities
-        </Text>
-      </TouchableOpacity>
-      
-      <TouchableOpacity 
-        style={[styles.navItem, currentRoute === "roast" && styles.activeNavItem]}
-        onPress={() => handleNavigation("roast", "/roastmaster")}
-        disabled={currentRoute === "roast"}
-      >
-        <MessageCircle 
-          size={24} 
-          color={currentRoute === "roast" ? colors.primary : colors.textLight} 
-          strokeWidth={currentRoute === "roast" ? 3 : 2}
-        />
-        <Text style={[
-          styles.navText, 
-          currentRoute === "roast" && styles.activeNavText
-        ]}>
-          Roasted!
-        </Text>
-      </TouchableOpacity>
-      
-      <TouchableOpacity 
-        style={[styles.navItem, (currentRoute === "results" || currentRoute === "history") && styles.activeNavItem]}
-        onPress={() => handleNavigation("results", "/results")}
-        disabled={currentRoute === "results" || currentRoute === "history"}
-      >
-        <BarChart3 
-          size={24} 
-          color={(currentRoute === "results" || currentRoute === "history") ? colors.primary : colors.textLight} 
-          strokeWidth={(currentRoute === "results" || currentRoute === "history") ? 3 : 2}
-        />
-        <Text style={[
-          styles.navText, 
-          (currentRoute === "results" || currentRoute === "history") && styles.activeNavText
-        ]}>
-          Results
-        </Text>
-      </TouchableOpacity>
+    <View style={[styles.container, { backgroundColor: colors.card, borderTopColor: colors.border }]}>
+      {tabs.map((tab) => {
+        const isActive = currentRoute === tab.id;
+        const IconComponent = tab.icon;
+        
+        return (
+          <Animated.View key={tab.id} style={animatedButtonStyle}>
+            <TouchableOpacity
+              style={styles.tab}
+              onPress={() => handleNavigation(tab.route, tab.id)}
+            >
+              <IconComponent
+                size={24}
+                color={isActive ? colors.primary : colors.textLight}
+              />
+              <Text
+                style={[
+                  styles.tabLabel,
+                  {
+                    color: isActive ? colors.primary : colors.textLight,
+                    fontWeight: isActive ? "600" : "400",
+                  },
+                ]}
+              >
+                {tab.label}
+              </Text>
+            </TouchableOpacity>
+          </Animated.View>
+        );
+      })}
     </View>
   );
 }
@@ -100,34 +142,24 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     flexDirection: "row",
-    backgroundColor: colors.card,
-    paddingVertical: 12,
+    paddingTop: 12,
+    paddingBottom: 24,
     paddingHorizontal: 16,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
-    shadowColor: colors.shadow,
+    shadowColor: "rgba(0, 0, 0, 0.1)",
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 8,
   },
-  navItem: {
+  tab: {
     flex: 1,
     alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 8,
-    borderRadius: 8,
   },
-  activeNavItem: {
-    backgroundColor: colors.primary + "15",
-  },
-  navText: {
+  tabLabel: {
     fontSize: 12,
-    color: colors.textLight,
     marginTop: 4,
-    fontWeight: "500",
-  },
-  activeNavText: {
-    color: colors.primary,
-    fontWeight: "900",
   },
 });

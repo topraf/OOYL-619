@@ -8,14 +8,16 @@
  * - Premium upgrade banner for free users
  * - Feature explanation section
  * - App disclaimer
+ * - Multilingual support with dynamic text based on user language preference
  * 
  * The screen uses a dark theme with orange/pink gradients and includes
  * smooth animations for user interactions. It integrates with the user
- * store for premium status and comparison management.
+ * store for premium status, comparison management, and language settings.
  * 
  * Navigation: Includes bottom navigation and routes to various app sections
  * Premium: Shows upgrade prompts for non-premium users
  * Animations: React Native Reanimated for smooth interactions
+ * Languages: Supports multiple languages through the translations system
  */
 
 import React, { useEffect } from "react";
@@ -43,9 +45,10 @@ const { width } = Dimensions.get("window");
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { resetUserImages, freeComparisonUsed, isPremium, getColors } = useUserStore();
+  const { resetUserImages, freeComparisonUsed, isPremium, getColors, getTranslations } = useUserStore();
   const { hasCompletedOnboarding, setHasCompletedOnboarding } = useOnboardingStore();
   const colors = getColors();
+  const t = getTranslations();
   
   const buttonScale = useSharedValue(1);
   const heroScale = useSharedValue(0.95);
@@ -187,14 +190,14 @@ export default function HomeScreen() {
             >
               <View style={styles.buttonContent}>
                 <Camera size={24} color="#FFFFFF" />
-                <Text style={styles.buttonText}>Find out if (s)he is out of your league!</Text>
+                <Text style={styles.buttonText}>{t.screens.home.main_cta}</Text>
               </View>
             </TouchableOpacity>
           </Animated.View>
           
           {!freeComparisonUsed && (
             <Animated.View style={[styles.freeTagContainer, { backgroundColor: colors.success }]}>
-              <Text style={[styles.freeTag, { color: colors.background }]}>First comparison is FREE!</Text>
+              <Text style={[styles.freeTag, { color: colors.background }]}>{t.screens.home.free_comparison}</Text>
             </Animated.View>
           )}
         </Animated.View>
@@ -216,9 +219,9 @@ export default function HomeScreen() {
             <View style={[styles.cardFlatBackground, { backgroundColor: colors.primary + "15" }]} />
             <View style={styles.cardContent}>
               <Star size={24} color={colors.primary} />
-              <Text style={[styles.cardTitle, { color: colors.text }]}>Celebrities</Text>
+              <Text style={[styles.cardTitle, { color: colors.text }]}>{t.screens.home.celebrities_title}</Text>
               <Text style={[styles.cardDescription, { color: colors.textLight }]}>
-                Compare with famous people
+                {t.screens.home.celebrities_subtitle}
               </Text>
             </View>
             {(!isPremium && freeComparisonUsed) && (
@@ -244,9 +247,9 @@ export default function HomeScreen() {
             <View style={[styles.cardFlatBackground, { backgroundColor: colors.secondary + "15" }]} />
             <View style={styles.cardContent}>
               <MessageCircle size={24} color={colors.secondary} />
-              <Text style={[styles.cardTitle, { color: colors.text }]}>AI Roast</Text>
+              <Text style={[styles.cardTitle, { color: colors.text }]}>{t.screens.home.ai_roast_title}</Text>
               <Text style={[styles.cardDescription, { color: colors.textLight }]}>
-                Get roasted by our AI
+                {t.screens.home.ai_roast_subtitle}
               </Text>
             </View>
             {(!isPremium && freeComparisonUsed) && (
@@ -275,17 +278,16 @@ export default function HomeScreen() {
               />
               <View style={styles.premiumContent}>
                 <Text style={[styles.premiumTitle, { color: colors.background }]}>
-                  Upgrade to{" "}
-                  <Text style={styles.premiumTitleAccent}>Premium</Text>
+                  {t.screens.home.premium_title}
                 </Text>
                 <Text style={[styles.premiumDescription, { color: colors.background }]}>
-                  Unlimited comparisons, celebrity matches, and AI beauty analysis
+                  {t.screens.home.premium_subtitle}
                 </Text>
                 <TouchableOpacity 
                   style={[styles.premiumButton, { backgroundColor: "#FFD700" }]}
                   onPress={() => router.push("/subscription")}
                 >
-                  <Text style={[styles.premiumButtonText, { color: "#000000" }]}>Get Premium</Text>
+                  <Text style={[styles.premiumButtonText, { color: "#000000" }]}>{t.screens.home.premium_cta}</Text>
                 </TouchableOpacity>
               </View>
             </LinearGradient>
@@ -294,8 +296,10 @@ export default function HomeScreen() {
         
         <Animated.View style={[styles.featuresContainer, animatedSlideStyle]}>
           <Text style={[styles.featuresTitle, { color: colors.text }]}>
-            How It{" "}
-            <Text style={[styles.featuresTitleAccent, { color: colors.primary }]}>Works</Text>
+            {t.screens.home.how_it_works.split(' ')[0]} {t.screens.home.how_it_works.split(' ')[1]}{" "}
+            <Text style={[styles.featuresTitleAccent, { color: colors.primary }]}>
+              {t.screens.home.how_it_works.split(' ')[2]}
+            </Text>
           </Text>
           
           <Animated.View style={[styles.featureItem, { backgroundColor: colors.card }]}>
@@ -303,9 +307,9 @@ export default function HomeScreen() {
               <Camera size={24} color={colors.primary} />
             </View>
             <View style={styles.featureContent}>
-              <Text style={[styles.featureTitle, { color: colors.text }]}>📸 Take Your Selfie</Text>
+              <Text style={[styles.featureTitle, { color: colors.text }]}>{t.screens.home.step1_title}</Text>
               <Text style={[styles.featureDescription, { color: colors.textLight }]}>
-                Capture a clear selfie for accurate beauty analysis
+                {t.screens.home.step1_description}
               </Text>
             </View>
           </Animated.View>
@@ -315,9 +319,9 @@ export default function HomeScreen() {
               <Star size={24} color={colors.primary} />
             </View>
             <View style={styles.featureContent}>
-              <Text style={[styles.featureTitle, { color: colors.text }]}>🎯 Compare With Someone</Text>
+              <Text style={[styles.featureTitle, { color: colors.text }]}>{t.screens.home.step2_title}</Text>
               <Text style={[styles.featureDescription, { color: colors.textLight }]}>
-                Upload their photo or choose from our celebrity database
+                {t.screens.home.step2_description}
               </Text>
             </View>
           </Animated.View>
@@ -327,9 +331,9 @@ export default function HomeScreen() {
               <Text style={[styles.gaugeIcon, { color: colors.primary }]}>%</Text>
             </View>
             <View style={styles.featureContent}>
-              <Text style={[styles.featureTitle, { color: colors.text }]}>✨ Get Honest Results</Text>
+              <Text style={[styles.featureTitle, { color: colors.text }]}>{t.screens.home.step3_title}</Text>
               <Text style={[styles.featureDescription, { color: colors.textLight }]}>
-                Find out if they're in your league with our advanced algorithm
+                {t.screens.home.step3_description}
               </Text>
             </View>
           </Animated.View>
@@ -337,9 +341,7 @@ export default function HomeScreen() {
         
         <View style={styles.disclaimerContainer}>
           <Text style={[styles.disclaimer, { color: colors.textLight }]}>
-            This app is for entertainment purposes only. Beauty is subjective and our algorithm
-            provides an approximation based on photographic evidence. Not everyone is photogenic,
-            so don't take the results too seriously!
+            {t.screens.home.disclaimer}
           </Text>
         </View>
       </ScrollView>
@@ -547,11 +549,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "900",
     marginBottom: 8,
-  },
-  premiumTitleAccent: {
-    textShadowColor: "rgba(255,255,255,0.3)",
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
   },
   premiumDescription: {
     fontSize: 14,
