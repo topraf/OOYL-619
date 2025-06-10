@@ -1,13 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Dimensions, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { ArrowRight, Star } from "lucide-react-native";
+import { ArrowRight, Star, Zap, Crown, Sparkles } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { Platform } from "react-native";
 import { useUserStore } from "@/store/user-store";
 import { useOnboardingStore } from "@/store/onboarding-store";
-import { subscriptionPlans } from "@/mocks/subscriptions";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -18,7 +17,6 @@ export default function OnboardingSubscriptionScreen() {
   const { getColors, setPremiumStatus } = useUserStore();
   const { completeOnboarding, acceptPremium, skipPremium, hasCompletedOnboarding } = useOnboardingStore();
   const colors = getColors();
-  const [selectedPlan, setSelectedPlan] = useState(subscriptionPlans.find(p => p.id === "monthly"));
   
   const subscribeButtonScale = useSharedValue(1);
   const skipButtonScale = useSharedValue(1);
@@ -42,7 +40,7 @@ export default function OnboardingSubscriptionScreen() {
     }
   }, [hasCompletedOnboarding]);
   
-  const handleSubscribe = () => {
+  const handleStartTrial = () => {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
@@ -53,7 +51,7 @@ export default function OnboardingSubscriptionScreen() {
     router.replace("/");
   };
   
-  const handleSkip = () => {
+  const handleNotRightNow = () => {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
@@ -81,77 +79,46 @@ export default function OnboardingSubscriptionScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
-        <Text style={[styles.title, { color: colors.text }]}>
-          Get the{" "}
-          <Text style={[styles.titleAccent, { color: colors.primary }]}>Full Experience</Text>
-        </Text>
-        
-        <Text style={[styles.subtitle, { color: colors.textLight }]}>
-          Unlock all premium features and enjoy unlimited comparisons
-        </Text>
-        
-        <View style={styles.plansContainer}>
-          <View style={styles.plansRow}>
-            {subscriptionPlans.map(plan => (
-              <TouchableOpacity
-                key={plan.id}
-                style={[
-                  styles.planCard,
-                  { backgroundColor: colors.card },
-                  selectedPlan?.id === plan.id && { borderColor: colors.primary }
-                ]}
-                onPress={() => setSelectedPlan(plan)}
-              >
-                <View style={styles.planHeader}>
-                  <Text style={[styles.planName, { color: colors.text }]}>{plan.name}</Text>
-                  <Text style={[styles.planPrice, { color: colors.primary }]}>{plan.price}</Text>
-                  <Text style={[styles.planInterval, { color: colors.textLight }]}>
-                    {plan.interval === "one-time" ? "One-time" : `per ${plan.interval}`}
-                  </Text>
-                </View>
-                
-                {plan.popular && (
-                  <View style={[styles.popularBadge, { backgroundColor: colors.primary }]}>
-                    <Star size={12} color={colors.background} />
-                    <Text style={[styles.popularText, { color: colors.background }]}>POPULAR</Text>
-                  </View>
-                )}
-                
-                <View style={[
-                  styles.radioButton,
-                  { borderColor: colors.border },
-                  selectedPlan?.id === plan.id && { borderColor: colors.primary }
-                ]}>
-                  {selectedPlan?.id === plan.id && (
-                    <View style={[styles.radioButtonInner, { backgroundColor: colors.primary }]} />
-                  )}
-                </View>
-              </TouchableOpacity>
-            ))}
+        <View style={[styles.headerContainer, { backgroundColor: colors.primary + "10" }]}>
+          <View style={[styles.crownContainer, { backgroundColor: colors.primary + "20" }]}>
+            <Crown size={32} color={colors.primary} />
           </View>
+          <Text style={[styles.title, { color: colors.text }]}>
+            Unlock{" "}
+            <Text style={[styles.titleAccent, { color: colors.primary }]}>Pro Features</Text>
+          </Text>
+          <Text style={[styles.subtitle, { color: colors.textLight }]}>
+            Get unlimited access to all premium features with a 3-day free trial
+          </Text>
         </View>
         
-        <View style={[styles.featuresContainer, { backgroundColor: colors.card }]}>
-          <Text style={[styles.featuresTitle, { color: colors.text }]}>Premium Features</Text>
-          
-          <View style={styles.featureItem}>
-            <Text style={styles.featureEmoji}>🚀</Text>
-            <Text style={[styles.featureText, { color: colors.text }]}>Unlimited comparisons</Text>
+        <View style={styles.featuresContainer}>
+          <View style={styles.featureRow}>
+            <View style={[styles.featureIcon, { backgroundColor: colors.primary + "20" }]}>
+              <Zap size={20} color={colors.primary} />
+            </View>
+            <Text style={[styles.featureText, { color: colors.text }]}>Unlimited beauty comparisons</Text>
           </View>
           
-          <View style={styles.featureItem}>
-            <Text style={styles.featureEmoji}>⭐</Text>
-            <Text style={[styles.featureText, { color: colors.text }]}>Celebrity comparisons</Text>
+          <View style={styles.featureRow}>
+            <View style={[styles.featureIcon, { backgroundColor: colors.primary + "20" }]}>
+              <Star size={20} color={colors.primary} />
+            </View>
+            <Text style={[styles.featureText, { color: colors.text }]}>Compare with celebrities</Text>
           </View>
           
-          <View style={styles.featureItem}>
-            <Text style={styles.featureEmoji}>🤖</Text>
-            <Text style={[styles.featureText, { color: colors.text }]}>AI beauty analysis and tips</Text>
+          <View style={styles.featureRow}>
+            <View style={[styles.featureIcon, { backgroundColor: colors.primary + "20" }]}>
+              <Sparkles size={20} color={colors.primary} />
+            </View>
+            <Text style={[styles.featureText, { color: colors.text }]}>AI beauty analysis & tips</Text>
           </View>
           
-          <View style={styles.featureItem}>
-            <Text style={styles.featureEmoji}>🔥</Text>
-            <Text style={[styles.featureText, { color: colors.text }]}>AI roast feature</Text>
+          <View style={styles.featureRow}>
+            <View style={[styles.featureIcon, { backgroundColor: colors.primary + "20" }]}>
+              <Sparkles size={20} color={colors.primary} />
+            </View>
+            <Text style={[styles.featureText, { color: colors.text }]}>AI roast feature for fun</Text>
           </View>
         </View>
         
@@ -168,13 +135,19 @@ export default function OnboardingSubscriptionScreen() {
             </Text>
           </LinearGradient>
         </View>
+        
+        <View style={styles.pricingContainer}>
+          <Text style={[styles.pricingText, { color: colors.textLight }]}>
+            Then $9.99/month. Cancel anytime.
+          </Text>
+        </View>
       </ScrollView>
       
       <View style={styles.footer}>
         <Animated.View style={animatedSubscribeButtonStyle}>
           <TouchableOpacity 
             style={[styles.subscribeButton, { backgroundColor: colors.primary }]}
-            onPress={handleSubscribe}
+            onPress={handleStartTrial}
             onPressIn={onSubscribePressIn}
             onPressOut={onSubscribePressOut}
           >
@@ -186,11 +159,11 @@ export default function OnboardingSubscriptionScreen() {
         <Animated.View style={animatedSkipButtonStyle}>
           <TouchableOpacity 
             style={styles.skipButton}
-            onPress={handleSkip}
+            onPress={handleNotRightNow}
             onPressIn={onSkipPressIn}
             onPressOut={onSkipPressOut}
           >
-            <Text style={[styles.skipButtonText, { color: colors.textLight }]}>Maybe Later</Text>
+            <Text style={[styles.skipButtonText, { color: colors.textLight }]}>Not right now</Text>
           </TouchableOpacity>
         </Animated.View>
         
@@ -213,6 +186,20 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: 24,
   },
+  headerContainer: {
+    borderRadius: 20,
+    padding: 24,
+    alignItems: "center",
+    marginBottom: 32,
+  },
+  crownContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 16,
+  },
   title: {
     fontSize: 28,
     fontWeight: "900",
@@ -226,104 +213,35 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     textAlign: "center",
-    marginBottom: 24,
     lineHeight: 24,
   },
-  plansContainer: {
-    marginBottom: 24,
-  },
-  plansRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  planCard: {
-    width: (width - 72) / 3,
-    borderRadius: 16,
-    padding: 12,
-    borderWidth: 2,
-    borderColor: "transparent",
-    shadowColor: "rgba(0, 0, 0, 0.1)",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-    position: "relative",
-  },
-  planHeader: {
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  planName: {
-    fontSize: 14,
-    fontWeight: "700",
-    marginBottom: 4,
-  },
-  planPrice: {
-    fontSize: 18,
-    fontWeight: "800",
-    marginBottom: 2,
-  },
-  planInterval: {
-    fontSize: 12,
-  },
-  radioButton: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    justifyContent: "center",
-    alignItems: "center",
-    alignSelf: "center",
-    marginTop: 8,
-  },
-  radioButtonInner: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-  },
-  popularBadge: {
-    position: "absolute",
-    top: -8,
-    right: -8,
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-    borderRadius: 10,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  popularText: {
-    fontSize: 8,
-    fontWeight: "700",
-    marginLeft: 2,
-  },
   featuresContainer: {
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 24,
+    marginBottom: 32,
   },
-  featuresTitle: {
-    fontSize: 18,
-    fontWeight: "700",
+  featureRow: {
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 16,
   },
-  featureItem: {
-    flexDirection: "row",
+  featureIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
     alignItems: "center",
-    marginBottom: 12,
-  },
-  featureEmoji: {
-    fontSize: 20,
-    marginRight: 12,
+    marginRight: 16,
   },
   featureText: {
     fontSize: 16,
+    fontWeight: "600",
   },
   trialContainer: {
-    marginBottom: 24,
+    marginBottom: 16,
   },
   trialBanner: {
     borderRadius: 16,
-    padding: 16,
+    padding: 20,
+    alignItems: "center",
     shadowColor: "rgba(0, 0, 0, 0.1)",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
@@ -331,20 +249,28 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   trialTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "800",
     marginBottom: 8,
   },
   trialDescription: {
     fontSize: 14,
     opacity: 0.9,
+    textAlign: "center",
+  },
+  pricingContainer: {
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  pricingText: {
+    fontSize: 14,
   },
   footer: {
     padding: 24,
   },
   subscribeButton: {
     borderRadius: 12,
-    paddingVertical: 16,
+    paddingVertical: 18,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -356,7 +282,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   subscribeButtonText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "700",
     marginRight: 8,
   },
