@@ -159,47 +159,51 @@ export default function HomeScreen() {
   };
   
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top"]}>
-      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
-        <Animated.View style={[styles.heroContainer, animatedHeroStyle]}>
-          <Image
-            source={{ uri: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" }}
-            style={styles.heroImage}
-          />
-          <LinearGradient
-            colors={["transparent", colors.overlay]}
-            style={styles.heroGradient}
-          />
-          <View style={styles.headerButtons}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <LinearGradient
+        colors={["#8B5A3C", "#FF6B35"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.headerGradient}
+      >
+        <SafeAreaView style={styles.headerContent}>
+          <View style={styles.headerTop}>
+            <Text style={styles.headerTitle}>Out of Your League</Text>
             <TouchableOpacity
-              style={[styles.headerButton, { backgroundColor: colors.overlay }]}
-              onPress={() => router.push("/settings")}
+              style={styles.proButton}
+              onPress={() => router.push("/subscription")}
             >
-              <Settings size={20} color={colors.background} />
+              <Text style={styles.proButtonText}>Go Pro +</Text>
             </TouchableOpacity>
           </View>
-        </Animated.View>
+        </SafeAreaView>
+      </LinearGradient>
+      
+      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
         
-        <Animated.View style={[styles.actionsContainer, animatedSlideStyle]}>
-          <Animated.View style={animatedPulseStyle}>
+        <Animated.View style={[styles.mainCard, animatedSlideStyle]}>
+          <View style={styles.mainCardContent}>
+            <View style={styles.heartIcon}>
+              <Text style={styles.heartEmoji}>♡</Text>
+            </View>
+            <Text style={styles.mainCardTitle}>
+              Find out if (s)he is{"\n"}out of your league!
+            </Text>
             <TouchableOpacity 
-              style={[styles.mainButton, { backgroundColor: colors.primary }]}
+              style={styles.startButton}
               onPress={handleStartComparison}
               onPressIn={onPressIn}
               onPressOut={onPressOut}
             >
-              <View style={styles.buttonContent}>
-                <Camera size={24} color="#FFFFFF" />
-                <Text style={styles.buttonText}>{t.screens.home.main_cta}</Text>
-              </View>
+              <Text style={styles.startButtonText}>Start ›</Text>
             </TouchableOpacity>
-          </Animated.View>
-          
-          {!freeComparisonUsed && (
-            <Animated.View style={[styles.freeTagContainer, { backgroundColor: colors.success }]}>
-              <Text style={[styles.freeTag, { color: colors.background }]}>{t.screens.home.free_comparison}</Text>
-            </Animated.View>
-          )}
+          </View>
+          <View style={styles.mainCardImage}>
+            <Image
+              source={{ uri: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" }}
+              style={styles.coupleImage}
+            />
+          </View>
         </Animated.View>
 
         <Animated.View style={[styles.quickActionsContainer, animatedSlideStyle]}>
@@ -207,137 +211,80 @@ export default function HomeScreen() {
             style={[styles.quickActionCard, { backgroundColor: colors.card }]}
             onPress={handleCelebrities}
           >
-            <View style={[styles.plusIconContainer, { backgroundColor: colors.background }]}>
-              <Plus size={20} color={colors.primary} />
+            <View style={styles.cardIcon}>
+              <Star size={24} color="#FFFFFF" />
             </View>
-            <LinearGradient
-              colors={[colors.secondary, colors.primary, "#9C27B0"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.cardGradientBorder}
-            />
-            <View style={[styles.cardFlatBackground, { backgroundColor: colors.primary + "15" }]} />
             <View style={styles.cardContent}>
-              <Star size={24} color={colors.primary} />
-              <Text style={[styles.cardTitle, { color: colors.text }]}>{t.screens.home.celebrities_title}</Text>
+              <Text style={[styles.cardTitle, { color: colors.text }]}>Celebrities</Text>
               <Text style={[styles.cardDescription, { color: colors.textLight }]}>
-                {t.screens.home.celebrities_subtitle}
+                Compare yourself to{"\n"}famous celebrities
               </Text>
+              <Text style={styles.unlockText}>Unlock PRO ›</Text>
             </View>
-            {(!isPremium && freeComparisonUsed) && (
-              <View style={[styles.premiumBadge, { backgroundColor: colors.primary }]}>
-                <Star size={10} color={colors.background} />
-              </View>
-            )}
           </TouchableOpacity>
           
           <TouchableOpacity 
             style={[styles.quickActionCard, { backgroundColor: colors.card }]}
             onPress={handleAIRoast}
           >
-            <View style={[styles.plusIconContainer, { backgroundColor: colors.background }]}>
-              <Plus size={20} color={colors.primary} />
+            <View style={styles.cardIcon}>
+              <MessageCircle size={24} color="#FFFFFF" />
             </View>
-            <LinearGradient
-              colors={[colors.primary, "#9C27B0", colors.secondary]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.cardGradientBorder}
-            />
-            <View style={[styles.cardFlatBackground, { backgroundColor: colors.secondary + "15" }]} />
             <View style={styles.cardContent}>
-              <MessageCircle size={24} color={colors.secondary} />
-              <Text style={[styles.cardTitle, { color: colors.text }]}>{t.screens.home.ai_roast_title}</Text>
+              <Text style={[styles.cardTitle, { color: colors.text }]}>AI Roast</Text>
               <Text style={[styles.cardDescription, { color: colors.textLight }]}>
-                {t.screens.home.ai_roast_subtitle}
+                Find smart ways to{"\n"}improve yourself
+              </Text>
+              <Text style={styles.unlockText}>Unlock PRO ›</Text>
+            </View>
+          </TouchableOpacity>
+        </Animated.View>
+        
+
+        
+        <Animated.View style={[styles.featuresContainer, animatedSlideStyle]}>
+          <Text style={[styles.featuresTitle, { color: colors.text }]}>
+            How it works
+          </Text>
+          
+          <Animated.View style={[styles.featureItem, { backgroundColor: colors.card }]}>
+            <View style={[styles.featureIconContainer, { backgroundColor: "rgba(255, 107, 53, 0.2)" }]}>
+              <Camera size={24} color={colors.primary} />
+            </View>
+            <View style={styles.featureContent}>
+              <Text style={[styles.featureTitle, { color: colors.text }]}>Take Your Selfie</Text>
+              <Text style={[styles.featureDescription, { color: colors.textLight }]}>
+                Capture a clear selfie for{"\n"}accurate beauty analysis
               </Text>
             </View>
-            {(!isPremium && freeComparisonUsed) && (
-              <View style={[styles.premiumBadge, { backgroundColor: colors.primary }]}>
-                <Star size={10} color={colors.background} />
-              </View>
-            )}
-          </TouchableOpacity>
+          </Animated.View>
         </Animated.View>
         
         {!isPremium && (
           <Animated.View style={[styles.premiumContainer, animatedSlideStyle]}>
             <LinearGradient
-              colors={[colors.secondary, colors.primary]}
+              colors={["#FF1744", "#FF6B35"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.premiumBanner}
             >
-              <Image
-                source={{ uri: "https://images.unsplash.com/photo-1494790108755-2616c9c0e8e3?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" }}
-                style={styles.premiumBackgroundImage}
-              />
-              <LinearGradient
-                colors={["rgba(0,0,0,0.3)", "rgba(0,0,0,0.7)"]}
-                style={styles.premiumOverlay}
-              />
               <View style={styles.premiumContent}>
-                <Text style={[styles.premiumTitle, { color: colors.background }]}>
-                  {t.screens.home.premium_title}
+                <Text style={styles.premiumTitle}>
+                  Unlock PRO
                 </Text>
-                <Text style={[styles.premiumDescription, { color: colors.background }]}>
-                  {t.screens.home.premium_subtitle}
+                <Text style={styles.premiumDescription}>
+                  Unlimited comparisons, celebrity{"\n"}matches, and AI beauty analyse
                 </Text>
                 <TouchableOpacity 
-                  style={[styles.premiumButton, { backgroundColor: "#FFD700" }]}
+                  style={styles.premiumButton}
                   onPress={() => router.push("/subscription")}
                 >
-                  <Text style={[styles.premiumButtonText, { color: "#000000" }]}>{t.screens.home.premium_cta}</Text>
+                  <Text style={styles.premiumButtonText}>Go Pro +</Text>
                 </TouchableOpacity>
               </View>
             </LinearGradient>
           </Animated.View>
         )}
-        
-        <Animated.View style={[styles.featuresContainer, animatedSlideStyle]}>
-          <Text style={[styles.featuresTitle, { color: colors.text }]}>
-            {t.screens.home.how_it_works.split(' ')[0]} {t.screens.home.how_it_works.split(' ')[1]}{" "}
-            <Text style={[styles.featuresTitleAccent, { color: colors.primary }]}>
-              {t.screens.home.how_it_works.split(' ')[2]}
-            </Text>
-          </Text>
-          
-          <Animated.View style={[styles.featureItem, { backgroundColor: colors.card }]}>
-            <View style={[styles.featureIconContainer, { backgroundColor: colors.primary + "20" }]}>
-              <Camera size={24} color={colors.primary} />
-            </View>
-            <View style={styles.featureContent}>
-              <Text style={[styles.featureTitle, { color: colors.text }]}>{t.screens.home.step1_title}</Text>
-              <Text style={[styles.featureDescription, { color: colors.textLight }]}>
-                {t.screens.home.step1_description}
-              </Text>
-            </View>
-          </Animated.View>
-          
-          <Animated.View style={[styles.featureItem, { backgroundColor: colors.card }]}>
-            <View style={[styles.featureIconContainer, { backgroundColor: colors.primary + "20" }]}>
-              <Star size={24} color={colors.primary} />
-            </View>
-            <View style={styles.featureContent}>
-              <Text style={[styles.featureTitle, { color: colors.text }]}>{t.screens.home.step2_title}</Text>
-              <Text style={[styles.featureDescription, { color: colors.textLight }]}>
-                {t.screens.home.step2_description}
-              </Text>
-            </View>
-          </Animated.View>
-          
-          <Animated.View style={[styles.featureItem, { backgroundColor: colors.card }]}>
-            <View style={[styles.featureIconContainer, { backgroundColor: colors.primary + "20" }]}>
-              <Text style={[styles.gaugeIcon, { color: colors.primary }]}>%</Text>
-            </View>
-            <View style={styles.featureContent}>
-              <Text style={[styles.featureTitle, { color: colors.text }]}>{t.screens.home.step3_title}</Text>
-              <Text style={[styles.featureDescription, { color: colors.textLight }]}>
-                {t.screens.home.step3_description}
-              </Text>
-            </View>
-          </Animated.View>
-        </Animated.View>
         
         <View style={styles.disclaimerContainer}>
           <Text style={[styles.disclaimer, { color: colors.textLight }]}>
@@ -347,7 +294,7 @@ export default function HomeScreen() {
       </ScrollView>
       
       <BottomNavigation currentRoute="scan" />
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -355,87 +302,94 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  headerGradient: {
+    paddingTop: 20,
+  },
+  headerContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
+  headerTop: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#FFFFFF",
+  },
+  proButton: {
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  proButtonText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "600",
+  },
   content: {
     flex: 1,
   },
   contentContainer: {
     paddingBottom: 120,
   },
-  heroContainer: {
-    height: 240,
+  mainCard: {
     marginHorizontal: 16,
     marginTop: 16,
-    borderRadius: 16,
+    backgroundColor: "#2A1810",
+    borderRadius: 20,
     overflow: "hidden",
-    position: "relative",
-    shadowColor: "rgba(0, 0, 0, 0.1)",
+    flexDirection: "row",
+    minHeight: 160,
+    shadowColor: "#000000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
-    elevation: 4,
+    elevation: 8,
   },
-  heroImage: {
-    width: "100%",
-    height: "100%",
+  mainCardContent: {
+    flex: 1,
+    padding: 20,
+    justifyContent: "space-between",
   },
-  heroGradient: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 16,
-  },
-  headerButtons: {
-    position: "absolute",
-    top: 12,
-    right: 12,
-    flexDirection: "row",
-    gap: 8,
-  },
-  headerButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+  heartIcon: {
+    width: 40,
+    height: 40,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 12,
   },
-  actionsContainer: {
-    marginTop: 24,
-    paddingHorizontal: 16,
-    position: "relative",
-  },
-  mainButton: {
-    borderRadius: 16,
-    paddingVertical: 20,
-    paddingHorizontal: 24,
-    shadowColor: "rgba(0, 0, 0, 0.1)",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  buttonContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonText: {
-    fontSize: 18,
-    fontWeight: "900",
-    marginLeft: 12,
+  heartEmoji: {
+    fontSize: 20,
     color: "#FFFFFF",
   },
-  freeTagContainer: {
-    position: "absolute",
-    top: -10,
-    right: 24,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  freeTag: {
-    fontSize: 12,
+  mainCardTitle: {
+    fontSize: 18,
     fontWeight: "700",
+    color: "#FFFFFF",
+    marginBottom: 16,
+    lineHeight: 24,
+  },
+  startButton: {
+    alignSelf: "flex-start",
+  },
+  startButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#FF6B35",
+  },
+  mainCardImage: {
+    width: 120,
+    height: "100%",
+  },
+  coupleImage: {
+    width: "100%",
+    height: "100%",
   },
   quickActionsContainer: {
     flexDirection: "row",
@@ -455,113 +409,73 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  cardGradientBorder: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    padding: 2,
-  },
-  cardFlatBackground: {
-    position: "absolute",
-    top: 2,
-    left: 2,
-    right: 2,
-    bottom: 2,
-    borderRadius: 14,
+  cardIcon: {
+    width: 40,
+    height: 40,
+    backgroundColor: "rgba(255, 107, 53, 0.2)",
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 12,
   },
   cardContent: {
     padding: 16,
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 1,
+    justifyContent: "space-between",
   },
   cardTitle: {
     fontSize: 18,
     fontWeight: "700",
-    marginTop: 12,
-    marginBottom: 4,
+    marginBottom: 8,
   },
   cardDescription: {
-    fontSize: 12,
-    textAlign: "center",
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 12,
   },
-  plusIconContainer: {
-    position: "absolute",
-    top: 8,
-    right: 8,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 10,
-  },
-  premiumBadge: {
-    position: "absolute",
-    top: 8,
-    left: 8,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 2,
+  unlockText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#FF6B35",
   },
   premiumContainer: {
-    marginTop: 24,
+    marginTop: 32,
     paddingHorizontal: 16,
   },
   premiumBanner: {
-    borderRadius: 16,
-    height: 120,
+    borderRadius: 20,
     overflow: "hidden",
-    position: "relative",
-    shadowColor: "rgba(0, 0, 0, 0.1)",
+    shadowColor: "#000000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
-    elevation: 4,
-  },
-  premiumBackgroundImage: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  premiumOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    elevation: 8,
   },
   premiumContent: {
-    padding: 20,
-    flex: 1,
-    justifyContent: "center",
-    zIndex: 1,
+    padding: 24,
+    alignItems: "center",
   },
   premiumTitle: {
-    fontSize: 20,
-    fontWeight: "900",
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#FFFFFF",
     marginBottom: 8,
   },
   premiumDescription: {
-    fontSize: 14,
-    opacity: 0.9,
-    marginBottom: 16,
+    fontSize: 16,
+    color: "rgba(255, 255, 255, 0.9)",
+    textAlign: "center",
+    marginBottom: 20,
+    lineHeight: 22,
   },
   premiumButton: {
+    backgroundColor: "#FFFFFF",
     paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 10,
-    alignSelf: "flex-start",
+    paddingHorizontal: 32,
+    borderRadius: 25,
   },
   premiumButtonText: {
+    color: "#000000",
     fontWeight: "700",
     fontSize: 16,
   },
@@ -571,11 +485,8 @@ const styles = StyleSheet.create({
   },
   featuresTitle: {
     fontSize: 24,
-    fontWeight: "900",
+    fontWeight: "700",
     marginBottom: 16,
-  },
-  featuresTitleAccent: {
-    // Color applied dynamically
   },
   featureItem: {
     flexDirection: "row",
@@ -595,10 +506,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginRight: 16,
-  },
-  gaugeIcon: {
-    fontSize: 20,
-    fontWeight: "800",
   },
   featureContent: {
     flex: 1,

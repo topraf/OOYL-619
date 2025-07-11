@@ -1,14 +1,21 @@
+/**
+ * Onboarding Features Screen - Second screen showing how the app works
+ * 
+ * This screen demonstrates the core functionality with example images
+ * and a visual gauge showing the league comparison system.
+ */
+
 import React from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Dimensions, Image } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, Dimensions, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { Camera, ArrowRight } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { Platform } from "react-native";
 import { colors } from "@/constants/colors";
 import { useOnboardingStore } from "@/store/onboarding-store";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
+import { Image } from "expo-image";
 
 const { width } = Dimensions.get("window");
 
@@ -40,153 +47,131 @@ export default function OnboardingFeaturesScreen() {
   };
   
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>
-          Take a selfie and see your{" "}
-          <Text style={styles.titleAccent}>results</Text>
-        </Text>
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#000000" />
+      
+      <SafeAreaView style={styles.content}>
+        <View style={styles.spacer} />
         
-        <View style={styles.featureContainer}>
-          <View style={styles.imagesRow}>
-            <View style={styles.imageBox}>
-              <Image
-                source={{ uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" }}
-                style={styles.faceImage}
-              />
-              <Text style={styles.imageLabel}>You</Text>
-            </View>
-            
-            <View style={styles.imageBox}>
-              <Image
-                source={{ uri: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" }}
-                style={styles.faceImage}
-              />
-              <Text style={styles.imageLabel}>Someone Else</Text>
+        <View style={styles.imagesContainer}>
+          <View style={styles.imageCard}>
+            <Image
+              source={{ uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" }}
+              style={styles.faceImage}
+            />
+            <View style={styles.imageLabel}>
+              <Text style={styles.imageLabelText}>You</Text>
             </View>
           </View>
           
-          <View style={styles.gaugeContainer}>
-            <Text style={styles.gaugeTitle}>League Status Gauge</Text>
-            <LinearGradient
-              colors={[
-                colors.gauge.purple,
-                colors.gauge.blue,
-                colors.gauge.green,
-                colors.gauge.yellow,
-                colors.gauge.orange,
-                colors.gauge.red,
-              ]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.gauge}
+          <View style={[styles.imageCard, styles.overlappingCard]}>
+            <Image
+              source={{ uri: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" }}
+              style={styles.faceImage}
             />
-            <View style={styles.gaugeLabels}>
-              <Text style={styles.gaugeLabel}>You can do better</Text>
-              <Text style={styles.gaugeLabel}>In your league</Text>
-              <Text style={[styles.gaugeLabel, styles.outOfLeagueLabel]}>Out of your league</Text>
+            <View style={styles.imageLabel}>
+              <Text style={styles.imageLabelText}>Someone else</Text>
             </View>
           </View>
         </View>
         
-        <LinearGradient
-          colors={[colors.primary + "10", colors.secondary + "10"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.infoContainer}
-        >
-          <View style={styles.infoIconContainer}>
-            <Camera size={24} color={colors.primary} />
+        <View style={styles.gaugeContainer}>
+          <LinearGradient
+            colors={["#FF6B35", "#4CC9F0", "#9C27B0", "#FF1744"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.gauge}
+          />
+          <View style={styles.gaugeLabels}>
+            <Text style={styles.gaugeLabel}>You can do better</Text>
+            <Text style={styles.gaugeLabel}>Your league</Text>
+            <Text style={styles.gaugeLabel}>Out of your league</Text>
           </View>
-          <Text style={styles.infoText}>
-            With our AI-powered face analysis, we'll calculate your beauty score and compare it with others
-          </Text>
-        </LinearGradient>
-      </View>
-      
-      <View style={styles.footer}>
-        <Animated.View style={animatedButtonStyle}>
-          <TouchableOpacity 
-            style={styles.button}
-            onPress={handleContinue}
-            onPressIn={onPressIn}
-            onPressOut={onPressOut}
-          >
-            <Text style={styles.buttonText}>Continue</Text>
-            <ArrowRight size={20} color={colors.background} />
-          </TouchableOpacity>
-        </Animated.View>
-      </View>
-    </SafeAreaView>
+        </View>
+        
+        <Text style={styles.title}>
+          Take a selfie and see{"\n"}your results
+        </Text>
+        
+        <View style={styles.bottomContainer}>
+          <Animated.View style={animatedButtonStyle}>
+            <TouchableOpacity 
+              style={styles.button}
+              onPress={handleContinue}
+              onPressIn={onPressIn}
+              onPressOut={onPressOut}
+            >
+              <Text style={styles.buttonText}>Continue</Text>
+            </TouchableOpacity>
+          </Animated.View>
+          
+          <View style={styles.indicator} />
+        </View>
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: "#000000",
   },
   content: {
     flex: 1,
-    padding: 24,
+    paddingHorizontal: 24,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: "900",
-    color: colors.text,
-    marginBottom: 32,
-    textAlign: "center",
-    lineHeight: 36,
+  spacer: {
+    flex: 0.3,
   },
-  titleAccent: {
-    color: colors.primary,
-  },
-  featureContainer: {
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 24,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  imagesRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 24,
-  },
-  imageBox: {
-    width: (width - 96) / 2,
+  imagesContainer: {
     alignItems: "center",
+    marginBottom: 40,
+    height: 280,
+    justifyContent: "center",
+  },
+  imageCard: {
+    width: 200,
+    height: 240,
+    borderRadius: 20,
+    overflow: "hidden",
+    position: "absolute",
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  overlappingCard: {
+    transform: [{ rotate: "15deg" }, { translateX: 60 }, { translateY: -20 }],
+    zIndex: 1,
   },
   faceImage: {
-    width: (width - 96) / 2,
-    height: (width - 96) / 2,
-    borderRadius: 12,
-    marginBottom: 8,
-    backgroundColor: colors.border,
+    width: "100%",
+    height: "100%",
   },
   imageLabel: {
+    position: "absolute",
+    bottom: 12,
+    left: 12,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  imageLabelText: {
+    color: "#FFFFFF",
     fontSize: 14,
-    color: colors.text,
     fontWeight: "600",
   },
   gaugeContainer: {
-    marginTop: 8,
-  },
-  gaugeTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: colors.text,
-    marginBottom: 12,
-    textAlign: "center",
+    marginBottom: 40,
+    paddingHorizontal: 20,
   },
   gauge: {
-    height: 12,
-    borderRadius: 6,
-    marginBottom: 8,
+    height: 8,
+    borderRadius: 4,
+    marginBottom: 12,
   },
   gaugeLabels: {
     flexDirection: "row",
@@ -194,53 +179,43 @@ const styles = StyleSheet.create({
   },
   gaugeLabel: {
     fontSize: 12,
-    color: colors.textLight,
-  },
-  outOfLeagueLabel: {
-    color: colors.gauge.red,
-    fontWeight: "700",
-  },
-  infoContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 12,
-    padding: 16,
-  },
-  infoIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.primary + "20",
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 16,
-  },
-  infoText: {
+    color: "rgba(255, 255, 255, 0.6)",
+    textAlign: "center",
     flex: 1,
-    fontSize: 14,
-    color: colors.text,
-    lineHeight: 20,
   },
-  footer: {
-    padding: 24,
+  title: {
+    fontSize: 32,
+    fontWeight: "700",
+    color: "#FFFFFF",
+    textAlign: "center",
+    marginBottom: 60,
+    lineHeight: 38,
+  },
+  bottomContainer: {
+    alignItems: "center",
+    paddingBottom: 20,
   },
   button: {
-    backgroundColor: colors.primary,
-    borderRadius: 12,
+    backgroundColor: "#FF6B35",
+    borderRadius: 25,
     paddingVertical: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
+    paddingHorizontal: 60,
+    marginBottom: 24,
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   buttonText: {
-    color: colors.background,
-    fontSize: 16,
-    fontWeight: "700",
-    marginRight: 8,
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  indicator: {
+    width: 134,
+    height: 5,
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    borderRadius: 2.5,
   },
 });
