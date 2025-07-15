@@ -35,7 +35,7 @@ import { useUserStore } from "@/store/user-store";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 
 interface BottomNavigationProps {
-  currentRoute: "scan" | "celebrities" | "results" | "roast" | "settings";
+  currentRoute: "scan" | "celebrities" | "results" | "roast" | "settings" | "history";
 }
 
 export default function BottomNavigation({ currentRoute }: BottomNavigationProps) {
@@ -107,7 +107,7 @@ export default function BottomNavigation({ currentRoute }: BottomNavigationProps
         const IconComponent = tab.icon;
         
         return (
-          <Animated.View key={tab.id} style={animatedButtonStyle}>
+          <Animated.View key={tab.id} style={[animatedButtonStyle, { flex: 1 }]}>
             <TouchableOpacity
               style={styles.tab}
               onPress={() => handleNavigation(tab.route, tab.id)}

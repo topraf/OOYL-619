@@ -3,7 +3,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Tabs } from "expo-router";
 import { Pressable } from "react-native";
 
-import Colors from "@/constants/colors";
+import { colors } from "@/constants/colors";
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
@@ -16,7 +16,7 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors.light.tint,
+        tabBarActiveTintColor: colors.primary, // "tabBarActiveTintColor: colors.primary.tint" tint does not exist on type 'string'. So I removed it.
         headerShown: true,
       }}
     >
@@ -26,13 +26,13 @@ export default function TabLayout() {
           title: "Tab One",
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
           headerRight: () => (
-            <Link href="/modal" asChild>
+            <Link href="/" asChild> // No existing file named "modal"
               <Pressable>
                 {({ pressed }) => (
                   <FontAwesome
                     name="info-circle"
                     size={25}
-                    color={Colors.light.text}
+                    color={colors.secondary} // "tabBarActiveTintColor: colors.primary.tint" text does not exist on type 'string'. So I removed it.
                     style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                   />
                 )}
