@@ -9,6 +9,7 @@ export const celebrityCategories: CelebrityCategory[] = [
   { id: "influencers", name: "Influencers", emoji: "📱" },
   { id: "politics", name: "Politics", emoji: "🏛️" },
   { id: "business", name: "Business", emoji: "💼" },
+  { id: "adult", name: "Adult Film Star", emoji: "🔞" },
 ];
 
 export const celebrities: Celebrity[] = [
@@ -151,5 +152,33 @@ export const celebrities: Celebrity[] = [
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     beautyScore: 0.85,
     category: "politics"
+  },
+  {
+    id: "21",
+    name: "Mia Khalifa",
+    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    beautyScore: 0.88,
+    category: "adult"
+  },
+  {
+    id: "22",
+    name: "Riley Reid",
+    image: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    beautyScore: 0.86,
+    category: "adult"
+  },
+  {
+    id: "23",
+    name: "Lana Rhoades",
+    image: "https://images.unsplash.com/photo-1534751516642-a1af1ef26a56?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    beautyScore: 0.87,
+    category: "adult"
+  },
+  {
+    id: "24",
+    name: "Johnny Sins",
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    beautyScore: 0.84,
+    category: "adult"
   },
 ];

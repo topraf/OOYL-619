@@ -51,6 +51,7 @@ interface UserState {
   isPremium: boolean;
   language: Language;
   isLoading: boolean;
+  isOffline: boolean;
   
   setUserGender: (gender: "male" | "female") => void;
   setUserFrontImage: (uri: string) => void;
@@ -62,6 +63,7 @@ interface UserState {
   
   setPremiumStatus: (status: boolean) => void;
   setLanguage: (language: Language) => void;
+  setOfflineStatus: (isOffline: boolean) => void;
   getColors: () => typeof darkColors;
   getTranslations: () => ReturnType<typeof useTranslations>;
   
@@ -86,6 +88,7 @@ export const useUserStore = create<UserState>()(
       isPremium: false,
       language: 'en',
       isLoading: false,
+      isOffline: false,
       
       setUserGender: (gender: "male" | "female") => {
         set(state => ({
@@ -207,6 +210,10 @@ export const useUserStore = create<UserState>()(
       
       setLanguage: (language: Language) => {
         set({ language });
+      },
+      
+      setOfflineStatus: (isOffline: boolean) => {
+        set({ isOffline });
       },
       
       getColors: () => {

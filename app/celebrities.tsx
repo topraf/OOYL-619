@@ -5,7 +5,7 @@ import { useRouter } from "expo-router";
 import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
 import { Platform } from "react-native";
-import { Search, X, ArrowLeft, Plus } from "lucide-react-native";
+import { Search, X, ArrowLeft, Plus, ArrowUpDown } from "lucide-react-native";
 import { useUserStore } from "@/store/user-store";
 import { celebrities, celebrityCategories } from "@/mocks/celebrities";
 import BottomNavigation from "@/components/BottomNavigation";
@@ -21,6 +21,9 @@ export default function CelebritiesScreen() {
   const colors = getColors();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [sortBy, setSortBy] = useState<"name" | "score" | "category">("name");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [showSortMenu, setShowSortMenu] = useState(false);
   
   const buttonScale = useSharedValue(1);
   const animatedButtonStyle = useAnimatedStyle(() => {
@@ -29,12 +32,30 @@ export default function CelebritiesScreen() {
     };
   });
   
-  const filteredCelebrities = celebrities.filter(celebrity => {
-    const matchesSearch = celebrity.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === "all" || celebrity.category === selectedCategory;
-    
-    return matchesSearch && matchesCategory;
-  });
+  const filteredAndSortedCelebrities = celebrities
+    .filter(celebrity => {
+      const matchesSearch = celebrity.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = selectedCategory === "all" || celebrity.category === selectedCategory;
+      
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => {
+      let comparison = 0;
+      
+      switch (sortBy) {
+        case "name":
+          comparison = a.name.localeCompare(b.name);
+          break;
+        case "score":
+          comparison = a.beautyScore - b.beautyScore;
+          break;
+        case "category":
+          comparison = a.category.localeCompare(b.category);
+          break;
+      }
+      
+      return sortOrder === "asc" ? comparison : -comparison;
+    });
   
   const handleSelectCelebrity = (id: string, image: string, name: string) => {
     if (Platform.OS !== "web") {
@@ -64,6 +85,29 @@ export default function CelebritiesScreen() {
     setSearchQuery("");
   };
   
+  const handleSort = (newSortBy: "name" | "score" | "category") => {
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    
+    if (sortBy === newSortBy) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(newSortBy);
+      setSortOrder("asc");
+    }
+    setShowSortMenu(false);
+  };
+  
+  const getSortLabel = () => {
+    const labels = {
+      name: "Name",
+      score: "Beauty Score",
+      category: "Category"
+    };
+    return `${labels[sortBy]} ${sortOrder === "asc" ? "↑" : "↓"}`;
+  };
+  
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top"]}>
       <View style={styles.header}>
@@ -82,6 +126,12 @@ export default function CelebritiesScreen() {
             Compare yourself with these famous personalities
           </Text>
         </View>
+        <TouchableOpacity 
+          style={[styles.sortButton, { backgroundColor: colors.card }]} 
+          onPress={() => setShowSortMenu(!showSortMenu)}
+        >
+          <ArrowUpDown size={20} color={colors.text} />
+        </TouchableOpacity>
       </View>
       
       <View style={[styles.searchContainer, { borderBottomColor: colors.border }]}>
@@ -136,8 +186,38 @@ export default function CelebritiesScreen() {
         </ScrollView>
       </View>
       
+      {showSortMenu && (
+        <View style={[styles.sortMenu, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <Text style={[styles.sortMenuTitle, { color: colors.text }]}>Sort by:</Text>
+          <TouchableOpacity 
+            style={[styles.sortMenuItem, sortBy === "name" && { backgroundColor: colors.primary + "20" }]} 
+            onPress={() => handleSort("name")}
+          >
+            <Text style={[styles.sortMenuText, { color: sortBy === "name" ? colors.primary : colors.text }]}>
+              Name {sortBy === "name" && (sortOrder === "asc" ? "↑" : "↓")}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.sortMenuItem, sortBy === "score" && { backgroundColor: colors.primary + "20" }]} 
+            onPress={() => handleSort("score")}
+          >
+            <Text style={[styles.sortMenuText, { color: sortBy === "score" ? colors.primary : colors.text }]}>
+              Beauty Score {sortBy === "score" && (sortOrder === "asc" ? "↑" : "↓")}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.sortMenuItem, sortBy === "category" && { backgroundColor: colors.primary + "20" }]} 
+            onPress={() => handleSort("category")}
+          >
+            <Text style={[styles.sortMenuText, { color: sortBy === "category" ? colors.primary : colors.text }]}>
+              Category {sortBy === "category" && (sortOrder === "asc" ? "↑" : "↓")}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      
       <FlatList
-        data={filteredCelebrities}
+        data={filteredAndSortedCelebrities}
         keyExtractor={(item) => item.id}
         numColumns={numColumns}
         contentContainerStyle={styles.listContent}
@@ -311,5 +391,33 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
+  },
+  sortButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  sortMenu: {
+    margin: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 16,
+  },
+  sortMenuTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 12,
+  },
+  sortMenuItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginBottom: 4,
+  },
+  sortMenuText: {
+    fontSize: 14,
+    fontWeight: "500",
   },
 });
