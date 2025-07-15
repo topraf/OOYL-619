@@ -26,7 +26,8 @@ export default function SettingsScreen() {
 
   const handleGoToOnboardingStep = (step: number, path: string) => {
     setCurrentStep(step);
-    router.push(path);
+    router.push("/celebrity-details" as any); //router.push(path);
+
   };
 
   const handleLanguageSelect = (selectedLanguage: Language) => {
@@ -257,7 +258,6 @@ export default function SettingsScreen() {
           </View>
         </View>
       </Modal>
-      
       <BottomNavigation currentRoute="settings" />
     </SafeAreaView>
   );

@@ -19,6 +19,8 @@ export interface Target {
   image: string;
   beautyScore: number;
   isCelebrity?: boolean;
+  category?: string;
+  gender?: "male" | "female";
 }
 
 export interface ComparisonResult {
@@ -30,7 +32,14 @@ export interface ComparisonResult {
   feedback: string;
   userImage: string; // User's image for compatibility
   celebrity: Celebrity; // Celebrity data for compatibility
+  firstCelebrity: Celebrity;
+  secondCelebrity: Celebrity;
   score: number; // Overall score for compatibility
+  isPremium: boolean; //Added isPrenium since it was not defined
+  firstScore?: number;
+  secondScore?: number;
+  winner?: "first" | "second" | "tie";
+  features: any;
 }
 
 export interface Celebrity {
@@ -39,6 +48,7 @@ export interface Celebrity {
   image: string;
   beautyScore: number;
   category: string;
+  gender: string; // Added gender here
 }
 
 export interface CelebrityCategory {
@@ -47,12 +57,14 @@ export interface CelebrityCategory {
   emoji: string;
 }
 
-export interface Subscription {
+export interface SubscriptionPlan {
   id: string;
+  name: string; // Added name here
   title: string;
   price: string;
   period: string;
   features: string[];
   isPopular?: boolean;
   savePercent?: string;
+  interval: number; // Added interval here
 }
