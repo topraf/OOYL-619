@@ -14,14 +14,14 @@ const { width } = Dimensions.get("window");
 export default function OnboardingWelcomeScreen() {
   const router = useRouter();
   const { setCurrentStep } = useOnboardingStore();
-  
+
   const buttonScale = useSharedValue(1);
   const animatedButtonStyle = useAnimatedStyle(() => {
     return {
       transform: [{ scale: buttonScale.value }]
     };
   });
-  
+
   const handleGetStarted = () => {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -37,55 +37,59 @@ export default function OnboardingWelcomeScreen() {
   const onPressOut = () => {
     buttonScale.value = withSpring(1);
   };
-  
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.imageContainer}>
-          <Image
-            source={{ uri: "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" }}
-            style={styles.image}
-          />
-          <LinearGradient
-            colors={["transparent", "rgba(0,0,0,0.7)"]}
-            style={styles.imageGradient}
-          />
-        </View>
-        
-        <View style={styles.textContainer}>
-          <Text style={styles.title}>
-            Want to see who's{" "}
-            <Text style={styles.titleAccent}>out of your league?</Text>
-          </Text>
-          <Text style={styles.subtitle}>
-            Find out if that crush is in your league with our AI-powered beauty analysis
-          </Text>
-        </View>
-        
-        <Animated.View style={animatedButtonStyle}>
-          <TouchableOpacity 
-            style={styles.button}
-            onPress={handleGetStarted}
-            onPressIn={onPressIn}
-            onPressOut={onPressOut}
-          >
+      <SafeAreaView style={styles.container}>
+        <View style={styles.content}>
+          <View style={styles.imageContainer}>
+            <Image
+                source={{ uri: "https://vivre-et-aimer.org/wp-content/uploads/2023/12/couple-sur-la-plage-768x870.jpg" }}
+                style={styles.image}
+            />
             <LinearGradient
-              colors={[colors.secondary, colors.primary]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.buttonGradient}
+                colors={["transparent", "rgba(0,0,0,0.5)"]}
+                style={styles.imageGradient}
+            />
+          </View>
+
+          <View style={styles.textContainer}>
+            <Text style={styles.title}>
+              Want to see who's out of your league?
+              <Text style={styles.titleAccent}></Text>
+            </Text>
+            <Text style={styles.subtitle}>
+              Find out if that crush is in your league with our AI-powered beauty analysis
+            </Text>
+          </View>
+
+          <Animated.View style={animatedButtonStyle}>
+            <TouchableOpacity
+                style={styles.button}
+                onPress={handleGetStarted}
+                onPressIn={onPressIn}
+                onPressOut={onPressOut}
             >
-              <Text style={styles.buttonText}>Get Started</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </Animated.View>
-        
-        <Text style={styles.disclaimer}>
-          For entertainment purposes only. Beauty is subjective and our algorithm
-          provides an approximation based on photographic evidence.
-        </Text>
-      </View>
-    </SafeAreaView>
+              <LinearGradient
+                  colors={['#913f8f', '#e5a0b9', '#f9943b']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={{
+                    padding: 15,
+                    borderRadius: 50,
+                    alignItems: 'center',
+                  }}
+              >
+                <Text style={{ color: '#fff', fontWeight: 'bold' }}>Get started</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </Animated.View>
+
+          <Text style={styles.disclaimer}>
+            For entertainment purposes only. Beauty is subjective and our algorithm
+            provides an approximation based on photographic evidence.
+          </Text>
+        </View>
+      </SafeAreaView>
   );
 }
 
@@ -98,14 +102,14 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 24,
+    padding: 20,
   },
   imageContainer: {
-    width: width - 48,
-    height: width - 48,
+    width: width - 30,
+    height: width - 10,
     borderRadius: 24,
     overflow: "hidden",
-    marginTop: 40,
+    marginTop: 10,
   },
   image: {
     width: "100%",
@@ -128,7 +132,7 @@ const styles = StyleSheet.create({
     color: colors.text,
     textAlign: "center",
     marginBottom: 16,
-    lineHeight: 40,
+    lineHeight: 35,
   },
   titleAccent: {
     color: colors.primary,
@@ -140,7 +144,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   button: {
-    width: width - 48,
+    width: width - 34,
     borderRadius: 16,
     overflow: "hidden",
     marginBottom: 24,
