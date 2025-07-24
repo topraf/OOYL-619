@@ -38,7 +38,7 @@ import Animated, {
   withSequence, 
   withTiming,
   withRepeat,
-  //interpolate
+
 } from "react-native-reanimated";
 import {colors} from "@/constants/colors";
 import AutoScrollFeatures from "@/components/AutoScroll";
