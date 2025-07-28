@@ -42,7 +42,7 @@ export default function UserPhotoScreen() {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: 'Images' as any,
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
@@ -184,17 +184,27 @@ export default function UserPhotoScreen() {
                     !user.frontImage && styles.disabledButtonWrapper
                   ]}
                   disabled={!user.frontImage}
-                  onPress={handleNext}
-                  onPressIn={onPressIn}
-                  onPressOut={onPressOut}
+                  onPress={user.frontImage ? handleNext : undefined}
+                  onPressIn={user.frontImage ? onPressIn : undefined}
+                  onPressOut={user.frontImage ? onPressOut : undefined}
               >
                 <LinearGradient
                     colors={['#FF914D', '#2C1B17']}
                     start={{ x: 1, y: 2 }}
                     end={{ x: 1, y: 1 }}
-                    style={styles.button}
+                    style={[
+                      styles.button,
+                      !user.frontImage && { opacity: 0.3 }
+                    ]}
                 >
-                  <Text style={styles.buttonText}>Continue</Text>
+                  <Text
+                      style={[
+                        styles.buttonText,
+                        !user.frontImage && { color: '#888' }
+                      ]}
+                  >
+                    Continue
+                  </Text>
                 </LinearGradient>
               </TouchableOpacity>
             </Animated.View>
