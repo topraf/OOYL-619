@@ -320,7 +320,7 @@ export default function HomeScreen() {
           </Animated.View>
         )}
 
-        //How it works
+        {/* How it works */}
         
         <Animated.View style={[styles.featuresContainer, animatedSlideStyle]}>
           <Text style={[styles.featuresTitle, { color: colors.text }]}>
@@ -337,7 +337,7 @@ export default function HomeScreen() {
         <PreniumCard onPress={handleSubscription} />
 
 
-        //partie disclaimer
+        {/* Partie disclaimer */}
         <View style={styles.disclaimerContainer}>
           <Text style={[styles.disclaimer, { color: colors.textLight }]}>
             {t.screens.home.disclaimer}
