@@ -25,33 +25,35 @@
  */
 
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Platform, Dimensions, Share, FlatList, Linking } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Dimensions, Share, Linking } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Home, Camera, MessageCircle, Star, Share2 } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { Platform as RNPlatform } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-// import { Image } from "expo-image";
+import { Image } from "expo-image";
 import { useUserStore } from "@/store/user-store";
 import { useComparisonStore } from "@/store/comparison-store";
 import LeagueGauge from "@/components/LeagueGauge";
 import ImagePreview from "@/components/ImagePreview";
 import PaywallModal from "@/components/PaywallModal";
-import FeatureScoreCard from "@/components/FeatureScoreCard";
+//import FeatureScoreCard from "@/components/FeatureScoreCard";
 import BottomNavigation from "@/components/BottomNavigation";
 // import ComparisonCard from "@/components/ComparisonCard";
 // import EmptyState from "@/components/EmptyState";
-import Animated, { useSharedValue, useAnimatedStyle, withSpring, withSequence, withTiming, useAnimatedProps } from "react-native-reanimated";
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, withSequence, withTiming } from "react-native-reanimated";
+//import { FontAwesome } from '@expo/vector-icons';
+
 
 const { width } = Dimensions.get("window");
 
-type FeatureStatus = "High" | "Mid" | "Low";
+{/* type FeatureStatus = "High" | "Mid" | "Low"; */}
 
 export default function ResultsScreen() {
   const router = useRouter();
-  const { comparisons, isLoading, isPremium, clearHistory, getColors } = useUserStore();
-  const { history, clearHistory: clearComparisonHistory } = useComparisonStore();
+  const { comparisons, isLoading, isPremium, getColors } = useUserStore();
+  const { history } = useComparisonStore();
   const colors = getColors();
   const [showResult, setShowResult] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
@@ -216,6 +218,7 @@ export default function ResultsScreen() {
     return Math.round(latestResult.user.beautyScore * 10);
   };
 
+  /*
   const getFeatureScores = () => {
     const scores = [
       { name: "Facial Symmetry", score: Math.round(Math.random() * 4 + 6) },
@@ -229,6 +232,8 @@ export default function ResultsScreen() {
       status: (item.score >= 7 ? "High" : item.score >= 5 ? "Mid" : "Low") as FeatureStatus
     }));
   };
+
+  */
 
   const onPressIn = () => {
     buttonScale.value = withSpring(0.95);
@@ -283,8 +288,8 @@ export default function ResultsScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top"]}>
-      <ScrollView 
-        contentContainerStyle={styles.scrollContent} 
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         bounces={true}
         alwaysBounceVertical={true}
@@ -292,8 +297,8 @@ export default function ResultsScreen() {
         {showResult ? (
           <>
             <View style={styles.header}>
-              <TouchableOpacity 
-                style={[styles.backButton, { backgroundColor: colors.card }]} 
+              <TouchableOpacity
+                style={[styles.backButton, { backgroundColor: colors.card }]}
                 onPress={() => router.push("/")}
               >
                 <Home size={20} color={colors.text} />
@@ -304,46 +309,59 @@ export default function ResultsScreen() {
               </Text>
               <View style={styles.placeholder} />
             </View>
-            
+
             <Animated.View style={animatedCardStyle}>
-              <LinearGradient
-                colors={[colors.secondary, colors.primary]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.resultCard}
+              <View style={[styles.resultCard, { backgroundColor: colors.background }]}
               >
                 <Text style={[styles.resultTitle, { color: colors.background }]}>
                   {getLeagueText()}
                 </Text>
-                
+
                 <View style={styles.imagesContainer}>
                   <View style={styles.imageColumn}>
-                    <ImagePreview
-                      uri={latestResult.user.frontImage || ""}
-                      style={[styles.circleImage, { borderColor: colors.background }]}
-                    />
-                    <Text style={[styles.imageLabel, { color: colors.background }]}>You</Text>
-                    <Text style={[styles.scoreText, { color: colors.background }]}>{getOverallScore()}/10</Text>
+                    <Animated.View
+                        style={{
+                          transform: [{ rotate: "-10deg" },
+                                      { translateX: -20 },
+                                      { translateY: -10 },
+                          ]
+                        }}
+                    >
+                      <ImagePreview
+                          uri={latestResult.user.frontImage || ""}
+                          style={[styles.circleImage, { borderColor: colors.background }]}
+                      />
+                    </Animated.View>
+                    <View style={styles.imageColumn}>
+                      <Text style={[styles.scoreText, { color: colors.background }]}>{getOverallScore()}/10</Text>
+                    </View>
                   </View>
-                  
+
                   <View style={styles.vsContainer}>
-                    <Text style={[styles.vsText, { color: colors.background }]}>VS</Text>
+                    <Text style={[styles.vsText, { color: colors.background }]}></Text>
                   </View>
-                  
+
                   <View style={styles.imageColumn}>
-                    <ImagePreview
-                      uri={latestResult.target.image}
-                      style={[styles.circleImage, { borderColor: colors.background }]}
-                    />
-                    <Text style={[styles.imageLabel, { color: colors.background }]}>
-                      {latestResult.target.name || "Them"}
-                    </Text>
+                    <Animated.View
+                        style={{
+                          transform: [{ rotate: "10deg" },
+                            { translateX: -10 },
+                            { translateY: -5 },
+                          ]
+                        }}
+                    >
+                      <ImagePreview
+                          uri={latestResult.target.image}
+                          style={[styles.circleImage2, { borderColor: colors.background }]}
+                      />
+                    </Animated.View>
+
                     <Text style={[styles.scoreText, { color: colors.background }]}>
                       {Math.round((latestResult.target.beautyScore || 0) * 10)}/10
                     </Text>
                   </View>
                 </View>
-              </LinearGradient>
+              </View>
             </Animated.View>
             
             <Animated.View style={[styles.gaugeContainer, animatedSlideStyle]}>
@@ -355,67 +373,49 @@ export default function ResultsScreen() {
                 {getLeagueDescription()}
               </Text>
             </Animated.View>
-            
-            {isPremium && (
-              <Animated.View style={[styles.featureScoresContainer, animatedSlideStyle]}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                  Your Beauty{" "}
-                  <Text style={[styles.sectionTitleAccent, { color: colors.primary }]}>Analysis</Text>
-                </Text>
-                <ScrollView 
-                  horizontal 
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.featureScoresRow}
-                >
-                  {getFeatureScores().map((feature, index) => (
-                    <FeatureScoreCard 
-                      key={index}
-                      name={feature.name}
-                      score={feature.score}
-                      status={feature.status}
-                    />
-                  ))}
-                </ScrollView>
-              </Animated.View>
-            )}
-            
+
             <Animated.View style={[styles.shareContainer, { backgroundColor: colors.card }, animatedSlideStyle]}>
               <Text style={[styles.shareTitle, { color: colors.text }]}>Share Your Results</Text>
               <View style={styles.socialButtonsContainer}>
-                <TouchableOpacity 
-                  style={[styles.socialButton, { backgroundColor: "#E4405F" }]}
-                  onPress={handleShareGeneral}
-                >
-                  <Text style={styles.socialButtonText}>📷</Text>
+                {/* SNAPCHAT */}
+                <TouchableOpacity onPress={() => Linking.openURL("snapchat://").catch(() =>
+                    Linking.openURL("https://www.snapchat.com/")
+                )} style={[styles.socialButton, { backgroundColor: "#FFFC00" }]}>
+                  <Image source={require("../assets/icons/Snapchat.png")} style={styles.icon} />
                 </TouchableOpacity>
-                
-                <TouchableOpacity 
-                  style={[styles.socialButton, { backgroundColor: "#FFFC00" }]}
-                  onPress={handleShareGeneral}
-                >
-                  <Text style={styles.socialButtonText}>👻</Text>
+
+                {/* INSTAGRAM */}
+                <TouchableOpacity onPress={() => Linking.openURL("instagram://app").catch(() =>
+                    Linking.openURL("https://www.instagram.com/")
+                )} style={[styles.socialButton, { backgroundColor: "#d83496" }]}>
+                  <LinearGradient
+                      colors={["#F58529", "#DD2A7B", "#8134AF"]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={StyleSheet.absoluteFillObject}
+                  />
+                  <Image source={require("../assets/icons/Instagram_icon.png.webp")} style={styles.icon} />
                 </TouchableOpacity>
-                
-                <TouchableOpacity 
-                  style={[styles.socialButton, { backgroundColor: "#000" }]}
-                  onPress={handleShareGeneral}
-                >
-                  <Text style={styles.socialButtonText}>𝕏</Text>
+
+                {/* WHATSAPP */}
+                <TouchableOpacity onPress={() => Linking.openURL("whatsapp://send").catch(() =>
+                    Linking.openURL("https://wa.me/")
+                )} style={[styles.socialButton, { backgroundColor: "#25D366" }]}>
+                  <Image source={require("../assets/icons/Whatsapp.png")} style={styles.icon} />
                 </TouchableOpacity>
-                
-                <TouchableOpacity 
-                  style={[styles.socialButton, { backgroundColor: colors.primary }]}
+
+                <TouchableOpacity
+                  style={[styles.socialButton, { backgroundColor: colors.background }]}
                   onPress={handleShareGeneral}
                 >
-                  <Share2 size={20} color={colors.background} />
+                  <Share2 size={20} color={colors.text} />
                 </TouchableOpacity>
               </View>
             </Animated.View>
-            
-            <Animated.View style={[styles.actionsContainer, { backgroundColor: colors.card }, animatedSlideStyle]}>
+
+            <Animated.View style={[styles.actionsContainer, { backgroundColor: colors.background }, animatedSlideStyle]}>
               <Text style={[styles.actionsTitle, { color: colors.text }]}>
-                What's{" "}
-                <Text style={[styles.actionsTitleAccent, { color: colors.primary }]}>Next?</Text>
+                What's Next ?
               </Text>
               
               <ScrollView 
@@ -424,33 +424,35 @@ export default function ResultsScreen() {
                 contentContainerStyle={styles.actionButtonsRow}
               >
                 <TouchableOpacity 
-                  style={[styles.actionButtonCard, { backgroundColor: colors.primary + "10" }]}
+                  style={[styles.actionButtonCard, { backgroundColor: colors.card }]}
                   onPress={handleNewComparison}
                 >
-                  <View style={[styles.actionIconCircle, { backgroundColor: colors.background }]}>
-                    <Camera size={24} color={colors.primary} />
+                  <View style={[styles.actionIconCircle, { backgroundColor: colors.third + 20 }]}>
+                    <Camera size={24} color={colors.third} />
                   </View>
-                  <Text style={[styles.actionButtonCardText, { color: colors.text }]}>Try with another photo again</Text>
+                  <Text style={[styles.actionButtonCardText, { color: colors.text }]}>Try with another {'\n'} photo again</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
-                  style={[styles.actionButtonCard, { backgroundColor: colors.primary + "10" }]}
+                  style={[styles.actionButtonCard, { backgroundColor: colors.card }]}
                   onPress={() => router.push("/celebrities")}
                 >
-                  <View style={[styles.actionIconCircle, { backgroundColor: colors.background }]}>
+                  <View style={[styles.actionIconCircle, { backgroundColor: colors.primary + 20 }]}>
                     <Star size={24} color={colors.primary} />
                   </View>
+                  <View style={styles.pro}> <Text style={styles.textpro}> PRO </Text> </View>
                   <Text style={[styles.actionButtonCardText, { color: colors.text }]}>Compare with celebrities</Text>
                   {!isPremium && <Text style={[styles.premiumLabel, { color: colors.primary }]}>Premium</Text>}
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
-                  style={[styles.actionButtonCard, { backgroundColor: colors.primary + "10" }]}
+                  style={[styles.actionButtonCard, { backgroundColor: colors.card }]}
                   onPress={() => router.push("/roastmaster")}
                 >
-                  <View style={[styles.actionIconCircle, { backgroundColor: colors.background }]}>
+                  <View style={[styles.actionIconCircle, { backgroundColor: colors.primary + 20 }]}>
                     <MessageCircle size={24} color={colors.primary} />
                   </View>
+                  <View style={styles.pro}> <Text style={styles.textpro}> PRO </Text> </View>
                   <Text style={[styles.actionButtonCardText, { color: colors.text }]}>Get roasted by our AI if you dare</Text>
                   {!isPremium && <Text style={[styles.premiumLabel, { color: colors.primary }]}>Premium</Text>}
                 </TouchableOpacity>
@@ -559,10 +561,18 @@ const styles = StyleSheet.create({
     width: "40%",
   },
   circleImage: {
-    width: width * 0.25,
-    height: width * 0.25,
-    borderRadius: width * 0.125,
-    borderWidth: 3,
+    width: 160,
+    height: 250,
+    borderRadius: 10,
+    left: 30,
+    zIndex: 1,
+  },
+  circleImage2: {
+    width: 160,
+    height: 250,
+    borderRadius: 10,
+    zIndex: 10,
+    right: 10,
   },
   imageLabel: {
     fontSize: 16,
@@ -644,6 +654,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,
+    overflow: "hidden"
   },
   socialButtonText: {
     fontSize: 20,
@@ -743,5 +754,27 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: "700",
+  },
+  icon: {
+    width: 28,
+    height: 28,
+    resizeMode: "contain",
+  },
+  pro: {
+    backgroundColor: "#171010",
+    position: "absolute",
+    top: 48,
+    left: 36,
+    paddingVertical: 2,
+    paddingHorizontal: 2,
+    borderRadius: 6,
+    borderWidth: 0.4,
+    borderColor: "#fc8032",
+  },
+  textpro: {
+    color: "#fc8032",
+    fontWeight: "bold",
+    fontSize: 10,
+    letterSpacing: 1,
   },
 });
