@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, ActivityIndicator, Dimensions, Image } from "react-native";
+import { StyleSheet, View, Text, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { useUserStore } from "@/store/user-store";
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withRepeat, 
-  withTiming, 
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
   withSequence,
   Easing,
   interpolate,
-  runOnJS
+  //runOnJS
 } from "react-native-reanimated";
 
 const { width } = Dimensions.get("window");
@@ -32,69 +32,78 @@ export default function ComparisonLoadingScreen() {
   const colors = getColors();
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
-  
   const rotation = useSharedValue(0);
   const scale = useSharedValue(1);
   const progressValue = useSharedValue(0);
   const pulseScale = useSharedValue(1);
   const fadeIn = useSharedValue(0);
-  
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        { rotate: `${rotation.value}deg` },
-        { scale: scale.value }
-      ]
-    };
-  });
-  
+
+  const animatedCard1 = useAnimatedStyle(() => ({
+    transform: [
+      { scale: pulseScale.value },
+      { rotate: "-12deg" },
+      { translateX: -20 },
+      { translateY: -100 },
+    ],
+  }));
+
+  const animatedCard2 = useAnimatedStyle(() => ({
+    transform: [
+      { scale: pulseScale.value },
+      { rotate: "12deg" },
+      { translateX: 40 },
+      { translateY: -140 },
+    ],
+    opacity: fadeIn.value,
+  }));
+
   const progressStyle = useAnimatedStyle(() => {
     return {
       width: `${interpolate(progressValue.value, [0, 1], [0, 100])}%`,
     };
   });
-  
+
   const pulseStyle = useAnimatedStyle(() => {
     return {
       transform: [{ scale: pulseScale.value }],
       opacity: fadeIn.value,
     };
   });
-  
+
   useEffect(() => {
     // Entrance animation
     fadeIn.value = withTiming(1, { duration: 500 });
-    
+
     // Rotation animation
     rotation.value = withRepeat(
-      withTiming(360, { duration: 2000, easing: Easing.linear }),
-      -1,
-      false
+        withTiming(360, { duration: 2000, easing: Easing.linear }),
+        -1,
+        false
     );
-    
+
     // Scale animation
     scale.value = withRepeat(
-      withTiming(1.1, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
-      -1,
-      true
+        withTiming(1.1, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
+        -1,
+        true
     );
-    
+
     // Pulse animation for images
     pulseScale.value = withRepeat(
-      withSequence(
-        withTiming(1.05, { duration: 800 }),
-        withTiming(1, { duration: 800 })
-      ),
-      -1,
-      false
+        withSequence(
+            withTiming(1.05, { duration: 900 }),
+            withTiming(1, { duration: 900 })
+        ),
+        -1,
+        false
     );
-    
+
     // Progress animation
-    progressValue.value = withTiming(1, { 
-      duration: 4000,
+    progressValue.value = withTiming(1, {
+      duration: 5000,
       easing: Easing.out(Easing.quad)
     });
-    
+
     // Step progression
     const stepInterval = setInterval(() => {
       setCurrentStep(prev => {
@@ -106,7 +115,7 @@ export default function ComparisonLoadingScreen() {
         return next;
       });
     }, 800);
-    
+
     // Progress updates
     const progressInterval = setInterval(() => {
       setProgress(prev => {
@@ -118,89 +127,83 @@ export default function ComparisonLoadingScreen() {
         return next;
       });
     }, 80);
-    
+
     // Navigate to results after animation completes
     const timer = setTimeout(() => {
       router.replace("/results");
     }, 4500);
-    
+
     return () => {
       clearTimeout(timer);
       clearInterval(stepInterval);
       clearInterval(progressInterval);
     };
   }, []);
-  
+
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <LinearGradient
-        colors={[colors.background, colors.card]}
-        style={styles.gradient}
-      >
-        <Animated.View style={pulseStyle}>
-          <Text style={[styles.title, { color: colors.text }]}>Analyzing Your Photos</Text>
-        </Animated.View>
-        
-        <View style={styles.imagesContainer}>
-          <Animated.View style={[styles.imageWrapper, pulseStyle]}>
-            <Image
-              source={{ uri: user.frontImage || "" }}
-              style={styles.image}
-            />
-            <View style={[styles.imageBorder, { borderColor: colors.primary }]} />
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        <LinearGradient
+            colors={[colors.background, colors.card]}
+            style={styles.gradient}
+        >
+          <Animated.View style={pulseStyle}>
+            <Text style={[styles.title, { color: colors.text }]}>Analyzing Your Photos</Text>
           </Animated.View>
-          
-          <Animated.View style={[styles.spinnerContainer, animatedStyle]}>
-            <View style={[styles.spinnerRing, { borderColor: colors.primary }]} />
-            <ActivityIndicator size="large" color={colors.primary} />
-          </Animated.View>
-          
-          <Animated.View style={[styles.imageWrapper, pulseStyle]}>
-            <Image
-              source={{ uri: currentTarget?.image || "" }}
-              style={styles.image}
-            />
-            <View style={[styles.imageBorder, { borderColor: colors.secondary }]} />
-          </Animated.View>
-        </View>
-        
-        <Animated.View style={[styles.statusContainer, pulseStyle]}>
-          <Text style={[styles.statusText, { color: colors.text }]}>
-            {loadingSteps[currentStep] || loadingSteps[loadingSteps.length - 1]}
-          </Text>
-          
-          <View style={styles.progressContainer}>
-            <View style={[styles.progressBar, { backgroundColor: colors.border }]}>
-              <Animated.View 
-                style={[
-                  styles.progressFill, 
-                  { backgroundColor: colors.primary },
-                  progressStyle
-                ]} 
+
+          <View style={styles.imagesContainer}>
+            <Animated.View style={styles.cardsContainer}>
+              <Animated.Image
+                  source={{ uri: user.frontImage || "" }}
+                  style={[
+                    styles.cardImage,
+                    {
+                      width: width * 0.45,
+                      height: width * 0.6,
+                      zIndex: 10,
+                    },
+                    animatedCard1,
+                  ]}
               />
-            </View>
-            <Text style={[styles.progressText, { color: colors.textLight }]}>
-              {Math.round(progress)}%
+
+
+              <Animated.Image
+                  source={{ uri: currentTarget?.image || "" }}
+                  style={[
+                    styles.cardImage2,
+                    {
+                      width: width * 0.45,
+                      height: width * 0.6,
+                      zIndex: 1,
+                    },
+                    animatedCard2,
+                  ]}
+              />
+            </Animated.View>
+          </View>
+
+          <Animated.View style={[styles.statusContainer]}>
+            <Text style={[styles.statusText, { color: colors.text }]}>
+              {loadingSteps[currentStep] || loadingSteps[loadingSteps.length - 1]}
             </Text>
-          </View>
-          
-          <View style={styles.dotsContainer}>
-            {[0, 1, 2].map((index) => (
-              <Animated.View
-                key={index}
-                style={[
-                  styles.dot,
-                  { 
-                    backgroundColor: colors.primary,
-                    opacity: (currentStep % 3) === index ? 1 : 0.3
-                  }
-                ]}
-              />
-            ))}
-          </View>
-        </Animated.View>
-      </LinearGradient>
-    </SafeAreaView>
+
+            <View style={styles.progressContainer}>
+              <View style={[styles.progressBar, { backgroundColor: colors.border }]}>
+                <Animated.View style={[progressStyle, { height: "100%", borderRadius: 4, overflow: "hidden" }]}>
+                  <LinearGradient
+                      colors={['#D46DD8', '#FF914D']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={{ flex: 1 }}
+                  />
+                </Animated.View>
+              </View>
+              <Text style={[styles.progressText, { color: colors.textLight }]}>
+                {Math.round(progress)}%
+              </Text>
+            </View>
+          </Animated.View>
+        </LinearGradient>
+      </SafeAreaView>
   );
 }
 
@@ -217,7 +220,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "700",
-    marginBottom: 48,
+    height: 400,
     textAlign: "center",
   },
   imagesContainer: {
@@ -265,6 +268,7 @@ const styles = StyleSheet.create({
   statusContainer: {
     width: "100%",
     alignItems: "center",
+    height: 100,
   },
   statusText: {
     fontSize: 16,
@@ -278,7 +282,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   progressBar: {
-    height: 8,
+    height: 4,
     borderRadius: 4,
     overflow: "hidden",
     width: "100%",
@@ -300,5 +304,47 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
+  },
+  cardsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 48,
+    gap: 20,
+  },
+  cardImage: {
+    width: width * 0.45,
+    height: width * 0.6,
+    borderRadius: 20,
+    position: "absolute",
+    shadowColor: "#000",
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 5 },
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  cardImage2: {
+    width: width * 0.45,
+    height: width * 0.6,
+    borderRadius: 20,
+    position: "absolute",
+    shadowColor: "#000",
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 5 },
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  shadowBackground: {
+    position: "absolute",
+    width: width * 0.9,
+    height: width * 0.6,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    borderRadius: width * 0.45,
+    top: "25%",
+    alignSelf: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.5,
+    shadowRadius: 30,
+    elevation: 20,
   },
 });
