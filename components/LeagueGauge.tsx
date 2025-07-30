@@ -37,24 +37,22 @@ export default function LeagueGauge({ leagueStatus }: LeagueGaugeProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>League Status</Text>
       
       <View style={styles.gaugeContainer}>
         <LinearGradient
-          colors={[
-            colors.gauge.purple,
-            colors.gauge.blue,
-            colors.gauge.green,
-            colors.gauge.yellow,
-            colors.gauge.orange,
-            colors.gauge.red,
-          ]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.gauge}
+            colors={[
+              '#fda43c',
+              '#70d6ff',
+              '#ff4d95',
+            ]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.gauge}
         />
+
+        <Text style={styles.triangle}>▲</Text>
         
-        <View style={[styles.indicator, { left: getIndicatorPosition() }]} />
+
       </View>
       
       <View style={styles.labelsContainer}>
@@ -115,5 +113,14 @@ const styles = StyleSheet.create({
   activeLabelText: {
     color: colors.success,
     fontWeight: "800",
+  },
+  triangle: {
+    marginTop: -5,
+    color: '#3cb1ca',
+    fontSize: 16,
+    textAlign: 'center',
+    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
