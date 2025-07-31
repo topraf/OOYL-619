@@ -32,6 +32,8 @@ export const darkColors = {
   // Main colors - Orange/Pink gradient theme
   primary: "#FF6B35", // Vibrant orange
   secondary: "#FF1744", // Pink/red
+  third: "#FFA4B9", //Salmon pink
+  fourth: '#D46DD8',
   
   // UI colors
   background: "#121212",
