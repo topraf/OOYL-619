@@ -44,6 +44,8 @@ import BottomNavigation from "@/components/BottomNavigation";
 // import EmptyState from "@/components/EmptyState";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withSequence, withTiming } from "react-native-reanimated";
 //import { FontAwesome } from '@expo/vector-icons';
+import { getIndicatorPosition } from "@/components/LeagueGauge";
+import { Ionicons } from "@expo/vector-icons";
 
 
 const { width } = Dimensions.get("window");
@@ -218,23 +220,6 @@ export default function ResultsScreen() {
     return Math.round(latestResult.user.beautyScore * 10);
   };
 
-  /*
-  const getFeatureScores = () => {
-    const scores = [
-      { name: "Facial Symmetry", score: Math.round(Math.random() * 4 + 6) },
-      { name: "Jawline", score: Math.round(Math.random() * 4 + 4) },
-      { name: "Eyes", score: Math.round(Math.random() * 4 + 5) },
-      { name: "Skin", score: Math.round(Math.random() * 4 + 6) },
-    ];
-
-    return scores.map(item => ({
-      ...item,
-      status: (item.score >= 7 ? "High" : item.score >= 5 ? "Mid" : "Low") as FeatureStatus
-    }));
-  };
-
-  */
-
   const onPressIn = () => {
     buttonScale.value = withSpring(0.95);
   };
@@ -242,6 +227,8 @@ export default function ResultsScreen() {
   const onPressOut = () => {
     buttonScale.value = withSpring(1);
   };
+
+  const indicatorLeft = getIndicatorPosition(latestResult.leagueStatus);
 
   if (isLoading) {
     return (
@@ -321,8 +308,8 @@ export default function ResultsScreen() {
                   <View style={styles.imageColumn}>
                     <Animated.View
                         style={{
-                          transform: [{ rotate: "-10deg" },
-                                      { translateX: -20 },
+                          transform: [{ rotate: "-8deg" },
+                                      { translateX: -24 },
                                       { translateY: -10 },
                           ]
                         }}
@@ -332,8 +319,8 @@ export default function ResultsScreen() {
                           style={[styles.circleImage, { borderColor: colors.background }]}
                       />
                     </Animated.View>
-                    <View style={styles.imageColumn}>
-                      <Text style={[styles.scoreText, { color: colors.background }]}>{getOverallScore()}/10</Text>
+                    <View style={styles.scoreContainer}>
+                      <Text style={styles.scoreText}>{getOverallScore()}/10</Text>
                     </View>
                   </View>
 
@@ -341,12 +328,16 @@ export default function ResultsScreen() {
                     <Text style={[styles.vsText, { color: colors.background }]}></Text>
                   </View>
 
+                  <View style={styles.centerButton}>
+                    <Ionicons name="swap-horizontal" size={20} color="white" />
+                  </View>
+
                   <View style={styles.imageColumn}>
                     <Animated.View
                         style={{
-                          transform: [{ rotate: "10deg" },
-                            { translateX: -10 },
-                            { translateY: -5 },
+                          transform: [{ rotate: "8deg" },
+                            { translateX: 6 },
+                            { translateY: -10 },
                           ]
                         }}
                     >
@@ -356,9 +347,11 @@ export default function ResultsScreen() {
                       />
                     </Animated.View>
 
-                    <Text style={[styles.scoreText, { color: colors.background }]}>
-                      {Math.round((latestResult.target.beautyScore || 0) * 10)}/10
-                    </Text>
+                    <View style={styles.scoreContainer2}>
+                      <Text style={styles.scoreText}>
+                        {Math.round((latestResult.target.beautyScore || 0) * 10)}/10
+                      </Text>
+                    </View>
                   </View>
                 </View>
               </View>
@@ -581,9 +574,55 @@ const styles = StyleSheet.create({
   },
   scoreText: {
     fontSize: 20,
-    fontWeight: "800",
-    marginTop: 4,
+    fontWeight: "600",
+    color: "white",
+    textAlign: "center",
   },
+
+  scoreContainer: {
+    position: "absolute",
+    bottom: 10,
+    left: 10,
+    alignSelf: "center",
+    backgroundColor: "rgba(0,0,0,0.37)",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    transform: [{ rotate: "-10deg" }],
+  },
+
+  scoreContainer2: {
+    position: "absolute",
+    bottom: 10,
+    left: 28,
+    alignSelf: "center",
+    backgroundColor: "rgba(0,0,0,0.37)",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    transform: [{ rotate: "10deg" }],
+  },
+
+  centerButton: {
+    position: "absolute",
+    top: 100,
+    left: "50%",
+    transform: [{ translateX: -20 }, { translateY: -20 }],
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 0.8,
+    borderColor: "gray",
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 20,
+  },
+  centerIcon: {
+    color: "white",
+    fontSize: 18,
+  },
+
   vsContainer: {
     width: "20%",
     alignItems: "center",
