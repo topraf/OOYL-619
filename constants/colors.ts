@@ -34,6 +34,10 @@ export const darkColors = {
   secondary: "#FF1744", // Pink/red
   third: "#FFA4B9", //Salmon pink
   fourth: '#D46DD8',
+  fifth: 'rgba(246,123,77,0.86)',
+  sixth: "rgba(51,51,51,0.32)",
+  seventh: "rgba(255,198,212,0.93)",
+  eight: "rgb(246,183,248)",
   
   // UI colors
   background: "#121212",

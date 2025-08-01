@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, FlatList, Dimensions, TextInput, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -5,11 +6,12 @@ import { useRouter } from "expo-router";
 import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
 import { Platform } from "react-native";
-import { Search, X, ArrowLeft, Plus } from "lucide-react-native";
+import { Search, X, ArrowLeft } from "lucide-react-native";
 import { useUserStore } from "@/store/user-store";
 import { celebrities, celebrityCategories } from "@/mocks/celebrities";
 import BottomNavigation from "@/components/BottomNavigation";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
+import { BlurView } from 'expo-blur';
 
 const { width } = Dimensions.get("window");
 const numColumns = 2;
@@ -75,8 +77,7 @@ export default function CelebritiesScreen() {
         </TouchableOpacity>
         <View style={styles.headerContent}>
           <Text style={[styles.title, { color: colors.text }]}>
-            Choose a{" "}
-            <Text style={[styles.titleAccent, { color: colors.primary }]}>Celebrity</Text>
+            Choose a Celebrity
           </Text>
           <Text style={[styles.subtitle, { color: colors.textLight }]}>
             Compare yourself with these famous personalities
@@ -114,7 +115,7 @@ export default function CelebritiesScreen() {
               style={[
                 styles.categoryButton,
                 {
-                  backgroundColor: selectedCategory === category.id ? colors.primary : colors.card,
+                  backgroundColor: selectedCategory === category.id ? colors.text : colors.card,
                 }
               ]}
               onPress={() => handleCategorySelect(category.id)}
@@ -154,30 +155,29 @@ export default function CelebritiesScreen() {
               onPressIn={onPressIn}
               onPressOut={onPressOut}
             >
-              <View style={[styles.plusIconContainer, { backgroundColor: colors.primary }]}>
-                <Plus size={16} color={colors.background} />
-              </View>
               <Image
                 source={{ uri: item.image }}
                 style={[styles.celebrityImage, { backgroundColor: colors.border }]}
                 contentFit="cover"
               />
               <View style={styles.celebrityInfo}>
+                <BlurView intensity={20} tint="prominent" style={styles.scoreContainer}>
+                    <Text style={[styles.scoreText, { color: colors.text }]}>{Math.round(item.beautyScore * 10)}/10</Text>
+                </BlurView>
+              </View>
+              <View style={styles.celebrityInfoName}>
                 <Text style={[styles.celebrityName, { color: colors.text }]}>{item.name}</Text>
-                <View style={styles.scoreContainer}>
-                  <Text style={[styles.scoreText, { color: colors.primary }]}>{Math.round(item.beautyScore * 10)}/10</Text>
-                  <Text style={[styles.scoreLabel, { color: colors.textLight }]}>Beauty Score</Text>
-                </View>
               </View>
             </TouchableOpacity>
           </Animated.View>
         )}
       />
-      
       <BottomNavigation currentRoute="celebrities" />
     </SafeAreaView>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -211,6 +211,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     lineHeight: 20,
+    justifyContent: "center",
   },
   searchContainer: {
     paddingHorizontal: 16,
@@ -220,7 +221,9 @@ const styles = StyleSheet.create({
   searchInputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "grey",
     paddingHorizontal: 12,
   },
   searchIcon: {
@@ -233,6 +236,7 @@ const styles = StyleSheet.create({
   },
   categoriesContainer: {
     borderBottomWidth: 1,
+    zIndex: 1,
   },
   categoriesContent: {
     paddingHorizontal: 16,
@@ -260,6 +264,7 @@ const styles = StyleSheet.create({
   },
   celebrityItem: {
     width: itemWidth,
+    height: 190,
     marginBottom: 16,
     marginHorizontal: 8,
     borderRadius: 12,
@@ -269,38 +274,52 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
     position: "relative",
-  },
-  plusIconContainer: {
-    position: "absolute",
-    top: 8,
-    right: 8,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 10,
+    zIndex: 1,
   },
   celebrityImage: {
     width: "100%",
     height: itemWidth * 1.2,
+    zIndex: 1,
   },
   celebrityInfo: {
     padding: 12,
   },
+  celebrityInfoName: {
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 12,
+  },
+
   celebrityName: {
     fontSize: 14,
     fontWeight: "600",
-    marginBottom: 8,
+    marginBottom: 6,
+    top: -85,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
   },
   scoreContainer: {
+    justifyContent: "center",
     flexDirection: "row",
-    alignItems: "baseline",
+    alignItems: "center",
+    overflow: "hidden",
+    width: 46,
+    height: 22,
+    borderWidth: 0.3,
+    borderColor: "grey",
+    backgroundColor: "rgba(37,37,37,0.27)",
+    borderRadius: 6,
+    top: -195,
+    left: 94,
+    zIndex: 10,
   },
   scoreText: {
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: 14,
+    fontWeight: "500",
     marginRight: 4,
+    flexDirection: "row",
+    alignItems: "center",
   },
   scoreLabel: {
     fontSize: 12,
@@ -313,3 +332,72 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+
+
+/*
+
+//wiki
+import React, { useEffect, useState } from "react";
+import { View, Text, Image, FlatList, StyleSheet } from "react-native";
+import { fetchCelebritiesFromWikidata } from "./data/wikidataFetcher";
+import { formatWikidataResult } from "@/mocks/celebrities";
+import { Celebrity } from "@/mocks/celebrity-test";
+
+export default function CelebrityListScreen() {
+  const [celebrities, setCelebrities] = useState<Celebrity[]>([]);
+
+  useEffect(() => {
+    const loadCelebrities = async () => {
+      const rawData = await fetchCelebritiesFromWikidata();
+      const formatted = formatWikidataResult(rawData);
+      setCelebrities(formatted);
+    };
+
+    loadCelebrities();
+  }, []);
+
+  const renderItem = ({ item }: { item: Celebrity }) => (
+      <View style={styles.card}>
+        <Image source={{ uri: item.image }} style={styles.image} />
+        <Text style={styles.name}>{item.name}</Text>
+        <Text style={styles.meta}>
+          {item.gender} - Beauty: {(item.beautyScore * 100).toFixed(0)}%
+        </Text>
+      </View>
+  );
+
+  return (
+      <FlatList
+          data={celebrities}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+          contentContainerStyle={styles.container}
+      />
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 16,
+  },
+  card: {
+    marginBottom: 16,
+    alignItems: "center",
+  },
+  image: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+  },
+  name: {
+    marginTop: 8,
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  meta: {
+    fontSize: 14,
+    color: "#666",
+  },
+});
+
+*/
