@@ -40,22 +40,6 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["bottom"]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {isPremium && (
-          <View style={[styles.premiumBanner, { backgroundColor: colors.primary }]}>
-            <Text style={[styles.premiumTitle, { color: colors.background }]}>
-              {t.common.premium}{" "}
-              <Text style={styles.premiumTitleAccent}>Subscription</Text>
-            </Text>
-            <Text style={[styles.premiumStatus, { color: colors.background }]}>Active</Text>
-            <TouchableOpacity 
-              style={styles.managePremiumButton}
-              onPress={() => alert("Subscription management would open here")}
-            >
-              <Text style={[styles.managePremiumText, { color: colors.background }]}>Manage Subscription</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-        
         {!isPremium && (
           <TouchableOpacity 
             style={[styles.getPremiumButton, { backgroundColor: colors.primary }]}
@@ -72,7 +56,7 @@ export default function SettingsScreen() {
         <View style={[styles.section, { backgroundColor: colors.card }]}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>
             {t.screens.settings.app_settings.split(' ')[0]}{" "}
-            <Text style={[styles.sectionTitleAccent, { color: colors.primary }]}>
+            <Text style={[styles.sectionTitleAccent, { color: colors.seventh }]}>
               {t.screens.settings.app_settings.split(' ')[1]}
             </Text>
           </Text>
@@ -85,8 +69,8 @@ export default function SettingsScreen() {
             <Switch
               value={notificationsEnabled}
               onValueChange={setNotificationsEnabled}
-              trackColor={{ false: colors.border, true: colors.primary }}
-              thumbColor={colors.background}
+              trackColor={{ false: colors.border, true: colors.seventh }}
+              thumbColor={colors.text}
             />
           </View>
           
@@ -98,8 +82,8 @@ export default function SettingsScreen() {
             <Switch
               value={saveHistory}
               onValueChange={setSaveHistory}
-              trackColor={{ false: colors.border, true: colors.primary }}
-              thumbColor={colors.background}
+              trackColor={{ false: colors.border, true: colors.seventh }}
+              thumbColor={colors.text}
             />
           </View>
           
@@ -122,7 +106,7 @@ export default function SettingsScreen() {
         <View style={[styles.section, { backgroundColor: colors.card }]}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>
             {t.screens.settings.about_support.split(' & ')[0]}{" "}
-            <Text style={[styles.sectionTitleAccent, { color: colors.primary }]}>
+            <Text style={[styles.sectionTitleAccent, { color: colors.seventh }]}>
               & {t.screens.settings.about_support.split(' & ')[1]}
             </Text>
           </Text>
@@ -146,7 +130,7 @@ export default function SettingsScreen() {
         <View style={[styles.section, { backgroundColor: colors.card }]}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>
             {t.screens.settings.debug_testing.split(' & ')[0]} &{" "}
-            <Text style={[styles.sectionTitleAccent, { color: colors.primary }]}>
+            <Text style={[styles.sectionTitleAccent, { color: colors.seventh }]}>
               {t.screens.settings.debug_testing.split(' & ')[1]}
             </Text>
           </Text>
@@ -155,7 +139,7 @@ export default function SettingsScreen() {
             style={[styles.debugItem, { borderBottomColor: colors.border }]}
             onPress={handleResetOnboarding}
           >
-            <RefreshCw size={20} color={colors.primary} />
+            <RefreshCw size={20} color={colors.seventh} />
             <Text style={[styles.debugLabel, { color: colors.text }]}>{t.screens.settings.reset_onboarding}</Text>
           </TouchableOpacity>
           
@@ -163,7 +147,7 @@ export default function SettingsScreen() {
             style={[styles.debugItem, { borderBottomColor: colors.border }]}
             onPress={() => handleGoToOnboardingStep(0, "/onboarding")}
           >
-            <Play size={20} color={colors.primary} />
+            <Play size={20} color={colors.seventh} />
             <Text style={[styles.debugLabel, { color: colors.text }]}>Welcome Screen</Text>
           </TouchableOpacity>
           
@@ -171,7 +155,7 @@ export default function SettingsScreen() {
             style={[styles.debugItem, { borderBottomColor: colors.border }]}
             onPress={() => handleGoToOnboardingStep(1, "/onboarding-features")}
           >
-            <Play size={20} color={colors.primary} />
+            <Play size={20} color={colors.seventh} />
             <Text style={[styles.debugLabel, { color: colors.text }]}>Features Screen</Text>
           </TouchableOpacity>
           
@@ -179,7 +163,7 @@ export default function SettingsScreen() {
             style={[styles.debugItem, { borderBottomColor: colors.border }]}
             onPress={() => handleGoToOnboardingStep(2, "/onboarding-more-features")}
           >
-            <Play size={20} color={colors.primary} />
+            <Play size={20} color={colors.seventh} />
             <Text style={[styles.debugLabel, { color: colors.text }]}>More Features Screen</Text>
           </TouchableOpacity>
           
@@ -187,7 +171,7 @@ export default function SettingsScreen() {
             style={[styles.debugItem, { borderBottomColor: colors.border }]}
             onPress={() => handleGoToOnboardingStep(3, "/onboarding-notifications")}
           >
-            <Play size={20} color={colors.primary} />
+            <Play size={20} color={colors.seventh} />
             <Text style={[styles.debugLabel, { color: colors.text }]}>Notifications Screen</Text>
           </TouchableOpacity>
           
@@ -195,15 +179,15 @@ export default function SettingsScreen() {
             style={[styles.debugItem, { borderBottomColor: colors.border }]}
             onPress={() => handleGoToOnboardingStep(4, "/onboarding-subscription")}
           >
-            <Play size={20} color={colors.primary} />
+            <Play size={20} color={colors.seventh} />
             <Text style={[styles.debugLabel, { color: colors.text }]}>Subscription Screen</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
-            style={[styles.demoButton, { backgroundColor: colors.primary + "20" }]}
+            style={[styles.demoButton, { backgroundColor: colors.shadow + "20" }]}
             onPress={() => setPremiumStatus(!isPremium)}
           >
-            <Text style={[styles.demoButtonText, { color: colors.primary }]}>
+            <Text style={[styles.demoButtonText, { color: colors.seventh }]}>
               {isPremium ? t.screens.settings.demo_disable_premium : t.screens.settings.demo_premium}
             </Text>
           </TouchableOpacity>
@@ -212,7 +196,7 @@ export default function SettingsScreen() {
         <View style={styles.footer}>
           <Text style={[styles.footerText, { color: colors.text }]}>
             League{" "}
-            <Text style={[styles.footerTextAccent, { color: colors.primary }]}>Checker</Text>
+            <Text style={[styles.footerTextAccent, { color: colors.seventh }]}>Checker</Text>
             {" "}{t.screens.settings.version}
           </Text>
           <Text style={[styles.disclaimer, { color: colors.textLight }]}>
